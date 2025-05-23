@@ -1,19 +1,37 @@
+import { Navbar } from '@heroui/react';
+import {
+  SignedOut,
+  SignedIn,
+  SignUpButton,
+  SignOutButton
+} from '@clerk/nextjs';
 
 export default function LandingPage() {
   return (
-     <div className="max-w-[90%] mx-auto p-28">
+    <div className="max-w-[90%] mx-auto p-28">
+      <Navbar className="mb-36 flex justify-end">
+        <SignedIn>
+          <SignOutButton />
+        </SignedIn>
+
+        <SignedOut>
+          <SignUpButton />
+        </SignedOut>
+      </Navbar>
       <section className="mb-16">
         <h1 className="text-4xl font-medium mb-10">
-          🧠 AlwaysSaved - Your Private, Searchable Knowledge Base for Videos
+          🧠 AlwaysSaved - Your Private, Searchable Knowledge Base for Your Info
         </h1>
         <p className="text-lg mb-4">
-          Most of your best ideas are locked inside video and audio files you’ll never rewatch.
+          Most of your best ideas are locked inside video, audio files, or other
+          media you&apos;ll never consume.
         </p>
 
         <p className="text-lg">
-          AlwaysSaved transforms long-form content - podcasts, Zoom calls, lectures, interviews,
-          YouTube videos, and more - into instantly searchable, AI-understandable knowledge. Upload
-          once, ask questions forever.
+          AlwaysSaved transforms long-form content - podcasts, Zoom calls,
+          lectures, interviews, YouTube videos, and more - into instantly
+          searchable, AI-understandable knowledge. Upload once, ask questions
+          forever.
         </p>
       </section>
 
@@ -21,17 +39,20 @@ export default function LandingPage() {
         <h2 className="text-3xl font-medium mb-4">⚡ Why AlwaysSaved?</h2>
 
         <p className="text-lg mb-4">
-          Because information should never be lost in a 90-minute podcast or a forgotten webinar.
+          Because information should never be lost in a 90-minute content file.
         </p>
-        <p className="text-lg">AlwaysSaved turns your media library into a second brain.</p>
+        <p className="text-lg">
+          AlwaysSaved turns your media library into a second brain.
+        </p>
       </section>
 
       <section className="mb-16">
         <h3 className="text-2xl font-medium mb-4">🔍 What It Does</h3>
 
         <p className="text-lg mb-4">
-          AlwaysSaved turns your personal video and audio files into smart, searchable documents
-          using advanced AI models — no manual note-taking, no rewatching.
+          AlwaysSaved turns your personal video and audio files into smart,
+          searchable documents using advanced AI models — no manual note-taking,
+          no rewatching.
         </p>
 
         <ul>
@@ -39,11 +60,12 @@ export default function LandingPage() {
             🧬 Transcribes speech to accurate, readable text using Whisper
           </li>
           <li className="text-lg mb-4">
-            🧷 Indexes everything in a vector database (Qdrant) for fast semantic search
+            🧷 Indexes everything in a vector database (Qdrant) for fast
+            semantic search
           </li>
           <li className="text-lg mb-4">
-            ❓ Answers natural language questions about your content using Retrieval-Augmented
-            Generation (RAG)
+            ❓ Answers natural language questions about your content using
+            Retrieval-Augmented Generation (RAG)
           </li>
         </ul>
       </section>
@@ -67,14 +89,15 @@ export default function LandingPage() {
           <li className="text-lg mb-4">
             <i>Private Semantic Search</i>
             <br />
-            Search your files like Google - but faster, smarter, and fully private.
+            Search your files like Google - but faster, smarter, and fully
+            private.
           </li>
 
           <li className="text-lg mb-4">
             <i>Ask Anything</i>
             <br />
-            &lsquo;What did the speaker say about market trends?&rsquo; - and get the exact answer,
-            sourced from your content.
+            &lsquo;What did the speaker say about market trends?&rsquo; - and
+            get the exact answer, sourced from your content.
           </li>
 
           <li className="text-lg mb-4">
