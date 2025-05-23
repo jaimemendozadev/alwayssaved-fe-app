@@ -1,3 +1,5 @@
+export * from './schemamodels/users'
+
 import mongoose from 'mongoose';
 
 interface MongooseGlobal {
