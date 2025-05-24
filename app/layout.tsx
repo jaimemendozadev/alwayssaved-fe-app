@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import { HeroUIProvider } from '@heroui/react';
+import { HeroUIProvider } from '@heroui/react'
+import { Toaster } from 'react-hot-toast';;
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -31,6 +32,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <Toaster />
           <HeroUIProvider>{children}</HeroUIProvider>
         </body>
       </html>
