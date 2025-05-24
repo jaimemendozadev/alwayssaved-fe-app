@@ -40,7 +40,7 @@ export const registerNewUser = async (): Promise<IUser | void> => {
 
     
   } catch (error) {
-    // TODO: Handle in Telemetry
+    // TODO: Handle in telemetry.
     console.log('Error in registerNewUser: ', error);
   }
 

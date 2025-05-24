@@ -10,7 +10,7 @@ const successMessage = "Yay! 🥳 You've been registered to AlwaysSaved. Welcome
 const errorMessage = "Whoops! 😱 Looks like there was a problem registering you to AlwaysSaved. 🤦🏽 Try again later.";
 const duration = { duration: 5000 };
 
-export default function Onboard(): ReactNode {
+export default function OnboardPage(): ReactNode {
 
   const router = useRouter();  
   const [onboardedUser, setOnboardedUser] = useState<IUser | null>(null)
@@ -25,8 +25,7 @@ export default function Onboard(): ReactNode {
             router.push('/home');
         }
 
-        toast.error(errorMessage, duration)
-
+        throw new Error(errorMessage);
 
     }
 
