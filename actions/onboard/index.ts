@@ -2,8 +2,10 @@
 import { dbConnect, IUser } from '@/utils/mongodb';
 import { UserModel } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
+import { LeanUser } from '@/utils/mongodb';
+import { getLeanUser, } from '@/utils/mongodb/utils';
 
-export const registerNewUser = async (): Promise<IUser | void> => {
+export const registerNewUser = async (): Promise<LeanUser | void> => {
   await dbConnect();
     const clerkUser = await currentUser();
 
@@ -35,6 +37,6 @@ export const registerNewUser = async (): Promise<IUser | void> => {
     console.log("newUser in onboardUser ", newUser);
     console.log("\n");
 
-    return newUser;
+    return getLeanUser(newUser);
 
 };

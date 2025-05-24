@@ -1,13 +1,15 @@
 'use client';
-import { IUser } from "@/utils/mongodb"
 import { useEffect, useState } from "react"
+import { LeanUser } from "@/utils/mongodb"
 import { getUserFromDB } from '@/actions';
 
 const errorMessage = "Looks like you might have never registered to AlwaysSaved. 😬 Try again later.";
 
 export default function HomePage() {
 
-    const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+    const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
+
+    console.log("currentUser ", currentUser);
 
     useEffect(() => {
         async function loadCurrentUser() {

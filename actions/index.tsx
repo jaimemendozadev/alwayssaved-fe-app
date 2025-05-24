@@ -1,9 +1,10 @@
 'use server';
-import { dbConnect, IUser } from '@/utils/mongodb';
-import { UserModel } from '@/utils/mongodb';
+import { dbConnect,} from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
+import { UserModel, LeanUser } from '@/utils/mongodb';
 
-export const getUserFromDB = async (): Promise<IUser | void> => {
+import { getLeanUser } from '@/utils/mongodb/utils';
+export const getUserFromDB = async (): Promise<LeanUser | void> => {
   await dbConnect();
     const clerkUser = await currentUser();
 
@@ -25,6 +26,6 @@ export const getUserFromDB = async (): Promise<IUser | void> => {
     console.log("foundUser in getUserFromDB ", foundUser);
     console.log("\n");
 
-    return foundUser;
+    return getLeanUser(foundUser);
 
 };
