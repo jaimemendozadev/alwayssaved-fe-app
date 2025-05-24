@@ -4,13 +4,12 @@ import { UserModel } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
 
 export const registerNewUser = async (): Promise<IUser | void> => {
-  try {
-    await dbConnect();
+  await dbConnect();
     const clerkUser = await currentUser();
 
     if(clerkUser === null) {
 
-        throw new Error("There was a problem registering the new user to the app.")
+        throw new Error("There was a problem registering the new user in Clerk. Can't continue the onboarding process.")
 
     }
 
@@ -38,11 +37,4 @@ export const registerNewUser = async (): Promise<IUser | void> => {
 
     return newUser;
 
-    
-  } catch (error) {
-    // TODO: Handle in telemetry.
-    console.log('Error in registerNewUser: ', error);
-  }
-
-  return undefined;
 };
