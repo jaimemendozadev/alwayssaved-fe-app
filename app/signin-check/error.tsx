@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 const duration = { duration: 5000 };
 const toastMessage = "Something went wrong. 🥺 You'll be redirected to the landing page in a few seconds."
-export default function OnboardErrorPage({
+export default function SignInCheckErrorPage({
   error,
 }: {
   error: Error & { digest?: string }
@@ -16,7 +16,7 @@ export default function OnboardErrorPage({
   useEffect(() => {
     toast.error(toastMessage, duration);
     // TODO: Handle in telemetry.
-    console.log("Error in OnboardPage: ", error);
+    console.log("Error in SignInCheckPage: ", error);
 
     setTimeout(() => {
       router.push('/');
