@@ -6,9 +6,13 @@ export interface IUser {
   last_name: string;
   email: string;
   sign_up_date: Date;
-  cancel_date: Date;
+  cancel_date: Date | null;
   avatar_url?: string | null;
 }
+
+export type LeanUser = Omit<IUser, '_id'> & {
+  _id: string;
+};
 
 
 const { Schema, model } = mongoose;
@@ -18,7 +22,7 @@ const UserSchema = new Schema<IUser>({
   last_name: { type: String, required: true },
   email: { type: String, required: true, unique: true }, // Enforce email uniqueness
   sign_up_date: { type: Date, default: Date.now },
-  cancel_date: { type: Date },
+  cancel_date: { type: Date, default: null },
   avatar_url: { type: String, default: null },
 });
 
