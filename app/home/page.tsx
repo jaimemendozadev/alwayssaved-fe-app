@@ -27,15 +27,13 @@ export default function HomePage() {
         loadCurrentUser();
 
     }, [])
-    return (<div>
-        <div className="w-5/6 bg-[#f9f9f9] min-h-screen">
+    return (<div className="flex">
+        <div className="w-[15%] bg-[#f9f9f9] min-h-screen">
 
         </div>
 
-        <main className="w-5/6 p-3">
-
+        <main className="p-6">
+          <h1>🏡 Home Page</h1>
         </main>
-
-        <h1>HomePage</h1>
     </div>)
 }
