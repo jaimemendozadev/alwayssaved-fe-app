@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-export * from './users';
 
 /***************************** 
  * Types & Interfaces
