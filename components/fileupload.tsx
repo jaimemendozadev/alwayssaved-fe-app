@@ -64,9 +64,16 @@ export default function FileUpload({
   };
 
   return (
-    <div className="w-[900px] mx-auto">
+    <div className="w-[900px]">
+
+      <article className="mb-16">
+        <p className="text-xl"><span className="font-bold">Media Upload Instructions</span>:</p>
+        <p className="text-lg">Create a new Note by giving your note a new name AND adding video files to your note for transcribing.</p>
+        <p className="text-lg">While you wait for the videos to upload and transcribe, go do something else. We&apos;ll let you know when it&apos;s done.</p>
+      </article>
+
       <form className="mb-8 border-2 p-4">
-        <label htmlFor="noteName" className="text-lg"><span className="font-bold">Note Name</span>:<br />
+        <label htmlFor="noteName" className="text-lg"><span className="font-bold">Your New Note Name</span>:<br />
         <input
           className="w-[100%]"
           onBlur={handleChange}
