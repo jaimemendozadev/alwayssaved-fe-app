@@ -5,7 +5,7 @@ import { INote } from './notes';
 import { LeanUser } from './users';
 import { LeanNote } from './notes';
 
-interface IFile {
+export interface IFile {
     _id: mongoose.Types.ObjectId;
     user_id: mongoose.Types.ObjectId | IUser;
     note_id: mongoose.Types.ObjectId | INote;
