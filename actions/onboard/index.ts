@@ -1,42 +1,39 @@
 'use server';
-import { dbConnect, IUser } from '@/utils/mongodb';
+import { dbConnect } from '@/utils/mongodb';
 import { UserModel } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
 import { LeanUser } from '@/utils/mongodb';
-import { getLeanUser, } from '@/utils/mongodb/utils';
+import { getLeanUser } from '@/utils/mongodb/utils';
 
 export const registerNewUser = async (): Promise<LeanUser | void> => {
   await dbConnect();
-    const clerkUser = await currentUser();
+  const clerkUser = await currentUser();
 
-    if(clerkUser === null) {
+  if (clerkUser === null) {
+    throw new Error(
+      "There was a problem registering the new user in Clerk. Can't continue the onboarding process."
+    );
+  }
 
-        throw new Error("There was a problem registering the new user in Clerk. Can't continue the onboarding process.")
+  const first_name = clerkUser?.firstName || '';
 
-    }
+  const last_name = clerkUser?.lastName || '';
 
-    const first_name = clerkUser?.firstName || '';
+  const email = clerkUser.emailAddresses[0].emailAddress;
 
-    const last_name = clerkUser?.lastName || '';
+  const avatar_url = clerkUser?.imageUrl || null;
 
-    const email = clerkUser.emailAddresses[0].emailAddress;
+  const payload = {
+    first_name,
+    last_name,
+    email,
+    avatar_url
+  };
 
-    const avatar_url = clerkUser?.imageUrl || null;
+  const [newUser] = await UserModel.create([payload], { j: true });
 
-    const payload = {
-        first_name,
-        last_name,
-        email,
-        avatar_url
-    };
+  console.log('newUser in onboardUser ', newUser);
+  console.log('\n');
 
-
-
-    const [newUser] = await UserModel.create([payload], {j: true});
-
-    console.log("newUser in onboardUser ", newUser);
-    console.log("\n");
-
-    return getLeanUser(newUser);
-
+  return getLeanUser(newUser);
 };
