@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
-import { getUserFromDB, s3FileUpload } from '@/actions';
+import { getUserFromDB } from '@/actions';
 
 import FileUpload from '@/components/fileupload';
 
