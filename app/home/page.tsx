@@ -4,6 +4,8 @@ import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
 import { getUserFromDB, s3FileUpload } from '@/actions';
 
+import FileUpload from '@/components/fileupload';
+
 const errorMessage =
   'Looks like you might have never registered to AlwaysSaved. 😬 Try again later.';
 
@@ -32,22 +34,7 @@ export default function HomePage() {
 
       <main className="p-6">
         <h1>🏡 Home Page</h1>
-        <Dropzone onDrop={(acceptedFiles) => {
-
-          console.log("acceptedFiles ", acceptedFiles);
-          console.log("\n");
-
-          // s3FileUpload()
-        }}>
-          {({ getRootProps, getInputProps }) => (
-            <section className="border-4 border-dashed p-10">
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                <p>Drag and drop some files here, or click to select files</p>
-              </div>
-            </section>
-          )}
-        </Dropzone>
+        <FileUpload currentUser={currentUser} />
       </main>
     </div>
   );
