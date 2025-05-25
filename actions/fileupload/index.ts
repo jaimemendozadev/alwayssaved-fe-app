@@ -4,7 +4,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { UserModel, LeanUser } from '@/utils/mongodb';
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
 
-import { getLeanUser } from '@/utils/mongodb/utils';
+import { deepLean } from '@/utils/mongodb/utils';
 
 
 interface s3FileUploadArguments {

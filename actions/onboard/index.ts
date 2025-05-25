@@ -3,7 +3,7 @@ import { dbConnect } from '@/utils/mongodb';
 import { UserModel } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
 import { LeanUser } from '@/utils/mongodb';
-import { getLeanUser } from '@/utils/mongodb/utils';
+import { deepLean } from '@/utils/mongodb/utils';
 
 export const registerNewUser = async (): Promise<LeanUser | void> => {
   await dbConnect();
@@ -35,5 +35,5 @@ export const registerNewUser = async (): Promise<LeanUser | void> => {
   console.log('newUser in onboardUser ', newUser);
   console.log('\n');
 
-  return getLeanUser(newUser);
+  return deepLean(newUser);
 };

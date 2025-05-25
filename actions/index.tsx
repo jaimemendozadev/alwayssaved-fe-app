@@ -2,8 +2,7 @@
 import { dbConnect,} from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
 import { UserModel, LeanUser } from '@/utils/mongodb';
-
-import { getLeanUser } from '@/utils/mongodb/utils';
+import { deepLean } from '@/utils/mongodb/utils';
 export const getUserFromDB = async (): Promise<LeanUser | void> => {
   await dbConnect();
     const clerkUser = await currentUser();
@@ -26,7 +25,7 @@ export const getUserFromDB = async (): Promise<LeanUser | void> => {
     console.log("foundUser in getUserFromDB ", foundUser);
     console.log("\n");
 
-    return getLeanUser(foundUser);
+    return deepLean(foundUser);
 
 };
 
