@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IUser } from './users';
+import { IUser, LeanUser } from './users';
 
 export interface INote {
   _id: mongoose.Types.ObjectId;
@@ -14,7 +14,7 @@ export interface INote {
 
 export type LeanNote = Omit<INote, '_id' | 'user_id'> & {
     _id: string;
-    user_id: string;
+    user_id: string | LeanUser;
 }
 
 const {Schema, model} = mongoose;
