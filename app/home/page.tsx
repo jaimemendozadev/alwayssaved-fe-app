@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
-import { getUserFromDB } from '@/actions';
+import { getUserFromDB, s3FileUpload } from '@/actions';
 
 const errorMessage =
   'Looks like you might have never registered to AlwaysSaved. 😬 Try again later.';
@@ -32,7 +32,13 @@ export default function HomePage() {
 
       <main className="p-6">
         <h1>🏡 Home Page</h1>
-        <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
+        <Dropzone onDrop={(acceptedFiles) => {
+
+          console.log("acceptedFiles ", acceptedFiles);
+          console.log("\n");
+
+          // s3FileUpload()
+        }}>
           {({ getRootProps, getInputProps }) => (
             <section className="border-4 border-dashed p-10">
               <div {...getRootProps()}>
@@ -46,3 +52,17 @@ export default function HomePage() {
     </div>
   );
 }
+
+
+/*
+  File Upload Flow:
+
+  When a user drops or selects X number of files:
+
+    [ ]: Create a single MongoDB Note document.
+    [ ]: Create a MongoDB File document for each dropped-in/uploaded file.
+    [ ]: Upload each selected file with FileID and NoteID to s3.
+    [ ]: Trigger Toast Message indicating upload result:
+      - For now, do not redirect the user to another page.
+
+*/
