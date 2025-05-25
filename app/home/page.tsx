@@ -32,7 +32,7 @@ export default function HomePage() {
       <div className="w-[15%] bg-[#f9f9f9] min-h-screen"></div>
 
       <main className="p-6">
-        <h1>🏡 Home Page</h1>
+        <h1 className="text-3xl lg:text-6xl mb-8">🏡 Home Page</h1>
         <FileUpload currentUser={currentUser} />
       </main>
     </div>
