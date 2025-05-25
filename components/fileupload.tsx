@@ -64,16 +64,18 @@ export default function FileUpload({
   };
 
   return (
-    <div>
-      <form className="mb-4">
-        <label htmlFor="noteName">Note Name:</label>
+    <div className="w-[900px] mx-auto">
+      <form className="mb-8 border-2 p-4">
+        <label htmlFor="noteName" className="text-lg"><span className="font-bold">Note Name</span>:<br />
         <input
+          className="w-[100%]"
           onBlur={handleChange}
           onFocus={handleChange}
           onChange={handleChange}
           id="noteName"
           value={noteName}
         />
+        </label>
       </form>
 
       <Dropzone
