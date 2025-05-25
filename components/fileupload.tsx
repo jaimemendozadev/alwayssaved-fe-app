@@ -7,15 +7,13 @@ import { s3FileUpload } from '@/actions/upload';
 import { NoteModel } from '@/utils/mongodb/schemamodels/notes';
 import { LeanUser } from '@/utils/mongodb';
 import { getObjectIDFromString } from '@/utils/mongodb/utils';
+import { InputEvent } from '@/utils/ts';
 
 interface FileUploadProps {
   currentUser: LeanUser | null;
 }
 
-const defaultDate = dayjs().format('MMMM D, YYYY');
-const defaultNoteName = `Untitled Note - ${defaultDate}`;
-
-console.log("defaultDate ", defaultDate);
+const defaultNoteName = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
 export default function FileUpload({
   currentUser
@@ -26,7 +24,7 @@ export default function FileUpload({
 
   if (!currentUser) return null;
 
-  const handleChange = (evt) => {
+  const handleChange = (evt: InputEvent) => {
     console.log('evt in handleChange ', evt);
 
     if (evt?.type === 'focus') {
@@ -57,7 +55,7 @@ export default function FileUpload({
 
     const notePayload = {
       user_id: userID,
-      title: ''
+      title: noteName
     };
 
     const [newNote] = await NoteModel.create([notePayload], { j: true });
@@ -68,8 +66,9 @@ export default function FileUpload({
 
       <article className="mb-16">
         <p className="text-xl"><span className="font-bold">Media Upload Instructions</span>:</p>
-        <p className="text-lg">Create a new Note by giving your note a new name AND adding video files to your note for transcribing.</p>
-        <p className="text-lg">While you wait for the videos to upload and transcribe, go do something else. We&apos;ll let you know when it&apos;s done.</p>
+        <p className="text-lg">Create a new Note by giving your note a new name AND adding media files to your note for transcribing.</p>
+        <p className="text-lg">Wait until all the media files are uploaded to the cloud for transcribing. Then you can create a new Note with new media files.</p>
+        <p className="text-lg">While you wait for the media files to be transcribed, go do something else. We&apos;ll let you know when it&apos;s done.</p>
       </article>
 
       <form className="mb-8 border-2 p-4">
