@@ -2,7 +2,11 @@
 import { useState, ReactNode } from 'react';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
-import { createNoteFileDocs, createPresignedUrl } from '@/actions/fileupload';
+import {
+  createNoteFileDocs,
+  createPresignedUrl,
+  handleFileDocUpdate
+} from '@/actions/fileupload';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
 
@@ -100,7 +104,7 @@ export default function FileUpload({
 
         return {
           file_id,
-          s3_key
+          update: { s3_key }
         };
       })
     );
@@ -110,23 +114,17 @@ export default function FileUpload({
       (result) => result.status === 'fulfilled'
     );
 
-    /*
+    const finalizedUploadResults = filteredUploadResults.map(
+      (result) => result.value
+    );
 
-      interface s3FilePayload {
-        s3_key: string;
-        file_id: string;
-        file_name: string;
-        presigned_url: string;
-      }
+    // 4) Update each File document with their s3_key.
 
+    const fileUpdateResults = await handleFileDocUpdate({
+      fileUpdates: finalizedUploadResults
+    });
 
-      await fetch(presignedUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': type },
-        body: file
-      });
-
-    */
+    console.log('fileUpdateResults ', fileUpdateResults);
   };
 
   return (

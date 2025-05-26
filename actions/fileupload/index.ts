@@ -10,6 +10,50 @@ import {
 } from '@/utils/mongodb';
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
 
+interface UpdateStatus {
+  file_id: string;
+  update_status: string;
+}
+
+interface fileUpdate {
+  file_id: string;
+  update: { s3_key: string };
+}
+interface handleFileDocUpdateArguments {
+  fileUpdates: fileUpdate[];
+}
+
+export const handleFileDocUpdate = async ({
+  fileUpdates
+}: handleFileDocUpdateArguments): Promise<UpdateStatus[]> => {
+  const updateResults = await Promise.allSettled(
+    fileUpdates.map(async (updateInfo) => {
+      const { file_id, update } = updateInfo;
+
+      const targetID = getObjectIDFromString(file_id);
+
+      const updatedFile = await FileModel.findByIdAndUpdate(targetID, update, {
+        new: true
+      }).exec();
+
+      console.log('updatedFile ', updatedFile);
+
+      return {
+        file_id,
+        update_status: 'success'
+      };
+    })
+  );
+
+  const filteredResults = updateResults.filter(
+    (result) => result.status === 'fulfilled'
+  );
+
+  const finalizedResults = filteredResults.map((result) => result.value);
+
+  return finalizedResults;
+};
+
 interface createPresignedUrlArguments {
   fileDocuments: LeanFile[];
 }
