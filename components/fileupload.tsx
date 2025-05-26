@@ -1,5 +1,6 @@
 'use client';
 import { useState, ReactNode } from 'react';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
 import {
@@ -15,6 +16,7 @@ interface FileUploadProps {
 }
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
+const feedbackDuration = {duration: 3000};
 
 export default function FileUpload({
   currentUser
@@ -52,8 +54,10 @@ export default function FileUpload({
     console.log('acceptedFiles ', acceptedFiles);
     console.log('\n');
 
+    let currentFiles = [...acceptedFiles];
+
     // 1) Create a Note Doc and all File Docs associated with that Note.
-    const filePayloads = acceptedFiles.map((file) => ({
+    const filePayloads = currentFiles.map((file) => ({
       name: file.name,
       type: file.type
     }));
@@ -68,21 +72,36 @@ export default function FileUpload({
       noteTitle
     });
 
-    // TODO: Handle case where fileDBResults.length doesn't equal filePaylods.length
+     const { newNote, fileDBResults } = noteFileResult;
+
+     console.log('noteFileResult ', noteFileResult);
+
+     if(fileDBResults.length === 0) {
+        toast.error("There was a problem saving your files in the database. Try again later.", feedbackDuration);
+        // TODO: Need to delete created Note document if successful;
+        return;
+     }
+
+     if(fileDBResults.length !== currentFiles.length) {
+       const createdFiles = fileDBResults.map(leanFile => leanFile.file_name);
+
+       const filteredFiles = currentFiles.filter(file => createdFiles.includes(file.name));
+
+       currentFiles = filteredFiles;
+
+       toast.error("It appears one of your files couldn't be saved. Try saving it again to the same note later.", feedbackDuration);
+
+     }
+
 
     // 2) Create the presignUrls for each File document.
-
-    const { newNote, fileDBResults } = noteFileResult;
-
-    console.log('noteFileResult ', noteFileResult);
-
-    // TODO: Handle case where s3PayloadResults.length doesn't equal fileDBResults.length
-
     const s3PayloadResults = await createPresignedUrl({
       fileDocuments: fileDBResults
     });
 
     console.log('s3PayloadResults ', s3PayloadResults);
+
+    // TODO: Handle case where s3PayloadResults.length doesn't equal fileDBResults.length
 
     // 3) Upload each media file to s3.
     const uploadResults = await Promise.allSettled(
