@@ -11,10 +11,10 @@ export interface IFile {
     user_id: mongoose.Types.ObjectId | IUser;
     note_id: mongoose.Types.ObjectId | INote;
     s3_key: string | null;
-    file_name: string | null;
-    file_type: string | null;
+    file_name: string;
+    file_type: string;
     date_uploaded: Date;
-    embedding_status: string;
+    embedding_status: string; // "pending" | "complete" | "failed"
 }
 
 
@@ -34,8 +34,8 @@ const FileSchema = new Schema<IFile>({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   note_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Note' },
   s3_key: {type: String, default: null},
-  file_name: {type: String, default: `Untitled File - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`},
-  file_type: {type: String, default: null},
+  file_name: {type: String, required: true, default: `Untitled File - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`},
+  file_type: {type: String, required: true,},
   date_uploaded: {type: Date, default: Date.now},
   embedding_status: {type: String, default: 'pending'},
 });
