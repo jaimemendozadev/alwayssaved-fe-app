@@ -48,6 +48,7 @@ export default function FileUpload({
     console.log('acceptedFiles ', acceptedFiles);
     console.log('\n');
 
+    // 1) Create a Note Doc and all File Docs associated with that Note.
     const filePayloads = acceptedFiles.map((file) => ({
       name: file.name,
       type: file.type
@@ -65,15 +66,67 @@ export default function FileUpload({
 
     // TODO: Handle case where fileDBResults.length doesn't equal filePaylods.length
 
-    const {newNote, fileDBResults} = noteFileResult;
+    // 2) Create the presignUrls for each File document.
+
+    const { newNote, fileDBResults } = noteFileResult;
 
     console.log('noteFileResult ', noteFileResult);
 
     // TODO: Handle case where s3PayloadResults.length doesn't equal fileDBResults.length
 
-    const s3PayloadResults = await createPresignedUrl({fileDocuments: fileDBResults});
+    const s3PayloadResults = await createPresignedUrl({
+      fileDocuments: fileDBResults
+    });
 
-    console.log("s3PayloadResults ", s3PayloadResults);
+    console.log('s3PayloadResults ', s3PayloadResults);
+
+    // 3) Upload each media file to s3.
+    const uploadResults = await Promise.allSettled(
+      acceptedFiles.map(async (file) => {
+        const targetName = file.name;
+        const targetType = file.type;
+
+        const [targetPayload] = s3PayloadResults.filter(
+          (s3Payload) => s3Payload.file_name === targetName
+        );
+
+        const { presigned_url, file_id, s3_key } = targetPayload;
+
+        await fetch(presigned_url, {
+          method: 'PUT',
+          headers: { 'Content-Type': targetType },
+          body: file
+        });
+
+        return {
+          file_id,
+          s3_key
+        };
+      })
+    );
+
+    // TODO: Handle case where filteredUploadResults.length doesn't equal uploadResults.length
+    const filteredUploadResults = uploadResults.filter(
+      (result) => result.status === 'fulfilled'
+    );
+
+    /*
+
+      interface s3FilePayload {
+        s3_key: string;
+        file_id: string;
+        file_name: string;
+        presigned_url: string;
+      }
+
+
+      await fetch(presignedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': type },
+        body: file
+      });
+
+    */
   };
 
   return (

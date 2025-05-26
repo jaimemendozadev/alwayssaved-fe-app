@@ -16,6 +16,7 @@ interface createPresignedUrlArguments {
 interface s3FilePayload {
   s3_key: string;
   file_id: string;
+  file_name: string;
   presigned_url: string;
 }
 
@@ -34,6 +35,7 @@ export const createPresignedUrl = async ({
       return {
         s3_key,
         file_id: _id,
+        file_name,
         presigned_url: presignedURL
       };
     })
