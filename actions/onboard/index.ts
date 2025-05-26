@@ -1,9 +1,6 @@
 'use server';
-import { dbConnect } from '@/utils/mongodb';
-import { UserModel } from '@/utils/mongodb';
+import { dbConnect, UserModel, LeanUser, deepLean } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
-import { LeanUser } from '@/utils/mongodb';
-import { deepLean } from '@/utils/mongodb/utils';
 
 export const registerNewUser = async (): Promise<LeanUser | void> => {
   await dbConnect();

@@ -1,6 +1,7 @@
 export * from './schemamodels/users';
 export * from './schemamodels/files';
 export * from './schemamodels/notes';
+export * from './utils'
 
 import mongoose from 'mongoose';
 
