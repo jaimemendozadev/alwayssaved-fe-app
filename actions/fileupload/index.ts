@@ -98,13 +98,13 @@ export const createPresignedUrl = async ({
 interface createNoteFileDocsArguments {
   filePayloads: { [key: string]: any }[];
   currentUserID: string;
-  noteName: string;
+  noteTitle: string;
 }
 
 export const createNoteFileDocs = async ({
   filePayloads,
   currentUserID,
-  noteName
+  noteTitle
 }: createNoteFileDocsArguments): Promise<{
   newNote: LeanNote[];
   fileDBResults: LeanFile[];
@@ -116,7 +116,7 @@ export const createNoteFileDocs = async ({
 
   const notePayload = {
     user_id: userMongoID,
-    title: noteName
+    title: noteTitle
   };
 
   const [newNote] = await NoteModel.create([notePayload], { j: true });

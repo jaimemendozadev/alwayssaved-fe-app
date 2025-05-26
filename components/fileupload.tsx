@@ -14,14 +14,14 @@ interface FileUploadProps {
   currentUser: LeanUser | null;
 }
 
-const defaultNoteName = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
+const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
 export default function FileUpload({
   currentUser
 }: FileUploadProps): ReactNode {
   console.log('currentUser in FileUpload: ', currentUser);
 
-  const [noteName, setNoteName] = useState(defaultNoteName);
+  const [noteTitle, setNoteTitle] = useState(defaultNoteTitle);
 
   if (!currentUser) return null;
 
@@ -29,21 +29,21 @@ export default function FileUpload({
     console.log('evt in handleChange ', evt);
 
     if (evt?.type === 'focus') {
-      if (noteName === defaultNoteName) {
-        setNoteName('');
+      if (noteTitle === defaultNoteTitle) {
+        setNoteTitle('');
         return;
       }
     }
 
     if (evt?.type === 'blur') {
-      if (noteName.length === 0) {
-        setNoteName(defaultNoteName);
+      if (noteTitle.length === 0) {
+        setNoteTitle(defaultNoteTitle);
         return;
       }
     }
 
     if (evt?.type === 'change') {
-      setNoteName(evt.target.value);
+      setNoteTitle(evt.target.value);
       return;
     }
   };
@@ -65,7 +65,7 @@ export default function FileUpload({
     const noteFileResult = await createNoteFileDocs({
       filePayloads,
       currentUserID,
-      noteName
+      noteTitle
     });
 
     // TODO: Handle case where fileDBResults.length doesn't equal filePaylods.length
@@ -148,15 +148,15 @@ export default function FileUpload({
       </article>
 
       <form className="mb-8 border-2 p-4">
-        <label htmlFor="noteName" className="text-lg">
+        <label htmlFor="noteTitle" className="text-lg">
           <span className="font-bold">Your New Note Name</span>:<br />
           <input
             className="w-[100%]"
             onBlur={handleChange}
             onFocus={handleChange}
             onChange={handleChange}
-            id="noteName"
-            value={noteName}
+            id="noteTitle"
+            value={noteTitle}
           />
         </label>
       </form>
