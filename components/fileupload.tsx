@@ -2,11 +2,8 @@
 import { useState, ReactNode } from 'react';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
-import { getUserFromDB } from '@/actions';
-import { s3FileUpload } from '@/actions/upload';
-import { NoteModel } from '@/utils/mongodb/schemamodels/notes';
+import { handleOnDrop } from '@/actions/fileupload';
 import { LeanUser } from '@/utils/mongodb';
-import { getObjectIDFromString } from '@/utils/mongodb/utils';
 import { InputEvent } from '@/utils/ts';
 
 interface FileUploadProps {
@@ -47,40 +44,37 @@ export default function FileUpload({
     }
   };
 
-  const handleOnDrop = async <T extends File>(
-    acceptedFiles: T[]
-  ): Promise<void> => {
-    // 1) Create a single MongoDB Note document.
-    const userID = getObjectIDFromString(currentUser._id);
-
-    const notePayload = {
-      user_id: userID,
-      title: noteName
-    };
-
-    const [newNote] = await NoteModel.create([notePayload], { j: true });
-  };
-
   return (
     <div className="w-[900px]">
-
       <article className="mb-16">
-        <p className="text-xl"><span className="font-bold">Media Upload Instructions</span>:</p>
-        <p className="text-lg">Create a new Note by giving your note a new name AND adding media files to your note for transcribing.</p>
-        <p className="text-lg">Wait until all the media files are uploaded to the cloud for transcribing. Then you can create a new Note with new media files.</p>
-        <p className="text-lg">While you wait for the media files to be transcribed, go do something else. We&apos;ll let you know when it&apos;s done.</p>
+        <p className="text-xl">
+          <span className="font-bold">Media Upload Instructions</span>:
+        </p>
+        <p className="text-lg">
+          Create a new Note by giving your note a new name AND adding media
+          files to your note for transcribing.
+        </p>
+        <p className="text-lg">
+          Wait until all the media files are uploaded to the cloud for
+          transcribing. Then you can create a new Note with new media files.
+        </p>
+        <p className="text-lg">
+          While you wait for the media files to be transcribed, go do something
+          else. We&apos;ll let you know when it&apos;s done.
+        </p>
       </article>
 
       <form className="mb-8 border-2 p-4">
-        <label htmlFor="noteName" className="text-lg"><span className="font-bold">Your New Note Name</span>:<br />
-        <input
-          className="w-[100%]"
-          onBlur={handleChange}
-          onFocus={handleChange}
-          onChange={handleChange}
-          id="noteName"
-          value={noteName}
-        />
+        <label htmlFor="noteName" className="text-lg">
+          <span className="font-bold">Your New Note Name</span>:<br />
+          <input
+            className="w-[100%]"
+            onBlur={handleChange}
+            onFocus={handleChange}
+            onChange={handleChange}
+            id="noteName"
+            value={noteName}
+          />
         </label>
       </form>
 
@@ -88,6 +82,8 @@ export default function FileUpload({
         onDrop={(acceptedFiles) => {
           console.log('acceptedFiles ', acceptedFiles);
           console.log('\n');
+
+          handleOnDrop(acceptedFiles);
 
           // s3FileUpload()
         }}
