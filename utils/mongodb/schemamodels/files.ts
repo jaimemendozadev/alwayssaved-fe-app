@@ -9,9 +9,9 @@ export interface IFile {
     _id: mongoose.Types.ObjectId;
     user_id: mongoose.Types.ObjectId | IUser;
     note_id: mongoose.Types.ObjectId | INote;
-    s3_key: string;
-    file_name: string;
-    file_type: string;
+    s3_key: string | null;
+    file_name: string | null;
+    file_type: string | null;
     date_uploaded: Date;
     embedding_status: string;
 }
@@ -30,9 +30,9 @@ const {Schema, model} = mongoose;
 const FileSchema = new Schema<IFile>({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   note_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Note' },
-  s3_key: {type: String, required: true},
-  file_name: {type: String, required: true},
-  file_type: {type: String, required: true},
+  s3_key: {type: String, default: null},
+  file_name: {type: String, default: null},
+  file_type: {type: String, default: null},
   date_uploaded: {type: Date, default: Date.now},
   embedding_status: {type: String, default: 'pending'},
 });
