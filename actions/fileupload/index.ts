@@ -1,9 +1,7 @@
 'use server';
-import { dbConnect } from '@/utils/mongodb';
-import { currentUser } from '@clerk/nextjs/server';
-import { UserModel, LeanUser, NoteModel } from '@/utils/mongodb';
+import { dbConnect, INote, LeanFile, LeanNote } from '@/utils/mongodb';
+import { LeanUser, NoteModel, FileModel, deepLean, getObjectIDFromString } from '@/utils/mongodb';
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
-import { deepLean, getObjectIDFromString } from '@/utils/mongodb/utils';
 
 interface s3FileUploadArguments {
   payload: {
@@ -38,6 +36,65 @@ export async function s3FileUpload({ payload }: s3FileUploadArguments) {
   }
 }
 
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+interface createNoteFileDocsProps {
+  filePayloads: {[key: string]: any}[];  
+  currentUser: LeanUser;
+  noteName: string;
+}
+
+export const createNoteFileDocs = async ({filePayloads, currentUser, noteName}: createNoteFileDocsProps
+
+): Promise<{newNote: LeanNote[], fileDBResults: LeanFile[]}> => {
+
+  await dbConnect();
+
+  // 1) Create a single MongoDB Note document.
+  const userStringID = currentUser._id;
+  const userMongoID = getObjectIDFromString(userStringID);
+
+  const notePayload = {
+    user_id: userMongoID,
+    title: noteName
+  };
+
+  const [newNote] = await NoteModel.create([notePayload], { j: true });
+
+  console.log("newNote ", newNote);
+  console.log("\n");
+
+  const noteMongoID = newNote._id;
+
+
+  // 2) Create File documents for each filePayload.
+  const fileDBResults = await Promise.allSettled(
+    filePayloads.map((file) => {
+      const filePayload = {
+        user_id: userMongoID,
+        note_id: noteMongoID,
+        file_name: file.name,
+        file_type: file.type
+      };
+
+      return FileModel.create([filePayload], { j: true });
+    })
+  );
+
+  console.log('fileDBResults ', fileDBResults);
+
+  const sanitizedNote = deepLean(newNote);
+
+  const sanitizedResults = fileDBResults.filter(result => result.status === 'fulfilled')
+
+  const finalizedResults = sanitizedResults.map(result => deepLean(result.value));
+
+  return {
+    newNote: [sanitizedNote],
+    fileDBResults: finalizedResults
+  }
+};
+
 /********************************************
  * Notes
  ********************************************
@@ -69,59 +126,3 @@ export async function s3FileUpload({ payload }: s3FileUploadArguments) {
   }   
 
 */
-
-export const handleOnDrop = async <T extends File>(
-  acceptedFiles: T[],
-  currentUser: LeanUser
-): Promise<void> => {
-  // 1) Create a single MongoDB Note document.
-  const userStringID = currentUser._id;
-  const userMongoID = getObjectIDFromString(userStringID);
-
-  const notePayload = {
-    user_id: userMongoID,
-    title: noteName
-  };
-
-  const [newNote] = await NoteModel.create([notePayload], { j: true });
-
-  const noteMongoID = newNote._id;
-  const noteStringID = newNote._id.toHexString();
-
-  /*
-      [ ]: Create a MongoDB File document for each dropped-in/uploaded file.
-
-      export interface IFile {
-          _id: mongoose.Types.ObjectId;
-          user_id: mongoose.Types.ObjectId | IUser;
-          note_id: mongoose.Types.ObjectId | INote;
-          s3_key: string;
-          file_name: string;
-          file_type: string;
-          date_uploaded: Date;
-          embedding_status: string;
-      }
-
-
-    */
-
-  /*
-      Proposed s3 Key: 
-      /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension}   
-    */
-
-  const fileDBResults = await Promise.allSettled(
-    acceptedFiles.map((file) => {
-      const filePayload = {
-        user_id: userMongoID,
-        note_id: noteMongoID,
-        file_name: file.name,
-        file_type: file.type
-      };
-
-      return FileModel.create([filePayload], { j: true });
-    })
-  );
-
-  console.log('fileDBResults ', fileDBResults);
-};

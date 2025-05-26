@@ -2,7 +2,7 @@
 import { useState, ReactNode } from 'react';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
-import { handleOnDrop } from '@/actions/fileupload';
+import { createNoteFileDocs } from '@/actions/fileupload';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
 
@@ -44,6 +44,22 @@ export default function FileUpload({
     }
   };
 
+  const handleUpload = async<T extends File> (acceptedFiles: T[]) => {
+    console.log('acceptedFiles ', acceptedFiles);
+          console.log('\n');
+
+          const filePayloads = acceptedFiles.map((file) => ({
+            name: file.name,
+            type: file.type,
+          }));
+
+          console.log("filePayloads ", filePayloads)
+
+          const noteFileResult = await createNoteFileDocs({filePayloads, currentUser, noteName});
+
+          console.log('noteFileResult ', noteFileResult);
+  }
+
   return (
     <div className="w-[900px]">
       <article className="mb-16">
@@ -79,14 +95,7 @@ export default function FileUpload({
       </form>
 
       <Dropzone
-        onDrop={(acceptedFiles) => {
-          console.log('acceptedFiles ', acceptedFiles);
-          console.log('\n');
-
-          handleOnDrop(acceptedFiles);
-
-          // s3FileUpload()
-        }}
+        onDrop={acceptedFiles => handleUpload(acceptedFiles)}
       >
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
