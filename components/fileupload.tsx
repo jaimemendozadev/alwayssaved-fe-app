@@ -2,7 +2,7 @@
 import { useState, ReactNode } from 'react';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
-import { createNoteFileDocs } from '@/actions/fileupload';
+import { createNoteFileDocs, createPresignedUrl } from '@/actions/fileupload';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
 
@@ -55,13 +55,25 @@ export default function FileUpload({
 
     console.log('filePayloads ', filePayloads);
 
+    const currentUserID = currentUser._id;
+
     const noteFileResult = await createNoteFileDocs({
       filePayloads,
-      currentUser,
+      currentUserID,
       noteName
     });
 
+    // TODO: Handle case where fileDBResults.length doesn't equal filePaylods.length
+
+    const {newNote, fileDBResults} = noteFileResult;
+
     console.log('noteFileResult ', noteFileResult);
+
+    // TODO: Handle case where s3PayloadResults.length doesn't equal fileDBResults.length
+
+    const s3PayloadResults = await createPresignedUrl({fileDocuments: fileDBResults});
+
+    console.log("s3PayloadResults ", s3PayloadResults);
   };
 
   return (
@@ -117,7 +129,6 @@ export default function FileUpload({
 
   When a user drops or selects X number of files:
 
-    [ ]: Create a MongoDB File document for each dropped-in/uploaded file.
     [ ]: Upload each selected file with FileID and NoteID to s3.
     [ ]: Trigger Toast Message indicating upload result:
       - For now, do not redirect the user to another page.

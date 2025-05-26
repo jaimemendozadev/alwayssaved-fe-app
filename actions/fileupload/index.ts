@@ -1,58 +1,72 @@
 'use server';
-import { dbConnect, INote, LeanFile, LeanNote } from '@/utils/mongodb';
-import { LeanUser, NoteModel, FileModel, deepLean, getObjectIDFromString } from '@/utils/mongodb';
+import {
+  dbConnect,
+  LeanFile,
+  LeanNote,
+  NoteModel,
+  FileModel,
+  deepLean,
+  getObjectIDFromString
+} from '@/utils/mongodb';
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
 
-interface s3FileUploadArguments {
-  payload: {
-    fileName: string;
-    fileOwner: string;
-  };
+interface createPresignedUrlArguments {
+  fileDocuments: LeanFile[];
+}
+interface s3FilePayload {
+  s3_key: string;
+  file_id: string;
+  presigned_url: string;
 }
 
-// See Note #2 below
-export async function s3FileUpload({ payload }: s3FileUploadArguments) {
-  /* TODOs:
+// See Note #1 below.
+export const createPresignedUrl = async ({
+  fileDocuments
+}: createPresignedUrlArguments): Promise<s3FilePayload[]> => {
+  const presignResults = await Promise.allSettled(
+    fileDocuments.map(async (fileDoc) => {
+      const { file_name, note_id, user_id, _id } = fileDoc;
 
-     [ ]: Create a MongoDB Note.
-     [ ]: Create a MongoDB File.
-     [ ]: Create an s3 Presigned Url for file.
-    */
+      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
 
-  /*
-    Proposed s3 Key: 
-    /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension}   
-  */
+      const presignedURL = await createPresignedUrlWithClient(s3_key);
 
-  try {
-    const { fileName, fileOwner } = payload;
+      return {
+        s3_key,
+        file_id: _id,
+        presigned_url: presignedURL
+      };
+    })
+  );
 
-    const key = `${fileOwner}/${noteID}/${fileID}/${fileName}`; // See Note #3 below
+  const filteredResults = presignResults.filter(
+    (result) => result.status === 'fulfilled'
+  );
 
-    const presignedUrl = await createPresignedUrlWithClient(key);
-  } catch (error) {
-    // TODO: Handle error in telemetry
-    console.log('There was a problem s3FileUpload: ', error);
-  }
-}
+  const finalizedResults = filteredResults.map((result) => result.value);
 
+  return finalizedResults;
+};
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface createNoteFileDocsProps {
-  filePayloads: {[key: string]: any}[];  
-  currentUser: LeanUser;
+interface createNoteFileDocsArguments {
+  filePayloads: { [key: string]: any }[];
+  currentUserID: string;
   noteName: string;
 }
 
-export const createNoteFileDocs = async ({filePayloads, currentUser, noteName}: createNoteFileDocsProps
-
-): Promise<{newNote: LeanNote[], fileDBResults: LeanFile[]}> => {
-
+export const createNoteFileDocs = async ({
+  filePayloads,
+  currentUserID,
+  noteName
+}: createNoteFileDocsArguments): Promise<{
+  newNote: LeanNote[];
+  fileDBResults: LeanFile[];
+}> => {
   await dbConnect();
 
   // 1) Create a single MongoDB Note document.
-  const userStringID = currentUser._id;
-  const userMongoID = getObjectIDFromString(userStringID);
+  const userMongoID = getObjectIDFromString(currentUserID);
 
   const notePayload = {
     user_id: userMongoID,
@@ -61,11 +75,10 @@ export const createNoteFileDocs = async ({filePayloads, currentUser, noteName}: 
 
   const [newNote] = await NoteModel.create([notePayload], { j: true });
 
-  console.log("newNote ", newNote);
-  console.log("\n");
+  console.log('newNote ', newNote);
+  console.log('\n');
 
   const noteMongoID = newNote._id;
-
 
   // 2) Create File documents for each filePayload.
   const fileDBResults = await Promise.allSettled(
@@ -85,26 +98,26 @@ export const createNoteFileDocs = async ({filePayloads, currentUser, noteName}: 
 
   const sanitizedNote = deepLean(newNote);
 
-  const sanitizedResults = fileDBResults.filter(result => result.status === 'fulfilled')
+  // 3) Filter out and sanitize fulfilled results.
+  const filteredResults = fileDBResults.filter(
+    (result) => result.status === 'fulfilled'
+  );
 
-  const finalizedResults = sanitizedResults.map(result => deepLean(result.value));
+  const finalizedResults = filteredResults.map((result) =>
+    deepLean(result.value)
+  );
 
   return {
     newNote: [sanitizedNote],
     fileDBResults: finalizedResults
-  }
+  };
 };
 
 /********************************************
  * Notes
  ********************************************
 
-
-
- 2) If the presignedURL was created in the POST request, the PUT 
-    request will update the RecipeAssets with the new URL. 
-
- 3) Media assets are stored in s3 in the following s3 Key format: 
+ 1) Media assets are stored in s3 in the following s3 Key format: 
 
     /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
 

@@ -28,7 +28,8 @@ const getConfigByEnv = (region: string, nodeEnv: string): S3ClientConfig => {
 
 // See Note #1 below
 export const createPresignedUrlWithClient = async (
-  key: string
+  key: string,
+  expiresIn: number = 3600
 ): Promise<string> => {
   // See Note #2 below
   const { NODE_ENV, AWS_REGION, AWS_BUCKET } = process.env;
@@ -46,7 +47,7 @@ export const createPresignedUrlWithClient = async (
 
   const client = new S3Client([config]); // See Note #2 below
   const command = new PutObjectCommand({ Bucket: AWS_BUCKET, Key: key });
-  const signedUrl = await getSignedUrl(client, command, { expiresIn: 3600 });
+  const signedUrl = await getSignedUrl(client, command, { expiresIn });
 
   return signedUrl;
 };
