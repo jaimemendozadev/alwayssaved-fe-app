@@ -1,4 +1,6 @@
-export * from './schemamodels/users'
+export * from './schemamodels/users';
+export * from './schemamodels/files';
+export * from './schemamodels/notes';
 
 import mongoose from 'mongoose';
 
