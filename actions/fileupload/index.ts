@@ -10,6 +10,11 @@ import {
 } from '@/utils/mongodb';
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
 
+
+/************************************************* 
+ * handleFileDocUpdate
+**************************************************/
+
 interface UpdateStatus {
   file_id: string;
   update_status: string;
@@ -54,6 +59,17 @@ export const handleFileDocUpdate = async ({
   return finalizedResults;
 };
 
+
+
+/***************************************************/
+
+
+
+
+/************************************************* 
+ * createPresignedUrl
+**************************************************/
+
 interface createPresignedUrlArguments {
   fileDocuments: LeanFile[];
 }
@@ -94,9 +110,25 @@ export const createPresignedUrl = async ({
   return finalizedResults;
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/***************************************************/
+
+
+
+
+
+/************************************************* 
+ * createNoteFileDocs
+**************************************************/
+
+
+interface filePayload {
+  name: string;
+  type: string;
+}
+
 interface createNoteFileDocsArguments {
-  filePayloads: { [key: string]: any }[];
+  filePayloads: filePayload[];
   currentUserID: string;
   noteTitle: string;
 }
@@ -121,8 +153,6 @@ export const createNoteFileDocs = async ({
 
   const [newNote] = await NoteModel.create([notePayload], { j: true });
 
-  console.log('newNote ', newNote);
-  console.log('\n');
 
   const noteMongoID = newNote._id;
 
@@ -140,7 +170,6 @@ export const createNoteFileDocs = async ({
     })
   );
 
-  console.log('fileDBResults ', fileDBResults);
 
   const sanitizedNote = deepLean(newNote);
 
@@ -158,6 +187,11 @@ export const createNoteFileDocs = async ({
     fileDBResults: finalizedResults
   };
 };
+
+/***************************************************/
+
+
+
 
 /********************************************
  * Notes
