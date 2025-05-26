@@ -44,21 +44,25 @@ export default function FileUpload({
     }
   };
 
-  const handleUpload = async<T extends File> (acceptedFiles: T[]) => {
+  const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
     console.log('acceptedFiles ', acceptedFiles);
-          console.log('\n');
+    console.log('\n');
 
-          const filePayloads = acceptedFiles.map((file) => ({
-            name: file.name,
-            type: file.type,
-          }));
+    const filePayloads = acceptedFiles.map((file) => ({
+      name: file.name,
+      type: file.type
+    }));
 
-          console.log("filePayloads ", filePayloads)
+    console.log('filePayloads ', filePayloads);
 
-          const noteFileResult = await createNoteFileDocs({filePayloads, currentUser, noteName});
+    const noteFileResult = await createNoteFileDocs({
+      filePayloads,
+      currentUser,
+      noteName
+    });
 
-          console.log('noteFileResult ', noteFileResult);
-  }
+    console.log('noteFileResult ', noteFileResult);
+  };
 
   return (
     <div className="w-[900px]">
@@ -94,9 +98,7 @@ export default function FileUpload({
         </label>
       </form>
 
-      <Dropzone
-        onDrop={acceptedFiles => handleUpload(acceptedFiles)}
-      >
+      <Dropzone onDrop={(acceptedFiles) => handleUpload(acceptedFiles)}>
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
             <div {...getRootProps()}>
