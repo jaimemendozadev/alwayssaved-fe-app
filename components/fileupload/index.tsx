@@ -10,7 +10,8 @@ import {
   createNoteFileDocs,
   createPresignedUrl,
   handleFileDocUpdate,
-  handleNoteDeletion
+  handleNoteDeletion,
+  handleFileDeletion
 } from './utils';
 
 interface FileUploadProps {
@@ -72,6 +73,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       noteTitle
     });
 
+    console.log('noteFileResult ', noteFileResult);
+
     const { newNote, fileDBResults } = noteFileResult;
 
     if (newNote.length === 0) {
@@ -80,10 +83,12 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
         feedbackDuration
       );
 
+      if (fileDBResults.length > 0) {
+        await handleFileDeletion(fileDBResults);
+      }
+
       return;
     }
-
-    console.log('noteFileResult ', noteFileResult);
 
     if (fileDBResults.length === 0) {
       if (newNote.length > 0) {
@@ -92,7 +97,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       }
 
       toast.error(
-        'There was a problem saving your files in the database. Try again later.',
+        'There was a problem saving your files in the database. Try uploading the files again later.',
         feedbackDuration
       );
 

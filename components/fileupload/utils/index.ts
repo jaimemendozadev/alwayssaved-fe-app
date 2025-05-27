@@ -4,9 +4,10 @@ import {
   createPresignedUrl,
   handleFileDocUpdate,
   handleNoteDeletion,
+  handleFileDeletion
 } from '@/actions/fileupload';
 
-export { createNoteFileDocs, createPresignedUrl, handleFileDocUpdate, handleNoteDeletion };
+export { createNoteFileDocs, createPresignedUrl, handleFileDocUpdate, handleNoteDeletion, handleFileDeletion };
 
 export const filterCurrentFiles = <T extends File>(
   currentFiles: T[],

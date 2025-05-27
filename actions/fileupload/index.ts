@@ -14,14 +14,36 @@ import { createPresignedUrlWithClient } from '@/utils/aws/s3';
  * handleNoteDeletion
  **************************************************/
 
-export const handleNoteDeletion = async (newNote: LeanNote): Promise<void> => {
+export const handleFileDeletion = async (
+  fileDBResults: LeanFile[]
+): Promise<void> => {
+  await Promise.allSettled(
+    fileDBResults.map(async (file) => {
+      await dbConnect();
+
+      const _id = getObjectIDFromString(file._id);
+
+      return FileModel.findOneAndDelete({ _id }).exec();
+    })
+  );
+};
+
+/***************************************************/
+
+/*************************************************
+ * handleNoteDeletion
+ **************************************************/
+
+export const handleNoteDeletion = async (
+  newNote: LeanNote
+): Promise<LeanNote> => {
   await dbConnect();
 
   const _id = getObjectIDFromString(newNote._id);
 
   const deletedNote = await NoteModel.findOneAndDelete({ _id }).exec();
 
-  console.log('deletedNote ', deletedNote);
+  return deepLean(deletedNote);
 };
 
 /***************************************************/
