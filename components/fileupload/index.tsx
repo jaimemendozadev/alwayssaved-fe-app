@@ -9,7 +9,9 @@ import {
   filterCurrentFiles,
   createNoteFileDocs,
   createPresignedUrl,
-  handleFileDocUpdate
+  handleFileDocUpdate,
+  handleNoteDeletion
+
 } from './utils';
 
 interface FileUploadProps {
@@ -76,11 +78,16 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('noteFileResult ', noteFileResult);
 
     if (fileDBResults.length === 0) {
+      if(newNote.length > 0) {
+        const [plucked] = newNote
+        await handleNoteDeletion(plucked);
+      }
+
       toast.error(
         'There was a problem saving your files in the database. Try again later.',
         feedbackDuration
       );
-      // TODO: Need to delete created Note document if successful;
+
       return;
     }
 

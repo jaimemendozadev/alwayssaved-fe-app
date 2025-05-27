@@ -2,10 +2,11 @@ import { LeanFile } from '@/utils/mongodb';
 import {
   createNoteFileDocs,
   createPresignedUrl,
-  handleFileDocUpdate
+  handleFileDocUpdate,
+  handleNoteDeletion,
 } from '@/actions/fileupload';
 
-export { createNoteFileDocs, createPresignedUrl, handleFileDocUpdate };
+export { createNoteFileDocs, createPresignedUrl, handleFileDocUpdate, handleNoteDeletion };
 
 export const filterCurrentFiles = <T extends File>(
   currentFiles: T[],
