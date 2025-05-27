@@ -3,24 +3,23 @@ import { useState, ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
+import { LeanUser } from '@/utils/mongodb';
+import { InputEvent } from '@/utils/ts';
 import {
+  filterCurrentFiles,
   createNoteFileDocs,
   createPresignedUrl,
   handleFileDocUpdate
-} from '@/actions/fileupload';
-import { LeanUser } from '@/utils/mongodb';
-import { InputEvent } from '@/utils/ts';
+} from './utils';
 
 interface FileUploadProps {
   currentUser: LeanUser | null;
 }
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
-const feedbackDuration = {duration: 3000};
+const feedbackDuration = { duration: 3000 };
 
-export const FileUpload = ({
-  currentUser
-}: FileUploadProps): ReactNode => {
+export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
   console.log('currentUser in FileUpload: ', currentUser);
 
   const [noteTitle, setNoteTitle] = useState(defaultNoteTitle);
@@ -72,27 +71,27 @@ export const FileUpload = ({
       noteTitle
     });
 
-     const { newNote, fileDBResults } = noteFileResult;
+    const { newNote, fileDBResults } = noteFileResult;
 
-     console.log('noteFileResult ', noteFileResult);
+    console.log('noteFileResult ', noteFileResult);
 
-     if(fileDBResults.length === 0) {
-        toast.error("There was a problem saving your files in the database. Try again later.", feedbackDuration);
-        // TODO: Need to delete created Note document if successful;
-        return;
-     }
+    if (fileDBResults.length === 0) {
+      toast.error(
+        'There was a problem saving your files in the database. Try again later.',
+        feedbackDuration
+      );
+      // TODO: Need to delete created Note document if successful;
+      return;
+    }
 
-     if(fileDBResults.length !== currentFiles.length) {
-       const createdFiles = fileDBResults.map(leanFile => leanFile.file_name);
+    if (fileDBResults.length !== currentFiles.length) {
+      currentFiles = filterCurrentFiles(currentFiles, fileDBResults);
 
-       const filteredFiles = currentFiles.filter(file => createdFiles.includes(file.name));
-
-       currentFiles = filteredFiles;
-
-       toast.error("It appears one of your files couldn't be saved. Try saving it again to the same note later.", feedbackDuration);
-
-     }
-
+      toast.error(
+        "It appears one of your files couldn't be saved. Try saving it again to the same note later.",
+        feedbackDuration
+      );
+    }
 
     // 2) Create the presignUrls for each File document.
     const s3PayloadResults = await createPresignedUrl({
@@ -192,7 +191,7 @@ export const FileUpload = ({
       </Dropzone>
     </div>
   );
-}
+};
 
 /*
   File Upload Flow:
