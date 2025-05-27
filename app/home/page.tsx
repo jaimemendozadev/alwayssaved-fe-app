@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { LeanUser } from '@/utils/mongodb';
 import { getUserFromDB } from '@/actions';
 
-import FileUpload from '@/components/fileupload';
+import {FileUpload} from '@/components/fileupload';
 
 const errorMessage =
   'Looks like you might have never registered to AlwaysSaved. 😬 Try again later.';

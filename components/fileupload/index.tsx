@@ -18,9 +18,9 @@ interface FileUploadProps {
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const feedbackDuration = {duration: 3000};
 
-export default function FileUpload({
+export const FileUpload = ({
   currentUser
-}: FileUploadProps): ReactNode {
+}: FileUploadProps): ReactNode => {
   console.log('currentUser in FileUpload: ', currentUser);
 
   const [noteTitle, setNoteTitle] = useState(defaultNoteTitle);
