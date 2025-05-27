@@ -6,12 +6,10 @@ import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
 import {
-  filterCurrentFiles,
   createNoteFileDocs,
   createPresignedUrl,
   handleFileDocUpdate,
-  handleNoteDeletion,
-  handleFileDeletion
+  checkNoteFileResultAndUserFiles
 } from './utils';
 
 interface FileUploadProps {
@@ -55,7 +53,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('acceptedFiles ', acceptedFiles);
     console.log('\n');
 
-    let currentFiles = [...acceptedFiles];
+    let currentFiles: T[] = [...acceptedFiles];
 
     // 1) Create a Note Doc and all File Docs associated with that Note.
     const filePayloads = currentFiles.map((file) => ({
@@ -67,51 +65,36 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const currentUserID = currentUser._id;
 
-    const noteFileResult = await createNoteFileDocs({
+    let noteFileResult = await createNoteFileDocs({
       filePayloads,
       currentUserID,
       noteTitle
     });
 
-    console.log('noteFileResult ', noteFileResult);
+    console.log('noteFileResult before Validation: ', noteFileResult);
 
-    const { newNote, fileDBResults } = noteFileResult;
+    const validationCheck = await checkNoteFileResultAndUserFiles(
+      noteFileResult,
+      currentFiles
+    );
 
-    if (newNote.length === 0) {
-      toast.error(
-        'There was a problem creating a Note for your files in the database. Try again later.',
-        feedbackDuration
-      );
+    if (validationCheck.continue === false) {
+      const { message } = validationCheck;
 
-      if (fileDBResults.length > 0) {
-        await handleFileDeletion(fileDBResults);
-      }
-
-      return;
+      return toast.error(message, feedbackDuration);
     }
 
-    if (fileDBResults.length === 0) {
-      if (newNote.length > 0) {
-        const [plucked] = newNote;
-        await handleNoteDeletion(plucked);
-      }
+    if (validationCheck.continue && validationCheck.message.length > 0) {
+      const { message } = validationCheck;
 
-      toast.error(
-        'There was a problem saving your files in the database. Try uploading the files again later.',
-        feedbackDuration
-      );
-
-      return;
+      toast.error(message, feedbackDuration);
     }
 
-    if (fileDBResults.length !== currentFiles.length) {
-      currentFiles = filterCurrentFiles(currentFiles, fileDBResults);
+    noteFileResult = validationCheck.noteFileResult;
 
-      toast.error(
-        "It appears one of your files couldn't be saved. Try saving it again to the same note later.",
-        feedbackDuration
-      );
-    }
+    const { fileDBResults } = noteFileResult;
+
+    currentFiles = validationCheck.currentFiles;
 
     // 2) Create the presignUrls for each File document.
     const s3PayloadResults = await createPresignedUrl({
@@ -124,7 +107,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     // 3) Upload each media file to s3.
     const uploadResults = await Promise.allSettled(
-      acceptedFiles.map(async (file) => {
+      currentFiles.map(async (file) => {
         const targetName = file.name;
         const targetType = file.type;
 

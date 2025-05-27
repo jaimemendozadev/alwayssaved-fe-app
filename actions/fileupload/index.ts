@@ -148,6 +148,12 @@ export const createPresignedUrl = async ({
  * createNoteFileDocs
  **************************************************/
 
+export interface noteFileResult {
+  newNote: LeanNote[];
+  fileDBResults: LeanFile[];
+}
+
+
 interface filePayload {
   name: string;
   type: string;
@@ -163,10 +169,7 @@ export const createNoteFileDocs = async ({
   filePayloads,
   currentUserID,
   noteTitle
-}: createNoteFileDocsArguments): Promise<{
-  newNote: LeanNote[];
-  fileDBResults: LeanFile[];
-}> => {
+}: createNoteFileDocsArguments): Promise<noteFileResult> => {
   try {
     await dbConnect();
 
