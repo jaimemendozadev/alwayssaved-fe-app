@@ -10,33 +10,25 @@ import {
 } from '@/utils/mongodb';
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
 
-
-/************************************************* 
+/*************************************************
  * handleNoteDeletion
-**************************************************/
+ **************************************************/
 
-export const handleNoteDeletion = async (newNote: LeanNote):Promise<void> => {
-
+export const handleNoteDeletion = async (newNote: LeanNote): Promise<void> => {
   await dbConnect();
 
-  const _id = getObjectIDFromString(newNote._id)
+  const _id = getObjectIDFromString(newNote._id);
 
-  const deletedNote = await NoteModel.findOneAndDelete({_id}).exec();
+  const deletedNote = await NoteModel.findOneAndDelete({ _id }).exec();
 
   console.log('deletedNote ', deletedNote);
-
-}
-
+};
 
 /***************************************************/
 
-
-
-
-
-/************************************************* 
+/*************************************************
  * handleFileDocUpdate
-**************************************************/
+ **************************************************/
 
 interface UpdateStatus {
   file_id: string;
@@ -82,16 +74,11 @@ export const handleFileDocUpdate = async ({
   return finalizedResults;
 };
 
-
-
 /***************************************************/
 
-
-
-
-/************************************************* 
+/*************************************************
  * createPresignedUrl
-**************************************************/
+ **************************************************/
 
 interface createPresignedUrlArguments {
   fileDocuments: LeanFile[];
@@ -133,17 +120,11 @@ export const createPresignedUrl = async ({
   return finalizedResults;
 };
 
-
 /***************************************************/
 
-
-
-
-
-/************************************************* 
+/*************************************************
  * createNoteFileDocs
-**************************************************/
-
+ **************************************************/
 
 interface filePayload {
   name: string;
@@ -164,57 +145,62 @@ export const createNoteFileDocs = async ({
   newNote: LeanNote[];
   fileDBResults: LeanFile[];
 }> => {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  // 1) Create a single MongoDB Note document.
-  const userMongoID = getObjectIDFromString(currentUserID);
+    // 1) Create a single MongoDB Note document.
+    const userMongoID = getObjectIDFromString(currentUserID);
 
-  const notePayload = {
-    user_id: userMongoID,
-    title: noteTitle
-  };
+    const notePayload = {
+      user_id: userMongoID,
+      title: noteTitle
+    };
 
-  const [newNote] = await NoteModel.create([notePayload], { j: true });
+    const [newNote] = await NoteModel.create([notePayload], { j: true });
 
+    const noteMongoID = newNote._id;
 
-  const noteMongoID = newNote._id;
+    // 2) Create File documents for each filePayload.
+    const fileDBResults = await Promise.allSettled(
+      filePayloads.map((file) => {
+        const filePayload = {
+          user_id: userMongoID,
+          note_id: noteMongoID,
+          file_name: file.name,
+          file_type: file.type
+        };
 
-  // 2) Create File documents for each filePayload.
-  const fileDBResults = await Promise.allSettled(
-    filePayloads.map((file) => {
-      const filePayload = {
-        user_id: userMongoID,
-        note_id: noteMongoID,
-        file_name: file.name,
-        file_type: file.type
-      };
+        return FileModel.create([filePayload], { j: true });
+      })
+    );
 
-      return FileModel.create([filePayload], { j: true });
-    })
-  );
+    const sanitizedNote = deepLean(newNote);
 
+    // 3) Filter out and sanitize fulfilled results.
+    const filteredResults = fileDBResults.filter(
+      (result) => result.status === 'fulfilled'
+    );
 
-  const sanitizedNote = deepLean(newNote);
+    const finalizedResults = filteredResults.map((result) =>
+      deepLean(result.value)
+    );
 
-  // 3) Filter out and sanitize fulfilled results.
-  const filteredResults = fileDBResults.filter(
-    (result) => result.status === 'fulfilled'
-  );
-
-  const finalizedResults = filteredResults.map((result) =>
-    deepLean(result.value)
-  );
+    return {
+      newNote: [sanitizedNote],
+      fileDBResults: finalizedResults
+    };
+  } catch (error) {
+    //TODO: Handle in telemetry.
+    console.log('Error in createNoteFileDocs ', error);
+  }
 
   return {
-    newNote: [sanitizedNote],
-    fileDBResults: finalizedResults
+    newNote: [],
+    fileDBResults: []
   };
 };
 
 /***************************************************/
-
-
-
 
 /********************************************
  * Notes

@@ -11,7 +11,6 @@ import {
   createPresignedUrl,
   handleFileDocUpdate,
   handleNoteDeletion
-
 } from './utils';
 
 interface FileUploadProps {
@@ -75,11 +74,20 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const { newNote, fileDBResults } = noteFileResult;
 
+    if (newNote.length === 0) {
+      toast.error(
+        'There was a problem creating a Note for your files in the database. Try again later.',
+        feedbackDuration
+      );
+
+      return;
+    }
+
     console.log('noteFileResult ', noteFileResult);
 
     if (fileDBResults.length === 0) {
-      if(newNote.length > 0) {
-        const [plucked] = newNote
+      if (newNote.length > 0) {
+        const [plucked] = newNote;
         await handleNoteDeletion(plucked);
       }
 
