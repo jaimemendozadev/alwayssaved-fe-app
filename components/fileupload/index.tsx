@@ -53,7 +53,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('acceptedFiles ', acceptedFiles);
     console.log('\n');
 
-    let currentFiles: T[] = [...acceptedFiles];
+    let currentFiles = [...acceptedFiles];
 
     // 1) Create a Note Doc and all File Docs associated with that Note.
     const filePayloads = currentFiles.map((file) => ({
@@ -78,17 +78,17 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       currentFiles
     );
 
-    if (validationCheck.continue === false) {
-      const { message } = validationCheck;
-
-      return toast.error(message, feedbackDuration);
-    }
-
-    if (validationCheck.continue && validationCheck.message.length > 0) {
+    if (validationCheck.message.length > 0) {
       const { message } = validationCheck;
 
       toast.error(message, feedbackDuration);
+
+      if(validationCheck.continue === false) {
+        return;
+      }
     }
+
+
 
     noteFileResult = validationCheck.noteFileResult;
 
