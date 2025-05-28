@@ -98,49 +98,6 @@ export const handleFileDocUpdate = async ({
 
 /***************************************************/
 
-/*************************************************
- * createPresignedUrl
- **************************************************/
-
-interface createPresignedUrlArguments {
-  fileDocuments: LeanFile[];
-}
-interface s3FilePayload {
-  s3_key: string;
-  file_id: string;
-  file_name: string;
-  presigned_url: string;
-}
-
-// See Note #1 below.
-export const createPresignedUrl = async ({
-  fileDocuments
-}: createPresignedUrlArguments): Promise<s3FilePayload[]> => {
-  const presignResults = await Promise.allSettled(
-    fileDocuments.map(async (fileDoc) => {
-      const { file_name, note_id, user_id, _id } = fileDoc;
-
-      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
-
-      const presignedURL = await createPresignedUrlWithClient(s3_key);
-
-      return {
-        s3_key,
-        file_id: _id,
-        file_name,
-        presigned_url: presignedURL
-      };
-    })
-  );
-
-  const filteredResults = presignResults.filter(
-    (result) => result.status === 'fulfilled'
-  );
-
-  const finalizedResults = filteredResults.map((result) => result.value);
-
-  return finalizedResults;
-};
 
 /***************************************************/
 
@@ -230,14 +187,6 @@ export const createNoteFileDocs = async ({
 /********************************************
  * Notes
  ********************************************
-
- 1) Media assets are stored in s3 in the following s3 Key format: 
-
-    /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
-
-    fileOwner: is the User._id
-    fileName: is the name of the file with the fileType extension 
-
 
 
  From Extractor Service Dev Notes 5/10/25 (Extractor Notes need to be updated):

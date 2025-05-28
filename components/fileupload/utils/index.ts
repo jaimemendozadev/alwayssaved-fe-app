@@ -1,18 +1,26 @@
 import { LeanFile } from '@/utils/mongodb';
 import {
   createNoteFileDocs,
-  createPresignedUrl,
   handleFileDocUpdate,
   handleNoteDeletion,
   handleFileDeletion,
   noteFileResult
 } from '@/actions/fileupload';
 
+import { createPresignedUrlWithClient } from '@/utils/aws/s3';
+
 export {
   createNoteFileDocs,
-  createPresignedUrl,
   handleFileDocUpdate,
 };
+
+
+
+
+/*************************************************
+ * filterCurrentFiles
+ **************************************************/
+
 
 const filterCurrentFiles = <T extends File>(
   currentFiles: T[],
@@ -26,6 +34,16 @@ const filterCurrentFiles = <T extends File>(
 
   return filteredFiles;
 };
+
+
+/******************************************************/
+
+
+
+/*************************************************
+ * checkNoteFileResultAndUserFiles
+ **************************************************/
+
 
 interface validationCheck<T extends File> {
   message: string;
@@ -95,3 +113,67 @@ export const checkNoteFileResultAndUserFiles = async <T extends File>(
 
   return validationCheck;
 };
+
+
+/******************************************************/
+
+
+
+/*************************************************
+ * createPresignedUrl
+ **************************************************/
+
+interface createPresignedUrlArguments {
+  fileDocuments: LeanFile[];
+}
+interface s3FilePayload {
+  s3_key: string;
+  file_id: string;
+  file_name: string;
+  presigned_url: string;
+}
+
+// See Note #1 below.
+export const createPresignedUrl = async ({
+  fileDocuments
+}: createPresignedUrlArguments): Promise<s3FilePayload[]> => {
+  const presignResults = await Promise.allSettled(
+    fileDocuments.map(async (fileDoc) => {
+      const { file_name, note_id, user_id, _id } = fileDoc;
+
+      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
+
+      const presignedURL = await createPresignedUrlWithClient(s3_key);
+
+      return {
+        s3_key,
+        file_id: _id,
+        file_name,
+        presigned_url: presignedURL
+      };
+    })
+  );
+
+  const filteredResults = presignResults.filter(
+    (result) => result.status === 'fulfilled'
+  );
+
+  const finalizedResults = filteredResults.map((result) => result.value);
+
+  return finalizedResults;
+};
+
+
+
+/********************************************
+ * Notes
+ ********************************************
+
+ 1) Media assets are stored in s3 in the following s3 Key format: 
+
+    /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
+
+    fileOwner: is the User._id
+    fileName: is the name of the file with the fileType extension 
+
+*/
