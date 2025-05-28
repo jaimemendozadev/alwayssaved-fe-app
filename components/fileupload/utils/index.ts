@@ -62,7 +62,7 @@ export const checkNoteFileResultAndUserFiles = async <T extends File>(
     return validationCheck;
   }
 
-  // 2) There was a problem creating File documents for the uploaded files, delete the parent Note document.
+  // 2) There was a problem creating File documents for all the uploaded files, delete the parent Note document.
   if (fileDBResults.length === 0) {
     if (newNote.length > 0) {
       const [plucked] = newNote;
@@ -80,7 +80,7 @@ export const checkNoteFileResultAndUserFiles = async <T extends File>(
     temp = filterCurrentFiles(temp, fileDBResults);
 
     validationCheck['message'] =
-      "It appears one of your files couldn't be saved. Try saving it again to the same note later.";
+      "Small Warning: It appears one of your files couldn't be saved. Try saving it again to the same note later.";
   }
 
   const validatedResult = {

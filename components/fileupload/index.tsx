@@ -81,11 +81,12 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     if (validationCheck.message.length > 0) {
       const { message } = validationCheck;
 
-      toast.error(message, feedbackDuration);
-
       if(validationCheck.continue === false) {
+        toast.error(message, feedbackDuration);
         return;
       }
+
+      toast(message, feedbackDuration);
     }
 
 
