@@ -5,12 +5,15 @@ import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
+import { handleFileDeletion, handleNoteDeletion } from '@/actions/fileupload';
 import {
   createNoteFileDocs,
   createPresignedUrl,
   handleFileDocUpdate,
   checkNoteFileResultAndUserFiles
 } from './utils';
+
+
 
 interface FileUploadProps {
   currentUser: LeanUser | null;
@@ -93,7 +96,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     noteFileResult = validationCheck.noteFileResult;
 
-    const { fileDBResults } = noteFileResult;
+    const { fileDBResults, newNote } = noteFileResult;
 
     currentFiles = validationCheck.currentFiles;
 
@@ -104,7 +107,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     console.log('s3PayloadResults ', s3PayloadResults);
 
-    // TODO: Handle case where s3PayloadResults.length doesn't equal fileDBResults.length
+
+    if(s3PayloadResults.length === 0) {
+      const [plucked] = newNote;
+      await handleNoteDeletion(plucked);
+      await handleFileDeletion(fileDBResults);
+      toast.error("There was a problem uploading your files to the cloud. Try again later.", feedbackDuration);
+      return;
+    }
 
     // 3) Upload each media file to s3.
     const uploadResults = await Promise.allSettled(
