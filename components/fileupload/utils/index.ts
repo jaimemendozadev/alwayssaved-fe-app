@@ -86,16 +86,17 @@ export const noteFileResultVersusUserFilesCheck = async <T extends File>(
     temp = filterCurrentFiles(temp, fileDBResults);
 
     validationCheck['message'] =
-      "Small Warning: It appears one of your files couldn't be saved. Try saving it again to the same note later.";
+      "Small Warning: It appears one of your files couldn't be saved. Try saving it again to the same Note later.";
   }
 
   const validatedResult = {
     newNote,
-    fileDBResults,
-    currentFiles: temp
+    fileDBResults
   };
 
   validationCheck['noteFileResult'] = validatedResult;
+
+  validationCheck['currentFiles'] = temp;
 
   validationCheck['continue'] = true;
 
