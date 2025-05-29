@@ -10,6 +10,7 @@ import {
   createNoteFileDocs,
   createPresignedUrl,
   handleFileDocUpdate,
+  handleS3FileUploads,
   noteFileResultVersusUserFilesCheck
 } from './utils';
 
@@ -121,37 +122,9 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     */
 
     // 3) Upload each media file to s3.
-    const uploadResults = await Promise.allSettled(
-      currentFiles.map(async (file) => {
-        const targetName = file.name;
-        const targetType = file.type;
-
-        const [targetPayload] = s3PayloadResults.filter(
-          (s3Payload) => s3Payload.file_name === targetName
-        );
-
-        const { presigned_url, file_id, s3_key } = targetPayload;
-
-        await fetch(presigned_url, {
-          method: 'PUT',
-          headers: { 'Content-Type': targetType },
-          body: file
-        });
-
-        return {
-          file_id,
-          update: { s3_key }
-        };
-      })
-    );
-
-    // TODO: Handle case where filteredUploadResults.length doesn't equal uploadResults.length
-    const filteredUploadResults = uploadResults.filter(
-      (result) => result.status === 'fulfilled'
-    );
-
-    const finalizedUploadResults = filteredUploadResults.map(
-      (result) => result.value
+    const finalizedUploadResults = await handleS3FileUploads(
+      currentFiles,
+      s3PayloadResults
     );
 
     // 4) Update each File document with their s3_key.

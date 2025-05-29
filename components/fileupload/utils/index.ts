@@ -149,6 +149,58 @@ export const createPresignedUrl = async ({
   return finalizedResults;
 };
 
+/******************************************************/
+
+/*************************************************
+ * handleS3FileUploads
+ **************************************************/
+
+interface s3UploadResult {
+  file_id: string;
+  update: {
+    s3_key: string;
+  };
+}
+
+export const handleS3FileUploads = async <T extends File>(
+  currentFiles: T[],
+  s3PayloadResults: s3FilePayload[]
+): Promise<s3UploadResult[]> => {
+  const uploadResults = await Promise.allSettled(
+    currentFiles.map(async (file) => {
+      const targetName = file.name;
+      const targetType = file.type;
+
+      const [targetPayload] = s3PayloadResults.filter(
+        (s3Payload) => s3Payload.file_name === targetName
+      );
+
+      const { presigned_url, file_id, s3_key } = targetPayload;
+
+      await fetch(presigned_url, {
+        method: 'PUT',
+        headers: { 'Content-Type': targetType },
+        body: file
+      });
+
+      return {
+        file_id,
+        update: { s3_key }
+      };
+    })
+  );
+
+  const filteredUploadResults = uploadResults.filter(
+    (result) => result.status === 'fulfilled'
+  );
+
+  const finalizedUploadResults = filteredUploadResults.map(
+    (result) => result.value
+  );
+
+  return finalizedUploadResults;
+};
+
 /********************************************
  * Notes
  ********************************************
