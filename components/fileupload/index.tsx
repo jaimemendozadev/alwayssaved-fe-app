@@ -10,10 +10,8 @@ import {
   createNoteFileDocs,
   createPresignedUrl,
   handleFileDocUpdate,
-  checkNoteFileResultAndUserFiles
+  noteFileResultVersusUserFilesCheck
 } from './utils';
-
-
 
 interface FileUploadProps {
   currentUser: LeanUser | null;
@@ -76,7 +74,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     console.log('noteFileResult before Validation: ', noteFileResult);
 
-    const validationCheck = await checkNoteFileResultAndUserFiles(
+    const validationCheck = await noteFileResultVersusUserFilesCheck(
       noteFileResult,
       currentFiles
     );
@@ -84,15 +82,13 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     if (validationCheck.message.length > 0) {
       const { message } = validationCheck;
 
-      if(validationCheck.continue === false) {
+      if (validationCheck.continue === false) {
         toast.error(message, feedbackDuration);
         return;
       }
 
       toast(message, feedbackDuration);
     }
-
-
 
     noteFileResult = validationCheck.noteFileResult;
 
@@ -107,14 +103,22 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     console.log('s3PayloadResults ', s3PayloadResults);
 
-
-    if(s3PayloadResults.length === 0) {
+    if (s3PayloadResults.length === 0) {
       const [plucked] = newNote;
       await handleNoteDeletion(plucked);
       await handleFileDeletion(fileDBResults);
-      toast.error("There was a problem uploading your files to the cloud. Try again later.", feedbackDuration);
+      toast.error(
+        'There was a problem uploading your files to the cloud. Try again later.',
+        feedbackDuration
+      );
       return;
     }
+
+    /*
+      5/28/25 TODO: Need to add some error handling if for some reason, actually uploading a file to s3 doesn't work
+                    and we have to possibly delete the Note Doc and all File docs that failed to upload to s3.
+
+    */
 
     // 3) Upload each media file to s3.
     const uploadResults = await Promise.allSettled(

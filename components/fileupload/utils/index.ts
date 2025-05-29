@@ -9,18 +9,11 @@ import {
 
 import { createPresignedUrlWithClient } from '@/utils/aws/s3';
 
-export {
-  createNoteFileDocs,
-  handleFileDocUpdate,
-};
-
-
-
+export { createNoteFileDocs, handleFileDocUpdate };
 
 /*************************************************
  * filterCurrentFiles
  **************************************************/
-
 
 const filterCurrentFiles = <T extends File>(
   currentFiles: T[],
@@ -35,15 +28,11 @@ const filterCurrentFiles = <T extends File>(
   return filteredFiles;
 };
 
-
 /******************************************************/
 
-
-
 /*************************************************
- * checkNoteFileResultAndUserFiles
+ * noteFileResultVersusUserFilesCheck
  **************************************************/
-
 
 interface validationCheck<T extends File> {
   message: string;
@@ -52,7 +41,7 @@ interface validationCheck<T extends File> {
   currentFiles: T[];
 }
 
-export const checkNoteFileResultAndUserFiles = async <T extends File>(
+export const noteFileResultVersusUserFilesCheck = async <T extends File>(
   noteFileResult: noteFileResult,
   currentFiles: T[]
 ): Promise<validationCheck<T>> => {
@@ -63,9 +52,8 @@ export const checkNoteFileResultAndUserFiles = async <T extends File>(
   const validationCheck: validationCheck<T> = {
     message: '',
     continue: false,
-    noteFileResult: {newNote: [], fileDBResults: []},
+    noteFileResult: { newNote: [], fileDBResults: [] },
     currentFiles: []
-
   };
 
   // 1) There was a problem creating a Note, delete all created File documents.
@@ -114,10 +102,7 @@ export const checkNoteFileResultAndUserFiles = async <T extends File>(
   return validationCheck;
 };
 
-
 /******************************************************/
-
-
 
 /*************************************************
  * createPresignedUrl
@@ -162,8 +147,6 @@ export const createPresignedUrl = async ({
 
   return finalizedResults;
 };
-
-
 
 /********************************************
  * Notes
