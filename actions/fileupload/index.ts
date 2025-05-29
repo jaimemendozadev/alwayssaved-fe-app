@@ -98,7 +98,6 @@ export const handleFileDocUpdate = async ({
 
 /***************************************************/
 
-
 /***************************************************/
 
 /*************************************************
@@ -109,7 +108,6 @@ export interface noteFileResult {
   newNote: LeanNote[];
   fileDBResults: LeanFile[];
 }
-
 
 interface filePayload {
   name: string;
@@ -138,9 +136,15 @@ export const createNoteFileDocs = async ({
       title: noteTitle
     };
 
-    const [newNote] = await NoteModel.create([notePayload], { j: true });
+    const [createdNote] = await NoteModel.create([notePayload], { j: true });
 
-    const noteMongoID = newNote._id;
+    if (!createdNote) {
+      throw new Error(
+        `There was a problem creating a Note document for user ${currentUserID} in createNoteFileDocs.`
+      );
+    }
+
+    const noteMongoID = createdNote._id;
 
     // 2) Create File documents for each filePayload.
     const fileDBResults = await Promise.allSettled(
@@ -156,7 +160,7 @@ export const createNoteFileDocs = async ({
       })
     );
 
-    const sanitizedNote = deepLean(newNote);
+    const newNote = [deepLean(createdNote)];
 
     // 3) Filter out and sanitize fulfilled results.
     const filteredResults = fileDBResults.filter(
@@ -168,7 +172,7 @@ export const createNoteFileDocs = async ({
     );
 
     return {
-      newNote: [sanitizedNote],
+      newNote,
       fileDBResults: finalizedResults
     };
   } catch (error) {
