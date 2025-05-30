@@ -105,24 +105,28 @@ export interface noteFileResult {
   fileDBResults: LeanFile[];
 }
 
-interface filePayload {
-  name: string;
-  type: string;
-}
 
-interface createNoteFileDocsArguments {
-  filePayloads: filePayload[];
+interface createNoteFileDocsArguments<T extends File> {
+  currentFiles: T[];
   currentUserID: string;
   noteTitle: string;
 }
 
-export const createNoteFileDocs = async ({
-  filePayloads,
+export const createNoteFileDocs = async <T extends File> ({
+  currentFiles,
   currentUserID,
   noteTitle
-}: createNoteFileDocsArguments): Promise<noteFileResult> => {
+}: createNoteFileDocsArguments<T>): Promise<noteFileResult> => {
   try {
     await dbConnect();
+
+    const filePayloads = currentFiles.map((file) => ({
+      name: file.name,
+      type: file.type
+    }));
+
+    console.log('filePayloads ', filePayloads);
+
 
     // 1) Create a single MongoDB Note document.
     const userMongoID = getObjectIDFromString(currentUserID);

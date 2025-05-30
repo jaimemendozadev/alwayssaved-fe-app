@@ -29,8 +29,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
   if (!currentUser) return null;
 
   const handleChange = (evt: InputEvent) => {
-    console.log('evt in handleChange ', evt);
-
     if (evt?.type === 'focus') {
       if (noteTitle === defaultNoteTitle) {
         setNoteTitle('');
@@ -56,19 +54,12 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('\n');
 
     let currentFiles = [...acceptedFiles];
-
-    // 1) Create a Note Doc and all File Docs associated with that Note.
-    const filePayloads = currentFiles.map((file) => ({
-      name: file.name,
-      type: file.type
-    }));
-
-    console.log('filePayloads ', filePayloads);
-
+    
     const currentUserID = currentUser._id;
 
+    // 1) Create a Note Doc and all File Docs associated with that Note.
     let noteFileResult = await createNoteFileDocs({
-      filePayloads,
+      currentFiles,
       currentUserID,
       noteTitle
     });
