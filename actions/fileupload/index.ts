@@ -8,20 +8,20 @@ import {
   deepLean,
   getObjectIDFromString
 } from '@/utils/mongodb';
-import { createPresignedUrlWithClient } from '@/utils/aws/s3';
+
 
 /*************************************************
  * handleNoteDeletion
  **************************************************/
 
 export const handleFileDeletion = async (
-  fileDBResults: LeanFile[]
+  fileDBIDs: string[]
 ): Promise<void> => {
   await Promise.allSettled(
-    fileDBResults.map(async (file) => {
+    fileDBIDs.map(async (fileStringID) => {
       await dbConnect();
 
-      const _id = getObjectIDFromString(file._id);
+      const _id = getObjectIDFromString(fileStringID);
 
       return FileModel.findOneAndDelete({ _id }).exec();
     })
