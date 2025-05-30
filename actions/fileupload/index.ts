@@ -30,7 +30,13 @@ export const handleFileDeletion = async (
     );
   } catch (error) {
     // TODO: Handle in telemetry.
-    console.log('Error in handleFileDeletion: ', error);
+
+    const fileIDString = fileDBIDs.join(', ');
+
+    console.log(
+      `There was an error in handleFileDeletion for one of the following File Document IDs: ${fileIDString}`
+    );
+    console.log('Error body in handleFileDeletion: ', error);
   }
 };
 
