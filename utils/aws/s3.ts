@@ -2,7 +2,6 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getAWSConfigByEnv } from '.';
 
-// See Note #1 below
 const { NODE_ENV, AWS_BUCKET } = process.env;
 
 const config = getAWSConfigByEnv(NODE_ENV);
@@ -25,9 +24,7 @@ export const createPresignedUrlWithClient = async (
  *************************************
 
 
-1) TODO: In production, need to decide how to set AWS_REGION & AWS_BUCKET variables. 🤔
-
-2) createPresignedUrlWithClient works in "production" without aws credentials 
+1) createPresignedUrlWithClient works in "production" without aws credentials 
    if you attach a task role to the ecs task definition with access to s3.
 
    Code Source: 

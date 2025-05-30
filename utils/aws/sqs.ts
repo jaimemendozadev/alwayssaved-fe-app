@@ -1,15 +1,24 @@
-import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
+import {
+  SendMessageCommand,
+  SQSClient,
+} from '@aws-sdk/client-sqs';
+import { getAWSConfigByEnv } from '.';
+import { getSecret } from './ssm';
+
+const { NODE_ENV } = process.env;
+
+const config = getAWSConfigByEnv(NODE_ENV);
+
+const client = new SQSClient([config]);
 
 export const sendSQSMessage = async () => {
-  const EXTRACTOR_PUSH_QUEUE_URL = process.env.EXTRACTOR_PUSH_QUEUE_URL;
+  const EXTRACTOR_PUSH_QUEUE_URL = await getSecret("EXTRACTOR_PUSH_QUEUE_URL");
 
   if (!EXTRACTOR_PUSH_QUEUE_URL) {
     throw new Error(
       `Missing environment variable to start ML pipeline. Cannot continue.`
     );
   }
-
-  const client = new SQSClient({});
 
   const command = new SendMessageCommand({
     QueueUrl: EXTRACTOR_PUSH_QUEUE_URL,
