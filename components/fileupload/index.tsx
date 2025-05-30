@@ -11,7 +11,8 @@ import {
   createPresignedUrl,
   handleFileDocUpdate,
   handleS3FileUploads,
-  noteFileResultVersusUserFilesCheck
+  noteFileResultVersusUserFilesCheck,
+  verifyS3FileUploads
 } from './utils';
 
 interface FileUploadProps {
@@ -95,6 +96,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const { fileDBResults, newNote } = noteFileResult;
 
+    const [pluckedNote] = newNote;
+
     currentFiles = validationCheck.currentFiles;
 
     // 2) Create the presignUrls for each File document.
@@ -105,9 +108,13 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('s3PayloadResults ', s3PayloadResults);
 
     if (s3PayloadResults.length === 0) {
-      const [plucked] = newNote;
-      await handleNoteDeletion(plucked);
-      await handleFileDeletion(fileDBResults);
+      const fileIDs = fileDBResults.map(leanFile => leanFile._id);
+
+      await handleFileDeletion(fileIDs);
+
+
+      await handleNoteDeletion(pluckedNote);
+      
       toast.error(
         'There was a problem uploading your files to the cloud. Try again later.',
         feedbackDuration
@@ -115,17 +122,31 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
 
-    /*
-      5/28/25 TODO: Need to add some error handling if for some reason, actually uploading a file to s3 doesn't work
-                    and we have to possibly delete the Note Doc and all File docs that failed to upload to s3.
-
-    */
 
     // 3) Upload each media file to s3.
     const finalizedUploadResults = await handleS3FileUploads(
       currentFiles,
       s3PayloadResults
     );
+
+
+
+     /*
+      5/28/25 TODO: Need to add some error handling if for some reason, actually uploading a file to s3 doesn't work
+                    and we have to possibly delete the Note Doc and all File docs that failed to upload to s3.
+
+    */
+
+
+
+
+    await verifyS3FileUploads(finalizedUploadResults, s3PayloadResults, pluckedNote);
+
+
+
+
+
+
 
     // 4) Update each File document with their s3_key.
 

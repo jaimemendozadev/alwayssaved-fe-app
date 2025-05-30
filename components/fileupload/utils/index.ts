@@ -1,4 +1,4 @@
-import { LeanFile } from '@/utils/mongodb';
+import { LeanFile, LeanNote } from '@/utils/mongodb';
 import {
   createNoteFileDocs,
   handleFileDocUpdate,
@@ -34,7 +34,7 @@ const filterCurrentFiles = <T extends File>(
  * noteFileResultVersusUserFilesCheck
  **************************************************/
 
-interface validationCheck<T extends File> {
+interface noteFileResValidationCheck<T extends File> {
   message: string;
   continue: boolean;
   noteFileResult: noteFileResult;
@@ -44,12 +44,12 @@ interface validationCheck<T extends File> {
 export const noteFileResultVersusUserFilesCheck = async <T extends File>(
   noteFileResult: noteFileResult,
   currentFiles: T[]
-): Promise<validationCheck<T>> => {
+): Promise<noteFileResValidationCheck<T>> => {
   let temp = [...currentFiles];
 
   const { newNote, fileDBResults } = noteFileResult;
 
-  const validationCheck: validationCheck<T> = {
+  const validationCheck: noteFileResValidationCheck<T> = {
     message: '',
     continue: false,
     noteFileResult: { newNote: [], fileDBResults: [] },
@@ -62,7 +62,9 @@ export const noteFileResultVersusUserFilesCheck = async <T extends File>(
       'There was a problem creating a Note for your files in the database. Try again later.';
 
     if (fileDBResults.length > 0) {
-      await handleFileDeletion(fileDBResults);
+      const fileIDs = fileDBResults.map((leanFile) => leanFile._id);
+
+      await handleFileDeletion(fileIDs);
     }
 
     return validationCheck;
@@ -200,6 +202,70 @@ export const handleS3FileUploads = async <T extends File>(
 
   return finalizedUploadResults;
 };
+
+/******************************************************/
+
+/*************************************************
+ * verifyS3FileUploads
+ **************************************************/
+
+interface s3ValidationCheck {
+  message: string;
+}
+
+export const verifyS3FileUploads = async (
+  s3UploadResults: s3UploadResult[],
+  s3PayloadResults: s3FilePayload[],
+  newNote: LeanNote
+): Promise<s3ValidationCheck> => {
+
+  // 1) None of the s3 Uploads were successful. Delete the created parent Note Document and File documents.
+  if (s3UploadResults.length === 0) {
+    const fileIDs = s3PayloadResults.map((filePayload) => filePayload.file_id);
+
+    await handleFileDeletion(fileIDs);
+
+    await handleNoteDeletion(newNote);
+
+    return {
+      message: 'There was an error uploading your media files. Try recreating your Note and upload your files again later.'
+    };
+  }
+
+  // 2) Some of the files failed to upload. Only delete the failed File uploads from the database.
+  if(s3UploadResults.length !== s3PayloadResults.length) {
+    const uploadIDs = s3UploadResults.map((uploadRes) => uploadRes.file_id);
+
+    const failedFilePayloads = s3PayloadResults.filter(payloadRes => {
+      const targetID = payloadRes.file_id;
+
+      return uploadIDs.includes(targetID) === false;
+
+    });
+
+    const failedFileIDs = failedFilePayloads.map(failPayload => failPayload.file_id);
+
+    await handleFileDeletion(failedFileIDs);
+
+    return {
+        message: 'Your files were uploaded successfully.'
+    };
+
+  }
+
+  
+  // 3) All the files were uploaded successfully.
+  return {
+    message: 'Your files were successfully uploaded.'
+  };
+};
+
+/******************************************************/
+
+
+
+
+
 
 /********************************************
  * Notes
