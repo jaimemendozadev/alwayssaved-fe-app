@@ -11,7 +11,6 @@ import {
 
 import { s3UploadResult } from '@/components/fileupload/utils';
 
-
 /*************************************************
  * handleNoteDeletion
  **************************************************/
@@ -19,15 +18,20 @@ import { s3UploadResult } from '@/components/fileupload/utils';
 export const handleFileDeletion = async (
   fileDBIDs: string[]
 ): Promise<void> => {
-  await Promise.allSettled(
-    fileDBIDs.map(async (fileStringID) => {
-      await dbConnect();
+  try {
+    await dbConnect();
 
-      const _id = getObjectIDFromString(fileStringID);
+    await Promise.allSettled(
+      fileDBIDs.map(async (fileStringID) => {
+        const _id = getObjectIDFromString(fileStringID);
 
-      return FileModel.findOneAndDelete({ _id }).exec();
-    })
-  );
+        return FileModel.findOneAndDelete({ _id }).exec();
+      })
+    );
+  } catch (error) {
+    // TODO: Handle in telemetry.
+    console.log('Error in handleFileDeletion: ', error);
+  }
 };
 
 /***************************************************/
@@ -59,10 +63,9 @@ interface UpdateStatus {
   update_status: string;
 }
 
-
 export const handleFileDocUpdate = async (
-  fileUpdates
-: s3UploadResult[]): Promise<UpdateStatus[]> => {
+  fileUpdates: s3UploadResult[]
+): Promise<UpdateStatus[]> => {
   const updateResults = await Promise.allSettled(
     fileUpdates.map(async (updateInfo) => {
       const { file_id, update } = updateInfo;
@@ -93,9 +96,6 @@ export const handleFileDocUpdate = async (
 
 /***************************************************/
 
-
-
-
 /*************************************************
  * createNoteFileDocs
  **************************************************/
@@ -105,14 +105,13 @@ export interface noteFileResult {
   fileDBResults: LeanFile[];
 }
 
-
 interface createNoteFileDocsArguments<T extends File> {
   currentFiles: T[];
   currentUserID: string;
   noteTitle: string;
 }
 
-export const createNoteFileDocs = async <T extends File> ({
+export const createNoteFileDocs = async <T extends File>({
   currentFiles,
   currentUserID,
   noteTitle
@@ -126,7 +125,6 @@ export const createNoteFileDocs = async <T extends File> ({
     }));
 
     console.log('filePayloads ', filePayloads);
-
 
     // 1) Create a single MongoDB Note document.
     const userMongoID = getObjectIDFromString(currentUserID);
@@ -187,7 +185,3 @@ export const createNoteFileDocs = async <T extends File> ({
 };
 
 /***************************************************/
-
-
-
-
