@@ -1,31 +1,28 @@
 'use server';
-import { dbConnect,} from '@/utils/mongodb';
+import { dbConnect } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
 import { UserModel, LeanUser } from '@/utils/mongodb';
 import { deepLean } from '@/utils/mongodb/utils';
 export const getUserFromDB = async (): Promise<LeanUser | void> => {
   await dbConnect();
-    const clerkUser = await currentUser();
+  const clerkUser = await currentUser();
 
-    if(clerkUser === null) {
+  if (clerkUser === null) {
+    throw new Error(
+      "There was a problem getting the currently logged in user from Clerk. Can't continue the sign in process."
+    );
+  }
 
-        throw new Error("There was a problem getting the currently logged in user from Clerk. Can't continue the sign in process.");
+  const email = clerkUser.emailAddresses[0].emailAddress;
 
-    }
+  const foundUser = await UserModel.findOne({ email }).exec();
 
-    const email = clerkUser.emailAddresses[0].emailAddress;
+  if (!foundUser) {
+    throw new Error(
+      `No user with the email of ${email} exists in the database. Can't continue the sign in process.`
+    );
+  }
 
 
-    const foundUser = await UserModel.findOne({email}).exec();
-
-    if(!foundUser) {
-        throw new Error(`No user with the email of ${email} exists in the database. Can't continue the sign in process.`);
-    }
-
-    console.log("foundUser in getUserFromDB ", foundUser);
-    console.log("\n");
-
-    return deepLean(foundUser);
-
+  return deepLean(foundUser);
 };
-

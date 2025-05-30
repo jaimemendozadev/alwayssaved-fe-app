@@ -29,8 +29,5 @@ export const registerNewUser = async (): Promise<LeanUser | void> => {
 
   const [newUser] = await UserModel.create([payload], { j: true });
 
-  console.log('newUser in onboardUser ', newUser);
-  console.log('\n');
-
   return deepLean(newUser);
 };
