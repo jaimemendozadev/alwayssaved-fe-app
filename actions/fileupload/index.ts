@@ -9,6 +9,8 @@ import {
   getObjectIDFromString
 } from '@/utils/mongodb';
 
+import { s3UploadResult } from '@/components/fileupload/utils';
+
 
 /*************************************************
  * handleNoteDeletion
@@ -57,17 +59,10 @@ interface UpdateStatus {
   update_status: string;
 }
 
-interface fileUpdate {
-  file_id: string;
-  update: { s3_key: string };
-}
-interface handleFileDocUpdateArguments {
-  fileUpdates: fileUpdate[];
-}
 
-export const handleFileDocUpdate = async ({
+export const handleFileDocUpdate = async (
   fileUpdates
-}: handleFileDocUpdateArguments): Promise<UpdateStatus[]> => {
+: s3UploadResult[]): Promise<UpdateStatus[]> => {
   const updateResults = await Promise.allSettled(
     fileUpdates.map(async (updateInfo) => {
       const { file_id, update } = updateInfo;

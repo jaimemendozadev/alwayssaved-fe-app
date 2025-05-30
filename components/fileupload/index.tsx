@@ -9,10 +9,9 @@ import { handleFileDeletion, handleNoteDeletion } from '@/actions/fileupload';
 import {
   createNoteFileDocs,
   createPresignedUrl,
-  handleFileDocUpdate,
   handleS3FileUploads,
   noteFileResultVersusUserFilesCheck,
-  verifyS3FileUploads
+  verifyUpdateS3Uploads
 } from './utils';
 
 interface FileUploadProps {
@@ -122,7 +121,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
 
-
     // 3) Upload each media file to s3.
     const finalizedUploadResults = await handleS3FileUploads(
       currentFiles,
@@ -130,31 +128,16 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     );
 
 
+    // 4) Verify media uploads were successful and perform database updates to each File document with their s3_key.
+    const feedback = await verifyUpdateS3Uploads(finalizedUploadResults, s3PayloadResults, pluckedNote);
 
-     /*
-      5/28/25 TODO: Need to add some error handling if for some reason, actually uploading a file to s3 doesn't work
-                    and we have to possibly delete the Note Doc and all File docs that failed to upload to s3.
+    if(feedback.error) {
+      toast.error(feedback.message, feedbackDuration);
+      return;
+    }
 
-    */
+    toast.success(feedback.message, feedbackDuration);
 
-
-
-
-    await verifyS3FileUploads(finalizedUploadResults, s3PayloadResults, pluckedNote);
-
-
-
-
-
-
-
-    // 4) Update each File document with their s3_key.
-
-    const fileUpdateResults = await handleFileDocUpdate({
-      fileUpdates: finalizedUploadResults
-    });
-
-    console.log('fileUpdateResults ', fileUpdateResults);
   };
 
   return (
@@ -204,25 +187,3 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     </div>
   );
 };
-
-/*
-  File Upload Flow:
-
-  When a user drops or selects X number of files:
-
-    [ ]: Upload each selected file with FileID and NoteID to s3.
-    [ ]: Trigger Toast Message indicating upload result:
-      - For now, do not redirect the user to another page.
-
-
-
-   export interface INote {
-     _id: mongoose.Types.ObjectId;
-     user_id: mongoose.Types.ObjectId | IUser;
-     title: string;
-     date_created: Date;
-     date_deleted: Date | null;
-   //   files: []
-   }   
-
-*/

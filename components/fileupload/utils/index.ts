@@ -157,7 +157,7 @@ export const createPresignedUrl = async ({
  * handleS3FileUploads
  **************************************************/
 
-interface s3UploadResult {
+export interface s3UploadResult {
   file_id: string;
   update: {
     s3_key: string;
@@ -206,18 +206,25 @@ export const handleS3FileUploads = async <T extends File>(
 /******************************************************/
 
 /*************************************************
- * verifyS3FileUploads
+ * verifyUpdateS3Uploads
  **************************************************/
 
-interface s3ValidationCheck {
+
+interface validationFeedback {
   message: string;
+  error: boolean;
 }
 
-export const verifyS3FileUploads = async (
+export const verifyUpdateS3Uploads = async (
   s3UploadResults: s3UploadResult[],
   s3PayloadResults: s3FilePayload[],
   newNote: LeanNote
-): Promise<s3ValidationCheck> => {
+): Promise<validationFeedback> => {
+
+  const feedback = {
+    message: '',
+    error: true,
+  }
 
   // 1) None of the s3 Uploads were successful. Delete the created parent Note Document and File documents.
   if (s3UploadResults.length === 0) {
@@ -227,9 +234,9 @@ export const verifyS3FileUploads = async (
 
     await handleNoteDeletion(newNote);
 
-    return {
-      message: 'There was an error uploading your media files. Try recreating your Note and upload your files again later.'
-    };
+    feedback['message'] = 'There was an error uploading your media files. Try recreating your Note and upload your files again later.';
+
+    return feedback;
   }
 
   // 2) Some of the files failed to upload. Only delete the failed File uploads from the database.
@@ -247,17 +254,20 @@ export const verifyS3FileUploads = async (
 
     await handleFileDeletion(failedFileIDs);
 
-    return {
-        message: 'Your files were uploaded successfully.'
-    };
+    await handleFileDocUpdate(s3UploadResults);
+
+    feedback['message'] = 'Only some of your files were uploaded successfully. Please re-upload the failed file uploads later.';
 
   }
 
   
   // 3) All the files were uploaded successfully.
-  return {
-    message: 'Your files were successfully uploaded.'
-  };
+  await handleFileDocUpdate(s3UploadResults);
+
+  feedback['error'] = false;
+  feedback['message'] = 'Your files were successfully uploaded.';
+  
+  return feedback
 };
 
 /******************************************************/
