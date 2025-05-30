@@ -47,16 +47,16 @@ export const handleFileDeletion = async (
  **************************************************/
 
 export const handleNoteDeletion = async (newNote: LeanNote): Promise<void> => {
-  const _id = getObjectIDFromString(newNote._id);
-
   try {
     await dbConnect();
+
+    const _id = getObjectIDFromString(newNote._id);
 
     await NoteModel.findOneAndDelete({ _id }).exec();
   } catch (error) {
     // TODO: Handle in telemetry.
     console.log(
-      `Error in handleNoteDeletion for Note with ID of ${_id}:`,
+      `Error in handleNoteDeletion for Note with ID of ${newNote._id}:`,
       error
     );
   }
