@@ -40,16 +40,20 @@ export const handleFileDeletion = async (
  * handleNoteDeletion
  **************************************************/
 
-export const handleNoteDeletion = async (
-  newNote: LeanNote
-): Promise<LeanNote> => {
-  await dbConnect();
-
+export const handleNoteDeletion = async (newNote: LeanNote): Promise<void> => {
   const _id = getObjectIDFromString(newNote._id);
 
-  const deletedNote = await NoteModel.findOneAndDelete({ _id }).exec();
+  try {
+    await dbConnect();
 
-  return deepLean(deletedNote);
+    await NoteModel.findOneAndDelete({ _id }).exec();
+  } catch (error) {
+    // TODO: Handle in telemetry.
+    console.log(
+      `Error in handleNoteDeletion for Note with ID of ${_id}:`,
+      error
+    );
+  }
 };
 
 /***************************************************/
