@@ -8,7 +8,7 @@ import { InputEvent } from '@/utils/ts';
 import { handleFileDeletion, handleNoteDeletion } from '@/actions/fileupload';
 import {
   createNoteFileDocs,
-  createPresignedUrl,
+  handlePresignedUrls,
   handleS3FileUploads,
   verifyCreateNoteFileDocsResult,
   verifyUpdateS3Uploads
@@ -91,7 +91,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     currentFiles = validationCheck.currentFiles;
 
     // 2) Create the presignUrls for each File document.
-    const s3PayloadResults = await createPresignedUrl(fileDBResults);
+    const s3PayloadResults = await handlePresignedUrls(fileDBResults);
 
     console.log('s3PayloadResults ', s3PayloadResults);
 

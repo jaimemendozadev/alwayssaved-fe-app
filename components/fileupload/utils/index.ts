@@ -7,7 +7,7 @@ import {
   noteFileResult
 } from '@/actions/fileupload';
 
-import { createPresignedUrlWithClient } from '@/utils/aws/s3';
+import { handlePresignedUrlsWithClient } from '@/utils/aws/s3';
 
 export { createNoteFileDocs, handleFileDocUpdate };
 
@@ -114,7 +114,7 @@ export const verifyCreateNoteFileDocsResult = async <T extends File>(
 
 
 /*************************************************
- * createPresignedUrl
+ * handlePresignedUrls
  **************************************************/
 
 interface s3FilePayload {
@@ -125,7 +125,7 @@ interface s3FilePayload {
 }
 
 // See Note #1 below.
-export const createPresignedUrl = async (
+export const handlePresignedUrls = async (
   fileDocuments
 : LeanFile[]): Promise<s3FilePayload[]> => {
   const presignResults = await Promise.allSettled(
@@ -134,7 +134,7 @@ export const createPresignedUrl = async (
 
       const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
 
-      const presignedURL = await createPresignedUrlWithClient(s3_key);
+      const presignedURL = await handlePresignedUrlsWithClient(s3_key);
 
       return {
         s3_key,

@@ -9,7 +9,7 @@ const config = getAWSConfigByEnv(NODE_ENV);
 const client = new S3Client([config]);
 
 // See Note #1 below
-export const createPresignedUrlWithClient = async (
+export const handlePresignedUrlsWithClient = async (
   key: string,
   expiresIn: number = 3600
 ): Promise<string> => {
@@ -24,14 +24,14 @@ export const createPresignedUrlWithClient = async (
  *************************************
 
 
-1) createPresignedUrlWithClient works in "production" without aws credentials 
+1) handlePresignedUrlsWithClient works in "production" without aws credentials 
    if you attach a task role to the ecs task definition with access to s3.
 
    Code Source: 
    https://docs.aws.amazon.com/AmazonS3/latest/userguide/example_s3_Scenario_PresignedUrl_section.html
 
 
-5/30/25 TODO: createPresignedUrlWithClient is fired in Promise.allSettled. 
+5/30/25 TODO: handlePresignedUrlsWithClient is fired in Promise.allSettled. 
               Should we add try/catch to function? 🤔
 
 */
