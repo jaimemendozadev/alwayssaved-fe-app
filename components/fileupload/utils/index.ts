@@ -117,9 +117,6 @@ export const verifyCreateNoteFileDocsResult = async <T extends File>(
  * createPresignedUrl
  **************************************************/
 
-interface createPresignedUrlArguments {
-  fileDocuments: LeanFile[];
-}
 interface s3FilePayload {
   s3_key: string;
   file_id: string;
@@ -128,9 +125,9 @@ interface s3FilePayload {
 }
 
 // See Note #1 below.
-export const createPresignedUrl = async ({
+export const createPresignedUrl = async (
   fileDocuments
-}: createPresignedUrlArguments): Promise<s3FilePayload[]> => {
+: LeanFile[]): Promise<s3FilePayload[]> => {
   const presignResults = await Promise.allSettled(
     fileDocuments.map(async (fileDoc) => {
       const { file_name, note_id, user_id, _id } = fileDoc;

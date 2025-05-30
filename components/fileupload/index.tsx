@@ -91,9 +91,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     currentFiles = validationCheck.currentFiles;
 
     // 2) Create the presignUrls for each File document.
-    const s3PayloadResults = await createPresignedUrl({
-      fileDocuments: fileDBResults
-    });
+    const s3PayloadResults = await createPresignedUrl(fileDBResults);
 
     console.log('s3PayloadResults ', s3PayloadResults);
 
