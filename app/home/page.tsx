@@ -38,17 +38,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-
-/*
-  File Upload Flow:
-
-  When a user drops or selects X number of files:
-
-    [ ]: Create a single MongoDB Note document.
-    [ ]: Create a MongoDB File document for each dropped-in/uploaded file.
-    [ ]: Upload each selected file with FileID and NoteID to s3.
-    [ ]: Trigger Toast Message indicating upload result:
-      - For now, do not redirect the user to another page.
-
-*/

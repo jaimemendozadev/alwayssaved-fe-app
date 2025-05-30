@@ -93,7 +93,8 @@ export const handleFileDocUpdate = async (
 
 /***************************************************/
 
-/***************************************************/
+
+
 
 /*************************************************
  * createNoteFileDocs
@@ -183,21 +184,6 @@ export const createNoteFileDocs = async ({
 
 /***************************************************/
 
-/********************************************
- * Notes
- ********************************************
 
 
- From Extractor Service Dev Notes 5/10/25 (Extractor Notes need to be updated):
 
-- Decided to organize media uploads and call each upload a "Note".
-- If the Note is an .mp3 or .mp4, a Note is created for that file and it'll get uploaded on the Frontend to s3 at /{userID}/{noteID}/{fileName}.{fileExtension}
-- When SQS messages arrives in Extractor service, will transcribe and upload the transcript to s3 at /{userID}/{noteID}/{fileName}.txt
-- Incoming SQS Message has the following shape:
-  {
-     note_id: ObjectID;
-     user_id: ObjectID;
-     s3_key: string;
-  }   
-
-*/
