@@ -10,7 +10,7 @@ import {
   createNoteFileDocs,
   createPresignedUrl,
   handleS3FileUploads,
-  noteFileResultVersusUserFilesCheck,
+  verifyCreateNoteFileDocsResult,
   verifyUpdateS3Uploads
 } from './utils';
 
@@ -66,7 +66,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     console.log('noteFileResult before Validation: ', noteFileResult);
 
-    const validationCheck = await noteFileResultVersusUserFilesCheck(
+    const validationCheck = await verifyCreateNoteFileDocsResult(
       noteFileResult,
       currentFiles
     );

@@ -34,7 +34,7 @@ const filterCurrentFiles = <T extends File>(
 
 
 /*************************************************
- * noteFileResultVersusUserFilesCheck
+ * verifyCreateNoteFileDocsResult
  **************************************************/
 
 interface noteFileResValidationCheck<T extends File> {
@@ -44,7 +44,7 @@ interface noteFileResValidationCheck<T extends File> {
   currentFiles: T[];
 }
 
-export const noteFileResultVersusUserFilesCheck = async <T extends File>(
+export const verifyCreateNoteFileDocsResult = async <T extends File>(
   noteFileResult: noteFileResult,
   currentFiles: T[]
 ): Promise<noteFileResValidationCheck<T>> => {
