@@ -31,4 +31,12 @@ export const handlePresignedUrlsWithClient = async (
    https://docs.aws.amazon.com/AmazonS3/latest/userguide/example_s3_Scenario_PresignedUrl_section.html
 
 
+ 2) Media assets are stored in s3 in the following s3_key format: 
+
+    /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
+
+    fileOwner: is the User._id
+    fileName: is the name of the file with the fileType extension 
+
+
 */
