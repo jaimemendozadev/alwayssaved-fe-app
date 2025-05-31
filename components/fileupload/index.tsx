@@ -6,6 +6,7 @@ import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
 import { handleFileDeletion, handleNoteDeletion } from '@/actions/fileupload';
+import { sendSQSMessage } from '@/utils/aws';
 import {
   createNoteFileDocs,
   handlePresignedUrls,
@@ -54,7 +55,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('\n');
 
     let currentFiles = [...acceptedFiles];
-    
+
     const currentUserID = currentUser._id;
 
     // 1) Create a Note Doc and all File Docs associated with that Note.
@@ -96,12 +97,12 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('s3PayloadResults ', s3PayloadResults);
 
     if (s3PayloadResults.length === 0) {
-      const fileIDs = fileDBResults.map(leanFile => leanFile._id);
+      const fileIDs = fileDBResults.map((leanFile) => leanFile._id);
 
       await handleFileDeletion(fileIDs);
 
       await handleNoteDeletion(pluckedNote);
-      
+
       toast.error(
         'There was a problem uploading your files to the cloud. Try again later.',
         feedbackDuration
@@ -115,17 +116,25 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       s3PayloadResults
     );
 
+    /*
+      4) Verify media uploads were successful, perform database updates to each 
+         File document with their s3_key, prep sqsPayload for sending SQS message.
+    */
+    const feedback = await verifyUploadsUpdateFilesInDB(
+      finalizedUploadResults,
+      s3PayloadResults,
+      pluckedNote
+    );
 
-    // 4) Verify media uploads were successful and perform database updates to each File document with their s3_key.
-    const feedback = await verifyUploadsUpdateFilesInDB(finalizedUploadResults, s3PayloadResults, pluckedNote);
-
-    if(feedback.error) {
+    if (feedback.error) {
       toast.error(feedback.message, feedbackDuration);
       return;
     }
 
     toast.success(feedback.message, feedbackDuration);
 
+    // 5) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
+    await sendSQSMessage(feedback.sqsPayload);
   };
 
   return (

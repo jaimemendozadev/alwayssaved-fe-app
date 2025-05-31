@@ -238,7 +238,7 @@ export const handleS3FileUploads = async <T extends File>(
  * verifyUploadsUpdateFilesInDB
  **************************************************/
 
-interface sqsMsgBody {
+export interface sqsMsgBody {
   s3_key: string;
   note_id: string;
   user_id: string;
@@ -255,8 +255,8 @@ export const verifyUploadsUpdateFilesInDB = async (
   s3PayloadResults: s3FilePayload[],
   newNote: LeanNote
 ): Promise<validationFeedback> => {
-  // 1) Prep s3UploadResults for sendSQSMessage, if any.
 
+  // 1) Prep s3UploadResults for sendSQSMessage, if any.
   const note_id = newNote._id;
   const user_id =
     typeof newNote.user_id === 'string' ? newNote.user_id : newNote.user_id._id;
