@@ -140,11 +140,12 @@ export const handlePresignedUrls = async (
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
 
-        throw new Error(message);
+        throw new Error(`Error in handlePresignedUrls for s3_key: ${s3_key}: ${message}`);
       }
     })
   );
 
+  // Log preSignUrl Failures
   presignResults.forEach((result) => {
     if (result.status === 'rejected') {
       // TODO: Handle in telemetry.
