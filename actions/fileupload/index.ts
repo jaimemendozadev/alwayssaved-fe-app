@@ -28,11 +28,10 @@ export const handleFileDeletion = async (
 
           return FileModel.findOneAndDelete({ _id }).exec();
         } catch (error) {
-          throw {
-            file_id: fileStringID,
-            message: 'MongoDB File Deletion failed',
-            error: error
-          };
+          const message =
+            error instanceof Error ? error.message : String(error);
+
+          throw new Error(message);
         }
       })
     );
