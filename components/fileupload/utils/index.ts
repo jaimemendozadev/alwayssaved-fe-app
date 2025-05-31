@@ -7,7 +7,7 @@ import {
   noteFileResult
 } from '@/actions/fileupload';
 
-import { handlePresignedUrlsWithClient } from '@/utils/aws/s3';
+import { handlePresignedUrlsWithClient } from '@/utils/aws';
 
 export { createNoteFileDocs, handleFileDocUpdate };
 
@@ -238,9 +238,16 @@ export const handleS3FileUploads = async <T extends File>(
  * verifyUploadsUpdateFilesInDB
  **************************************************/
 
+interface sqsMsgBody {
+  s3_key: string;
+  note_id: string;
+  user_id: string;
+}
+
 interface validationFeedback {
   message: string;
   error: boolean;
+  sqsPayload: sqsMsgBody[];
 }
 
 export const verifyUploadsUpdateFilesInDB = async (
@@ -248,12 +255,30 @@ export const verifyUploadsUpdateFilesInDB = async (
   s3PayloadResults: s3FilePayload[],
   newNote: LeanNote
 ): Promise<validationFeedback> => {
-  const feedback = {
+  // 1) Prep s3UploadResults for sendSQSMessage, if any.
+
+  const note_id = newNote._id;
+  const user_id =
+    typeof newNote.user_id === 'string' ? newNote.user_id : newNote.user_id._id;
+
+  const sqsPayload = s3UploadResults.map((uploadResult) => {
+    const { update } = uploadResult;
+    const { s3_key } = update;
+
+    return {
+      s3_key,
+      note_id,
+      user_id
+    };
+  });
+
+  const feedback: validationFeedback = {
     message: '',
-    error: true
+    error: true,
+    sqsPayload
   };
 
-  // 1) None of the s3 Uploads were successful. Delete the created parent Note Document and File documents.
+  // 2) None of the s3 Uploads were successful. Delete the created parent Note Document and File documents.
   if (s3UploadResults.length === 0) {
     const fileIDs = s3PayloadResults.map((filePayload) => filePayload.file_id);
 
@@ -267,7 +292,7 @@ export const verifyUploadsUpdateFilesInDB = async (
     return feedback;
   }
 
-  // 2) Some of the files failed to upload. Only delete the failed File uploads from the database.
+  // 3) Some of the files failed to upload. Only delete the failed File uploads from the database.
   if (s3UploadResults.length !== s3PayloadResults.length) {
     const uploadIDs = s3UploadResults.map((uploadRes) => uploadRes.file_id);
 
@@ -293,7 +318,7 @@ export const verifyUploadsUpdateFilesInDB = async (
     return feedback;
   }
 
-  // 3) All the files were uploaded successfully.
+  // 4) All the files were uploaded successfully.
   await handleFileDocUpdate(s3UploadResults);
 
   feedback['error'] = false;
