@@ -21,22 +21,32 @@ export const handleFileDeletion = async (
   try {
     await dbConnect();
 
-    await Promise.allSettled(
+    const deletionResults = await Promise.allSettled(
       fileDBIDs.map(async (fileStringID) => {
-        const _id = getObjectIDFromString(fileStringID);
+        try {
+          const _id = getObjectIDFromString(fileStringID);
 
-        return FileModel.findOneAndDelete({ _id }).exec();
+          return FileModel.findOneAndDelete({ _id }).exec();
+        } catch (error) {
+          throw {
+            file_id: fileStringID,
+            message: 'MongoDB File Deletion failed',
+            error: error
+          };
+        }
       })
     );
+
+    // Log File Deletion Failures
+    deletionResults.forEach((result) => {
+      if (result.status === 'rejected') {
+        // TODO: Handle in telemetry.
+        console.error('Deletion failed:', result.reason);
+      }
+    });
   } catch (error) {
     // TODO: Handle in telemetry.
-
-    const fileIDString = fileDBIDs.join(', ');
-
-    console.log(
-      `There was an error in handleFileDeletion for one of the following File Document IDs: ${fileIDString}`
-    );
-    console.log('Error body in handleFileDeletion: ', error);
+    console.log('Error in handleFileDeletion: ', error);
   }
 };
 
