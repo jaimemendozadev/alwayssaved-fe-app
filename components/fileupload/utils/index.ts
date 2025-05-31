@@ -140,7 +140,9 @@ export const handlePresignedUrls = async (
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
 
-        throw new Error(`Error in handlePresignedUrls for s3_key: ${s3_key}: ${message}`);
+        throw new Error(
+          `Error in handlePresignedUrls for s3_key: ${s3_key}: ${message}`
+        );
       }
     })
   );
@@ -190,18 +192,34 @@ export const handleS3FileUploads = async <T extends File>(
 
       const { presigned_url, file_id, s3_key } = targetPayload;
 
-      await fetch(presigned_url, {
-        method: 'PUT',
-        headers: { 'Content-Type': targetType },
-        body: file
-      });
+      try {
+        await fetch(presigned_url, {
+          method: 'PUT',
+          headers: { 'Content-Type': targetType },
+          body: file
+        });
 
-      return {
-        file_id,
-        update: { s3_key }
-      };
+        return {
+          file_id,
+          update: { s3_key }
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        throw new Error(
+          `Error in handleS3FileUploads for s3_key: ${s3_key}: ${message}`
+        );
+      }
     })
   );
+
+  // Log s3FileUpload Failures
+  uploadResults.forEach((result) => {
+    if (result.status === 'rejected') {
+      // TODO: Handle in telemetry.
+      console.error('Uploading file to s3 failed: ', result.reason);
+    }
+  });
 
   const filteredUploadResults = uploadResults.filter(
     (result) => result.status === 'fulfilled'
