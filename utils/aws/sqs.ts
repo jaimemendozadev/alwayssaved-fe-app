@@ -9,7 +9,11 @@ const config = getAWSConfigByEnv(NODE_ENV);
 
 const client = new SQSClient([config]);
 
-export const sendSQSMessage = async (sqsPayload: sqsMsgBody[]): Promise<void> => {
+interface sqsMessage {
+  user_id: string;
+  media_uploads: sqsMsgBody[]
+}
+export const sendSQSMessage = async (sqsMessage: sqsMessage): Promise<void> => {
   const EXTRACTOR_PUSH_QUEUE_URL = await getSecret('EXTRACTOR_PUSH_QUEUE_URL');
 
   if (!EXTRACTOR_PUSH_QUEUE_URL) {
@@ -18,7 +22,7 @@ export const sendSQSMessage = async (sqsPayload: sqsMsgBody[]): Promise<void> =>
     );
   }
 
-  const MessageBody = JSON.stringify(sqsPayload)
+  const MessageBody = JSON.stringify(sqsMessage)
 
   const command = new SendMessageCommand({
     QueueUrl: EXTRACTOR_PUSH_QUEUE_URL,

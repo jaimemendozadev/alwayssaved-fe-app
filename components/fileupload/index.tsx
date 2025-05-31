@@ -133,8 +133,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     toast.success(feedback.message, feedbackDuration);
 
+    const sqs_message = {
+      user_id: currentUserID,
+      media_uploads: feedback.sqsPayload
+
+    }
+
     // 5) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
-    await sendSQSMessage(feedback.sqsPayload);
+    await sendSQSMessage(sqs_message);
   };
 
   return (
