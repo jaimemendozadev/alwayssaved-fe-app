@@ -1,7 +1,7 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { getAWSConfigByEnv } from '.';
 import { getSecret } from './ssm';
-import { sqsMsgBody } from '@/components/fileupload/utils';
+import { s3MediaUpload } from '@/components/fileupload/utils';
 
 const { NODE_ENV } = process.env;
 
@@ -11,7 +11,7 @@ const client = new SQSClient([config]);
 
 interface sqsMessage {
   user_id: string;
-  media_uploads: sqsMsgBody[]
+  media_uploads: s3MediaUpload[]
 }
 export const sendSQSMessage = async (sqsMessage: sqsMessage): Promise<void> => {
   const EXTRACTOR_PUSH_QUEUE_URL = await getSecret('EXTRACTOR_PUSH_QUEUE_URL');

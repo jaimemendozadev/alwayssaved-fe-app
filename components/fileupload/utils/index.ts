@@ -238,7 +238,7 @@ export const handleS3FileUploads = async <T extends File>(
  * verifyUploadsUpdateFilesInDB
  **************************************************/
 
-export interface sqsMsgBody {
+export interface s3MediaUpload {
   s3_key: string;
   note_id: string;
   user_id: string;
@@ -247,7 +247,7 @@ export interface sqsMsgBody {
 interface validationFeedback {
   message: string;
   error: boolean;
-  sqsPayload: sqsMsgBody[];
+  sqsPayload: s3MediaUpload[];
 }
 
 export const verifyUploadsUpdateFilesInDB = async (
