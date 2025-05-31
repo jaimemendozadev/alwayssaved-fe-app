@@ -186,18 +186,38 @@ export const createNoteFileDocs = async <T extends File>({
     // 2) Create File documents for each filePayload.
     const fileDBResults = await Promise.allSettled(
       filePayloads.map((file) => {
-        const filePayload = {
-          user_id: userMongoID,
-          note_id: noteMongoID,
-          file_name: file.name,
-          file_type: file.type
-        };
+        const file_name = file.name;
+        const file_type = file.type;
 
-        return FileModel.create([filePayload], { j: true });
+        try {
+          const filePayload = {
+            user_id: userMongoID,
+            note_id: noteMongoID,
+            file_name,
+            file_type
+          };
+
+          return FileModel.create([filePayload], { j: true });
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : String(error);
+
+          throw new Error(
+            `Error in createNoteFileDocs for user_id ${currentUserID}, note_id ${createdNote._id}, for file_name ${file_name}: ${message}`
+          );
+        }
       })
     );
 
     const newNote = [deepLean(createdNote)];
+
+    // Log File document creation failures
+    fileDBResults.forEach((result) => {
+      if (result.status === 'rejected') {
+        // TODO: Handle in telemetry.
+        console.error('File document creation failed:', result.reason);
+      }
+    });
 
     // 3) Filter out and sanitize fulfilled results.
     const filteredResults = fileDBResults.filter(
