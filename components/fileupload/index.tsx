@@ -11,7 +11,7 @@ import {
   handlePresignedUrls,
   handleS3FileUploads,
   verifyCreateNoteFileDocsResult,
-  verifyUpdateS3Uploads
+  verifyUploadsUpdateFileDocs
 } from './utils';
 
 interface FileUploadProps {
@@ -100,7 +100,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
       await handleFileDeletion(fileIDs);
 
-
       await handleNoteDeletion(pluckedNote);
       
       toast.error(
@@ -118,7 +117,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
 
     // 4) Verify media uploads were successful and perform database updates to each File document with their s3_key.
-    const feedback = await verifyUpdateS3Uploads(finalizedUploadResults, s3PayloadResults, pluckedNote);
+    const feedback = await verifyUploadsUpdateFileDocs(finalizedUploadResults, s3PayloadResults, pluckedNote);
 
     if(feedback.error) {
       toast.error(feedback.message, feedbackDuration);

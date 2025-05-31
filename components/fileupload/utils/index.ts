@@ -212,7 +212,7 @@ export const handleS3FileUploads = async <T extends File>(
 /******************************************************/
 
 /*************************************************
- * verifyUpdateS3Uploads
+ * verifyUploadsUpdateFileDocs
  **************************************************/
 
 
@@ -221,7 +221,7 @@ interface validationFeedback {
   error: boolean;
 }
 
-export const verifyUpdateS3Uploads = async (
+export const verifyUploadsUpdateFileDocs = async (
   s3UploadResults: s3UploadResult[],
   s3PayloadResults: s3FilePayload[],
   newNote: LeanNote
