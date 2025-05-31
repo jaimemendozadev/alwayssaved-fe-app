@@ -285,8 +285,12 @@ export const verifyUploadsUpdateFilesInDB = async (
 
     await handleFileDocUpdate(s3UploadResults);
 
+    feedback['error'] = false;
+
     feedback['message'] =
-      'Only some of your files were uploaded successfully. Please re-upload the failed file uploads later.';
+      'Most of your files were successfully uploaded. Please re-upload the failed file uploads later.';
+
+    return feedback;
   }
 
   // 3) All the files were uploaded successfully.
