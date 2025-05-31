@@ -30,9 +30,6 @@ const filterCurrentFiles = <T extends File>(
 
 /******************************************************/
 
-
-
-
 /*************************************************
  * verifyCreateNoteFileDocsResult
  **************************************************/
@@ -110,9 +107,6 @@ export const verifyCreateNoteFileDocsResult = async <T extends File>(
 
 /******************************************************/
 
-
-
-
 /*************************************************
  * handlePresignedUrls
  **************************************************/
@@ -126,24 +120,37 @@ interface s3FilePayload {
 
 // See Note #1 below.
 export const handlePresignedUrls = async (
-  fileDocuments
-: LeanFile[]): Promise<s3FilePayload[]> => {
+  fileDocuments: LeanFile[]
+): Promise<s3FilePayload[]> => {
   const presignResults = await Promise.allSettled(
     fileDocuments.map(async (fileDoc) => {
       const { file_name, note_id, user_id, _id } = fileDoc;
 
       const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
 
-      const presignedURL = await handlePresignedUrlsWithClient(s3_key);
+      try {
+        const presignedURL = await handlePresignedUrlsWithClient(s3_key);
 
-      return {
-        s3_key,
-        file_id: _id,
-        file_name,
-        presigned_url: presignedURL
-      };
+        return {
+          s3_key,
+          file_id: _id,
+          file_name,
+          presigned_url: presignedURL
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        throw new Error(message);
+      }
     })
   );
+
+  presignResults.forEach((result) => {
+    if (result.status === 'rejected') {
+      // TODO: Handle in telemetry.
+      console.error('Creating PresignUrl failed: ', result.reason);
+    }
+  });
 
   const filteredResults = presignResults.filter(
     (result) => result.status === 'fulfilled'
@@ -155,9 +162,6 @@ export const handlePresignedUrls = async (
 };
 
 /******************************************************/
-
-
-
 
 /*************************************************
  * handleS3FileUploads
@@ -215,7 +219,6 @@ export const handleS3FileUploads = async <T extends File>(
  * verifyUploadsUpdateFileDocs
  **************************************************/
 
-
 interface validationFeedback {
   message: string;
   error: boolean;
@@ -226,11 +229,10 @@ export const verifyUploadsUpdateFileDocs = async (
   s3PayloadResults: s3FilePayload[],
   newNote: LeanNote
 ): Promise<validationFeedback> => {
-
   const feedback = {
     message: '',
-    error: true,
-  }
+    error: true
+  };
 
   // 1) None of the s3 Uploads were successful. Delete the created parent Note Document and File documents.
   if (s3UploadResults.length === 0) {
@@ -240,48 +242,44 @@ export const verifyUploadsUpdateFileDocs = async (
 
     await handleNoteDeletion(newNote);
 
-    feedback['message'] = 'There was an error uploading your media files. Try recreating your Note and upload your files again later.';
+    feedback['message'] =
+      'There was an error uploading your media files. Try recreating your Note and upload your files again later.';
 
     return feedback;
   }
 
   // 2) Some of the files failed to upload. Only delete the failed File uploads from the database.
-  if(s3UploadResults.length !== s3PayloadResults.length) {
+  if (s3UploadResults.length !== s3PayloadResults.length) {
     const uploadIDs = s3UploadResults.map((uploadRes) => uploadRes.file_id);
 
-    const failedFilePayloads = s3PayloadResults.filter(payloadRes => {
+    const failedFilePayloads = s3PayloadResults.filter((payloadRes) => {
       const targetID = payloadRes.file_id;
 
       return uploadIDs.includes(targetID) === false;
-
     });
 
-    const failedFileIDs = failedFilePayloads.map(failPayload => failPayload.file_id);
+    const failedFileIDs = failedFilePayloads.map(
+      (failPayload) => failPayload.file_id
+    );
 
     await handleFileDeletion(failedFileIDs);
 
     await handleFileDocUpdate(s3UploadResults);
 
-    feedback['message'] = 'Only some of your files were uploaded successfully. Please re-upload the failed file uploads later.';
-
+    feedback['message'] =
+      'Only some of your files were uploaded successfully. Please re-upload the failed file uploads later.';
   }
 
-  
   // 3) All the files were uploaded successfully.
   await handleFileDocUpdate(s3UploadResults);
 
   feedback['error'] = false;
   feedback['message'] = 'Your files were successfully uploaded.';
-  
-  return feedback
+
+  return feedback;
 };
 
 /******************************************************/
-
-
-
-
-
 
 /********************************************
  * Notes
