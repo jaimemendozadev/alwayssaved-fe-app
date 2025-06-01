@@ -5,10 +5,9 @@ import { s3MediaUpload } from '@/components/fileupload/utils';
 
 const { NODE_ENV } = process.env;
 
-
 interface sqsMessage {
   user_id: string;
-  media_uploads: s3MediaUpload[]
+  media_uploads: s3MediaUpload[];
 }
 export const sendSQSMessage = async (sqsMessage: sqsMessage): Promise<void> => {
   const EXTRACTOR_PUSH_QUEUE_URL = await getSecret('EXTRACTOR_PUSH_QUEUE_URL');
@@ -19,7 +18,7 @@ export const sendSQSMessage = async (sqsMessage: sqsMessage): Promise<void> => {
     );
   }
 
-  const MessageBody = JSON.stringify(sqsMessage)
+  const MessageBody = JSON.stringify(sqsMessage);
 
   const command = new SendMessageCommand({
     QueueUrl: EXTRACTOR_PUSH_QUEUE_URL,
@@ -27,15 +26,13 @@ export const sendSQSMessage = async (sqsMessage: sqsMessage): Promise<void> => {
     MessageBody
   });
 
-
   const config = getAWSConfigByEnv(NODE_ENV);
-  
-  const client = new SQSClient([config]);
+
+  const client = new SQSClient(config);
 
   const response = await client.send(command);
 
-  console.log("sendSQSMessage response: ", response);
-  
+  console.log('sendSQSMessage response: ', response);
 };
 
 /********************************************

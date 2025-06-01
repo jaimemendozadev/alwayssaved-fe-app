@@ -4,17 +4,16 @@ import { getAWSConfigByEnv } from './index';
 
 const { NODE_ENV, AWS_BUCKET } = process.env;
 
-
-
 // See Note #1 below
 export const handlePresignedUrlsWithClient = async (
   key: string,
   expiresIn: number = 3600
 ): Promise<string> => {
-
   const config = getAWSConfigByEnv(NODE_ENV);
-  
-  const client = new S3Client([config]);
+
+  console.log('aws s3 config ', config);
+
+  const client = new S3Client(config);
 
   const command = new PutObjectCommand({ Bucket: AWS_BUCKET, Key: key });
   const signedUrl = await getSignedUrl(client, command, { expiresIn });
