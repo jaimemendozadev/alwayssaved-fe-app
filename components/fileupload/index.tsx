@@ -128,14 +128,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
 
-    // 3) Upload each media file to s3.
+    // 5) Upload each media file to s3.
     const finalizedUploadResults = await handleS3FileUploads(
       currentFiles,
       s3PayloadResults
     );
 
     /*
-      4) Verify media uploads were successful, perform database updates to each 
+      6) Verify media uploads were successful, perform database updates to each 
          File document with their s3_key, prep sqsPayload for sending SQS message.
     */
     const feedback = await verifyUploadsUpdateFilesInDB(
@@ -157,7 +157,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     }
 
-    // 5) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
+    // 7) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
     await sendSQSMessage(sqs_message);
   };
 
