@@ -4,7 +4,8 @@ import {
   handleFileDocUpdate,
   handleNoteDeletion,
   handleFileDeletion,
-  noteFileResult
+  noteFileResult,
+  filePayload
 } from '@/actions/fileupload';
 
 import { handlePresignedUrlsWithClient } from '@/utils/aws';
@@ -12,11 +13,11 @@ import { handlePresignedUrlsWithClient } from '@/utils/aws';
 export { createNoteFileDocs, handleFileDocUpdate };
 
 /*************************************************
- * filterCurrentFiles
+ * filterUploadedFiles
  **************************************************/
 
-const filterCurrentFiles = <T extends File>(
-  currentFiles: T[],
+const filterUploadedFiles = (
+  currentFiles: filePayload[],
   fileDBResults: LeanFile[]
 ) => {
   const createdFiles = fileDBResults.map((leanFile) => leanFile.file_name);
@@ -34,27 +35,28 @@ const filterCurrentFiles = <T extends File>(
  * verifyCreateNoteFileDocsResult
  **************************************************/
 
-interface noteFileResValidationCheck<T extends File> {
+interface noteFileResValidationCheck{
   message: string;
   continue: boolean;
   noteFileResult: noteFileResult;
-  currentFiles: T[];
+  verifiedFiles: filePayload[];
 }
 
-export const verifyCreateNoteFileDocsResult = async <T extends File>(
+export const verifyCreateNoteFileDocsResult = async(
   noteFileResult: noteFileResult,
-  currentFiles: T[]
-): Promise<noteFileResValidationCheck<T>> => {
-  let temp = [...currentFiles];
+  currentFiles: filePayload[]
+): Promise<noteFileResValidationCheck> => {
 
   const { newNote, fileDBResults } = noteFileResult;
 
-  const validationCheck: noteFileResValidationCheck<T> = {
+  const validationCheck: noteFileResValidationCheck = {
     message: '',
     continue: false,
     noteFileResult: { newNote: [], fileDBResults: [] },
-    currentFiles: []
+    verifiedFiles: []
   };
+
+  let temp = [...currentFiles];
 
   // 1) There was a problem creating a Note, delete all created File documents.
   if (newNote.length === 0) {
@@ -85,7 +87,7 @@ export const verifyCreateNoteFileDocsResult = async <T extends File>(
 
   // 3) One of the uploaded files didn't get its File doucment created in the database, continue uploading files to s3.
   if (fileDBResults.length !== currentFiles.length) {
-    temp = filterCurrentFiles(temp, fileDBResults);
+    temp = filterUploadedFiles(temp, fileDBResults);
 
     validationCheck['message'] =
       "Small Warning: It appears one of your files couldn't be saved. Try saving it again to the same Note later.";
@@ -98,7 +100,7 @@ export const verifyCreateNoteFileDocsResult = async <T extends File>(
 
   validationCheck['noteFileResult'] = validatedResult;
 
-  validationCheck['currentFiles'] = temp;
+  validationCheck['verifiedFiles'] = temp;
 
   validationCheck['continue'] = true;
 

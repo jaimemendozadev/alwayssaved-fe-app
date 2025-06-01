@@ -64,17 +64,24 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     }));
 
     // 1) Create a Note Doc and all File Docs associated with that Note.
-    let noteFileResult = await createNoteFileDocs({
+    const noteFileDBResult = await createNoteFileDocs({
       filePayloads,
       currentUserID,
       noteTitle
     });
 
-    console.log('noteFileResult before Validation: ', noteFileResult);
+    console.log('noteFileDBResult before Validation: ', noteFileDBResult);
 
+
+    /*
+      2) Verify the DB documents were created and only cancel file uploads to s3 if
+         the Note document wasn't created or if al the File documents were not created.
+         Return the filePayloads with names matching the File document names that were
+         successfully saved in the db.
+    */
     const validationCheck = await verifyCreateNoteFileDocsResult(
-      noteFileResult,
-      currentFiles
+      noteFileDBResult,
+      filePayloads
     );
 
     if (validationCheck.message.length > 0) {
@@ -88,15 +95,21 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       toast(message, feedbackDuration);
     }
 
-    noteFileResult = validationCheck.noteFileResult;
+    const {noteFileResult, verifiedFiles} = validationCheck;
+
+    /* 
+      3) Filter the currentFiles that will be uploaded to s3 because 
+         they have corresponding File documents created in the db.
+    */
+    const verifiedFileNames = verifiedFiles.map(filePayload => filePayload.name);
+    currentFiles = currentFiles.filter(file => verifiedFileNames.includes(file.name));
+
 
     const { fileDBResults, newNote } = noteFileResult;
-
     const [pluckedNote] = newNote;
 
-    currentFiles = validationCheck.currentFiles;
 
-    // 2) Create the presignUrls for each File document.
+    // 4) Create the presignUrls for each File document.
     const s3PayloadResults = await handlePresignedUrls(fileDBResults);
 
     console.log('s3PayloadResults ', s3PayloadResults);

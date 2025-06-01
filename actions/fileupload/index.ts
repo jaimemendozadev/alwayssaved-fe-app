@@ -144,7 +144,7 @@ export interface noteFileResult {
   fileDBResults: LeanFile[];
 }
 
-interface filePayload {
+export interface filePayload {
   name: string;
   type: string;
 }
