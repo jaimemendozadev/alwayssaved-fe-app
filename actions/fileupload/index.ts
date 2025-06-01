@@ -144,19 +144,19 @@ export interface noteFileResult {
   fileDBResults: LeanFile[];
 }
 
-export interface filePayload {
+export interface fileInfo {
   name: string;
   type: string;
 }
 
 interface createNoteFileDocsArguments {
-  filePayloads: filePayload[];
+  fileInfoArray: fileInfo[];
   currentUserID: string;
   noteTitle: string;
 }
 
 export const createNoteFileDocs = async ({
-  filePayloads,
+  fileInfoArray,
   currentUserID,
   noteTitle
 }: createNoteFileDocsArguments): Promise<noteFileResult> => {
@@ -181,9 +181,9 @@ export const createNoteFileDocs = async ({
 
     const noteMongoID = createdNote._id;
 
-    // 2) Create File documents for each filePayload.
+    // 2) Create File documents for each fileInfo object.
     const fileDBResults = await Promise.allSettled(
-      filePayloads.map((file) => {
+      fileInfoArray.map((file) => {
         const file_name = file.name;
         const file_type = file.type;
 

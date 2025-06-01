@@ -58,14 +58,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const currentUserID = currentUser._id;
 
-    const filePayloads = currentFiles.map((file) => ({
+    const fileInfoArray = currentFiles.map((file) => ({
       name: file.name,
       type: file.type
     }));
 
     // 1) Create a Note Doc and all File Docs associated with that Note.
     const noteFileDBResult = await createNoteFileDocs({
-      filePayloads,
+      fileInfoArray,
       currentUserID,
       noteTitle
     });
@@ -75,13 +75,13 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     /*
       2) Verify the DB documents were created and only cancel file uploads to s3 if
-         the Note document wasn't created or if al the File documents were not created.
-         Return the filePayloads with names matching the File document names that were
+         the Note document wasn't created or if all the File documents were not created.
+         Return the fileInfo objects with names matching the File document names that were
          successfully saved in the db.
     */
     const validationCheck = await verifyCreateNoteFileDocsResult(
       noteFileDBResult,
-      filePayloads
+      fileInfoArray
     );
 
     if (validationCheck.message.length > 0) {
@@ -101,7 +101,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       3) Filter the currentFiles that will be uploaded to s3 because 
          they have corresponding File documents created in the db.
     */
-    const verifiedFileNames = verifiedFiles.map(filePayload => filePayload.name);
+    const verifiedFileNames = verifiedFiles.map(fileInfo => fileInfo.name);
     currentFiles = currentFiles.filter(file => verifiedFileNames.includes(file.name));
 
 

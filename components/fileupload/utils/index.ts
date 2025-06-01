@@ -5,7 +5,7 @@ import {
   handleNoteDeletion,
   handleFileDeletion,
   noteFileResult,
-  filePayload
+  fileInfo
 } from '@/actions/fileupload';
 
 import { handlePresignedUrlsWithClient } from '@/utils/aws';
@@ -17,7 +17,7 @@ export { createNoteFileDocs, handleFileDocUpdate };
  **************************************************/
 
 const filterUploadedFiles = (
-  currentFiles: filePayload[],
+  currentFiles: fileInfo[],
   fileDBResults: LeanFile[]
 ) => {
   const createdFiles = fileDBResults.map((leanFile) => leanFile.file_name);
@@ -39,12 +39,12 @@ interface noteFileResValidationCheck{
   message: string;
   continue: boolean;
   noteFileResult: noteFileResult;
-  verifiedFiles: filePayload[];
+  verifiedFiles: fileInfo[];
 }
 
 export const verifyCreateNoteFileDocsResult = async(
   noteFileResult: noteFileResult,
-  currentFiles: filePayload[]
+  fileInfoArray: fileInfo[]
 ): Promise<noteFileResValidationCheck> => {
 
   const { newNote, fileDBResults } = noteFileResult;
@@ -56,7 +56,7 @@ export const verifyCreateNoteFileDocsResult = async(
     verifiedFiles: []
   };
 
-  let temp = [...currentFiles];
+  let temp = [...fileInfoArray];
 
   // 1) There was a problem creating a Note, delete all created File documents.
   if (newNote.length === 0) {
@@ -86,7 +86,7 @@ export const verifyCreateNoteFileDocsResult = async(
   }
 
   // 3) One of the uploaded files didn't get its File doucment created in the database, continue uploading files to s3.
-  if (fileDBResults.length !== currentFiles.length) {
+  if (fileDBResults.length !== fileInfoArray.length) {
     temp = filterUploadedFiles(temp, fileDBResults);
 
     validationCheck['message'] =
