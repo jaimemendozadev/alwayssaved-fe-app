@@ -1,13 +1,10 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
-import { getAWSConfigByEnv } from '.';
+import { getAWSConfigByEnv } from './index';
 import { getSecret } from './ssm';
 import { s3MediaUpload } from '@/components/fileupload/utils';
 
 const { NODE_ENV } = process.env;
 
-const config = getAWSConfigByEnv(NODE_ENV);
-
-const client = new SQSClient([config]);
 
 interface sqsMessage {
   user_id: string;
@@ -29,6 +26,11 @@ export const sendSQSMessage = async (sqsMessage: sqsMessage): Promise<void> => {
     DelaySeconds: 10, // Should we adjust? 🤔
     MessageBody
   });
+
+
+  const config = getAWSConfigByEnv(NODE_ENV);
+  
+  const client = new SQSClient([config]);
 
   const response = await client.send(command);
 

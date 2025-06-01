@@ -1,18 +1,21 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { getAWSConfigByEnv } from '.';
+import { getAWSConfigByEnv } from './index';
 
 const { NODE_ENV, AWS_BUCKET } = process.env;
 
-const config = getAWSConfigByEnv(NODE_ENV);
 
-const client = new S3Client([config]);
 
 // See Note #1 below
 export const handlePresignedUrlsWithClient = async (
   key: string,
   expiresIn: number = 3600
 ): Promise<string> => {
+
+  const config = getAWSConfigByEnv(NODE_ENV);
+  
+  const client = new S3Client([config]);
+
   const command = new PutObjectCommand({ Bucket: AWS_BUCKET, Key: key });
   const signedUrl = await getSignedUrl(client, command, { expiresIn });
 
