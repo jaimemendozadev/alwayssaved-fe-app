@@ -5,16 +5,18 @@ import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
-import { handleFileDeletion, handleNoteDeletion } from '@/actions/fileupload';
+import {
+  handleFileDeletion,
+  handleNoteDeletion,
+  handlePresignedUrls
+} from '@/actions/fileupload';
 import { sendSQSMessage } from '@/utils/aws';
 import {
   createNoteFileDocs,
-  handlePresignedUrls,
   handleS3FileUploads,
   verifyCreateNoteFileDocsResult,
   verifyUploadsUpdateFilesInDB
 } from './utils';
-
 interface FileUploadProps {
   currentUser: LeanUser | null;
 }
@@ -72,6 +74,10 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     console.log('noteFileDBResult before Validation: ', noteFileDBResult);
 
+    console.log(
+      'fileInfoArray before verifyCreateNoteFileDocsResult ',
+      fileInfoArray
+    );
 
     /*
       2) Verify the DB documents were created and only cancel file uploads to s3 if
@@ -82,6 +88,11 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     const validationCheck = await verifyCreateNoteFileDocsResult(
       noteFileDBResult,
       fileInfoArray
+    );
+
+    console.log(
+      'validationCheck after verifyCreateNoteFileDocsResult ',
+      validationCheck
     );
 
     if (validationCheck.message.length > 0) {
@@ -95,19 +106,22 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       toast(message, feedbackDuration);
     }
 
-    const {noteFileResult, verifiedFiles} = validationCheck;
+    const { noteFileResult, verifiedFiles } = validationCheck;
 
     /* 
       3) Filter the currentFiles that will be uploaded to s3 because 
          they have corresponding File documents created in the db.
     */
-    const verifiedFileNames = verifiedFiles.map(fileInfo => fileInfo.name);
-    currentFiles = currentFiles.filter(file => verifiedFileNames.includes(file.name));
-
+    const verifiedFileNames = verifiedFiles.map((fileInfo) => fileInfo.name);
+    currentFiles = currentFiles.filter((file) =>
+      verifiedFileNames.includes(file.name)
+    );
 
     const { fileDBResults, newNote } = noteFileResult;
-    const [pluckedNote] = newNote;
 
+    console.log('fileDBResults before handlePresignUrls ', fileDBResults);
+
+    const [pluckedNote] = newNote;
 
     // 4) Create the presignUrls for each File document.
     const s3PayloadResults = await handlePresignedUrls(fileDBResults);
@@ -154,8 +168,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     const sqs_message = {
       user_id: currentUserID,
       media_uploads: feedback.sqsPayload
-
-    }
+    };
 
     // 7) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
     await sendSQSMessage(sqs_message);

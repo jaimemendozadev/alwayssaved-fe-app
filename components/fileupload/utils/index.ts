@@ -5,10 +5,9 @@ import {
   handleNoteDeletion,
   handleFileDeletion,
   noteFileResult,
-  fileInfo
+  fileInfo, s3FilePayload
 } from '@/actions/fileupload';
 
-import { handlePresignedUrlsWithClient } from '@/utils/aws';
 
 export { createNoteFileDocs, handleFileDocUpdate };
 
@@ -35,18 +34,17 @@ const filterUploadedFiles = (
  * verifyCreateNoteFileDocsResult
  **************************************************/
 
-interface noteFileResValidationCheck{
+interface noteFileResValidationCheck {
   message: string;
   continue: boolean;
   noteFileResult: noteFileResult;
   verifiedFiles: fileInfo[];
 }
 
-export const verifyCreateNoteFileDocsResult = async(
+export const verifyCreateNoteFileDocsResult = async (
   noteFileResult: noteFileResult,
   fileInfoArray: fileInfo[]
 ): Promise<noteFileResValidationCheck> => {
-
   const { newNote, fileDBResults } = noteFileResult;
 
   const validationCheck: noteFileResValidationCheck = {
@@ -109,64 +107,7 @@ export const verifyCreateNoteFileDocsResult = async(
 
 /******************************************************/
 
-/*************************************************
- * handlePresignedUrls
- **************************************************/
 
-interface s3FilePayload {
-  s3_key: string;
-  file_id: string;
-  file_name: string;
-  presigned_url: string;
-}
-
-// See Note #1 below.
-export const handlePresignedUrls = async (
-  fileDocuments: LeanFile[]
-): Promise<s3FilePayload[]> => {
-  const presignResults = await Promise.allSettled(
-    fileDocuments.map(async (fileDoc) => {
-      const { file_name, note_id, user_id, _id } = fileDoc;
-
-      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
-
-      try {
-        const presignedURL = await handlePresignedUrlsWithClient(s3_key);
-
-        return {
-          s3_key,
-          file_id: _id,
-          file_name,
-          presigned_url: presignedURL
-        };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-
-        throw new Error(
-          `Error in handlePresignedUrls for s3_key: ${s3_key}: ${message}`
-        );
-      }
-    })
-  );
-
-  // Log preSignUrl Failures
-  presignResults.forEach((result) => {
-    if (result.status === 'rejected') {
-      // TODO: Handle in telemetry.
-      console.error('Creating PresignUrl failed: ', result.reason);
-    }
-  });
-
-  const filteredResults = presignResults.filter(
-    (result) => result.status === 'fulfilled'
-  );
-
-  const finalizedResults = filteredResults.map((result) => result.value);
-
-  return finalizedResults;
-};
-
-/******************************************************/
 
 /*************************************************
  * handleS3FileUploads
@@ -178,6 +119,7 @@ export interface s3UploadResult {
     s3_key: string;
   };
 }
+
 
 export const handleS3FileUploads = async <T extends File>(
   currentFiles: T[],
@@ -191,6 +133,10 @@ export const handleS3FileUploads = async <T extends File>(
       const [targetPayload] = s3PayloadResults.filter(
         (s3Payload) => s3Payload.file_name === targetName
       );
+
+      console.log('file in handleS3FileUploads ', file);
+
+      console.log('targetPayload in handleS3FileUploads ', targetPayload);
 
       const { presigned_url, file_id, s3_key } = targetPayload;
 
@@ -214,6 +160,8 @@ export const handleS3FileUploads = async <T extends File>(
       }
     })
   );
+
+  console.log("uploadResults in handleS3FileUploads ", uploadResults);
 
   // Log s3FileUpload Failures
   uploadResults.forEach((result) => {
@@ -257,7 +205,6 @@ export const verifyUploadsUpdateFilesInDB = async (
   s3PayloadResults: s3FilePayload[],
   newNote: LeanNote
 ): Promise<validationFeedback> => {
-
   // 1) Prep s3UploadResults for sendSQSMessage, if any.
   const note_id = newNote._id;
   const user_id =
