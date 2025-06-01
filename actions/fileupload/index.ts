@@ -183,7 +183,7 @@ export const createNoteFileDocs = async ({
 
     // 2) Create File documents for each fileInfo object.
     const fileDBResults = await Promise.allSettled(
-      fileInfoArray.map((file) => {
+      fileInfoArray.map(async file => {
         const file_name = file.name;
         const file_type = file.type;
 
@@ -195,7 +195,9 @@ export const createNoteFileDocs = async ({
             file_type
           };
 
-          return FileModel.create([filePayload], { j: true });
+          const [createdFile] = await FileModel.create([filePayload], { j: true });
+
+          return createdFile;
         } catch (error) {
           const message =
             error instanceof Error ? error.message : String(error);
@@ -206,6 +208,8 @@ export const createNoteFileDocs = async ({
         }
       })
     );
+
+    console.log("fileDBResults ", fileDBResults);
 
     const newNote = [deepLean(createdNote)];
 
