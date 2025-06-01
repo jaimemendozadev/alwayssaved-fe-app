@@ -58,9 +58,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const currentUserID = currentUser._id;
 
+    const filePayloads = currentFiles.map((file) => ({
+      name: file.name,
+      type: file.type
+    }));
+
     // 1) Create a Note Doc and all File Docs associated with that Note.
     let noteFileResult = await createNoteFileDocs({
-      currentFiles,
+      filePayloads,
       currentUserID,
       noteTitle
     });
