@@ -123,8 +123,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const [pluckedNote] = newNote;
 
+    const createPresignStart = performance.now();
+
     // 4) Create the presignUrls for each File document.
     const s3PayloadResults = await handlePresignedUrls(fileDBResults);
+
+    const createPresignEnd = performance.now();
+
+    console.log("Time to create presignUrls in ms: ", createPresignEnd - createPresignStart);
 
     console.log('s3PayloadResults ', s3PayloadResults);
 
@@ -142,11 +148,18 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
 
+    const uploadStart = performance.now();
+
     // 5) Upload each media file to s3.
     const finalizedUploadResults = await handleS3FileUploads(
       currentFiles,
       s3PayloadResults
     );
+
+    const uploadEnd = performance.now();
+
+    console.log("Time to upload files to s3 in ms: ", uploadEnd - uploadStart);
+    console.log("finalizedUploadResults ", finalizedUploadResults);
 
     /*
       6) Verify media uploads were successful, perform database updates to each 
@@ -158,11 +171,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       pluckedNote
     );
 
+    console.log('feedback ', feedback);
+
     if (feedback.error) {
       toast.error(feedback.message, feedbackDuration);
       return;
     }
 
+    console.log("SHOULD FIRE TOAST");
     toast.success(feedback.message, feedbackDuration);
 
     const sqs_message = {
@@ -171,7 +187,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     };
 
     // 7) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
-    await sendSQSMessage(sqs_message);
+    // await sendSQSMessage(sqs_message);
   };
 
   return (
@@ -221,3 +237,15 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     </div>
   );
 };
+
+
+/*
+  TODO Dev Notes:
+
+  - If you have multiple long format videos (> 15 minutes), it will take a long time to
+    upload all the files to s3. Need feedback to tell user to wait.
+
+  - Address issue on Backend to somehow delay processing incoming SQS message from Frontend
+    because s3 videos might not be immediately available for processing.
+
+*/

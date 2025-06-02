@@ -295,8 +295,6 @@ export const handlePresignedUrls = async (
     })
   );
 
-  console.log('presignResults ', presignResults);
-
   // Log preSignUrl Failures
   presignResults.forEach((result) => {
     if (result.status === 'rejected') {

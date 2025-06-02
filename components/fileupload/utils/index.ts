@@ -134,10 +134,6 @@ export const handleS3FileUploads = async <T extends File>(
         (s3Payload) => s3Payload.file_name === targetName
       );
 
-      console.log('file in handleS3FileUploads ', file);
-
-      console.log('targetPayload in handleS3FileUploads ', targetPayload);
-
       const { presigned_url, file_id, s3_key } = targetPayload;
 
       try {
