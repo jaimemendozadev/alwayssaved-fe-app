@@ -9,6 +9,8 @@ import {
   getObjectIDFromString
 } from '@/utils/mongodb';
 
+import { handlePresignedUrlsWithClient } from '@/utils/aws';
+
 import { s3UploadResult } from '@/components/fileupload/utils';
 
 /*************************************************
@@ -183,7 +185,7 @@ export const createNoteFileDocs = async ({
 
     // 2) Create File documents for each fileInfo object.
     const fileDBResults = await Promise.allSettled(
-      fileInfoArray.map(async file => {
+      fileInfoArray.map(async (file) => {
         const file_name = file.name;
         const file_type = file.type;
 
@@ -195,7 +197,9 @@ export const createNoteFileDocs = async ({
             file_type
           };
 
-          const [createdFile] = await FileModel.create([filePayload], { j: true });
+          const [createdFile] = await FileModel.create([filePayload], {
+            j: true
+          });
 
           return createdFile;
         } catch (error) {
@@ -209,7 +213,7 @@ export const createNoteFileDocs = async ({
       })
     );
 
-    console.log("fileDBResults ", fileDBResults);
+    console.log('fileDBResults ', fileDBResults);
 
     const newNote = [deepLean(createdNote)];
 
@@ -246,3 +250,68 @@ export const createNoteFileDocs = async ({
 };
 
 /***************************************************/
+
+/*************************************************
+ * handlePresignedUrls
+ **************************************************/
+
+export interface s3FilePayload {
+  s3_key: string;
+  file_id: string;
+  file_name: string;
+  presigned_url: string;
+}
+
+// See Note #1 below.
+export const handlePresignedUrls = async (
+  fileDocuments: LeanFile[]
+): Promise<s3FilePayload[]> => {
+  const presignResults = await Promise.allSettled(
+    fileDocuments.map(async (fileDoc) => {
+      const { file_name, note_id, user_id, _id } = fileDoc;
+
+      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
+
+      console.log('s3_key is ', s3_key);
+
+      try {
+        const presignedURL = await handlePresignedUrlsWithClient(s3_key);
+
+        console.log('presignedUrl ', presignedURL);
+
+        return {
+          s3_key,
+          file_id: _id,
+          file_name,
+          presigned_url: presignedURL
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        throw new Error(
+          `Error in handlePresignedUrls for s3_key: ${s3_key}: ${message}`
+        );
+      }
+    })
+  );
+
+  console.log('presignResults ', presignResults);
+
+  // Log preSignUrl Failures
+  presignResults.forEach((result) => {
+    if (result.status === 'rejected') {
+      // TODO: Handle in telemetry.
+      console.error('Creating PresignUrl failed: ', result.reason);
+    }
+  });
+
+  const filteredResults = presignResults.filter(
+    (result) => result.status === 'fulfilled'
+  );
+
+  const finalizedResults = filteredResults.map((result) => result.value);
+
+  return finalizedResults;
+};
+
+/******************************************************/
