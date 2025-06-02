@@ -1,3 +1,4 @@
+'use server';
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { getAWSConfigByEnv } from './index';
 import { getSecret } from './ssm';
