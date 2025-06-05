@@ -12,6 +12,8 @@ import {
 } from '@/actions/fileupload';
 import { sendSQSMessage } from '@/utils/aws';
 import {
+  createFileDocuments,
+  createNoteDocument,
   createNoteFileDocs,
   handleS3FileUploads,
   verifyCreateNoteFileDocsResult,
@@ -56,28 +58,39 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     console.log('acceptedFiles ', acceptedFiles);
     console.log('\n');
 
-    let currentFiles = [...acceptedFiles];
-
     const currentUserID = currentUser._id;
+
+    // 1) Create a Note Doc and all File Docs associated with that Note.
+    const createdNote = await createNoteDocument(currentUserID, noteTitle);
+
+    if (!createdNote) {
+      toast.error(
+        'There was an error uploading your files, try again later.',
+        feedbackDuration
+      );
+      return;
+    }
+
+    let currentFiles = [...acceptedFiles];
 
     const fileInfoArray = currentFiles.map((file) => ({
       name: file.name,
       type: file.type
     }));
 
-    // 1) Create a Note Doc and all File Docs associated with that Note.
-    const noteFileDBResult = await createNoteFileDocs({
+    const createdFiles = await createFileDocuments(
       fileInfoArray,
       currentUserID,
-      noteTitle
-    });
-
-    console.log('noteFileDBResult before Validation: ', noteFileDBResult);
-
-    console.log(
-      'fileInfoArray before verifyCreateNoteFileDocsResult ',
-      fileInfoArray
+      createdNote._id
     );
+
+    if (createdFiles.length === 0) {
+      toast.error(
+        'There was an error uploading your files, try again later.',
+        feedbackDuration
+      );
+      return;
+    }
 
     /*
       2) Verify the DB documents were created and only cancel file uploads to s3 if
@@ -130,7 +143,10 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const createPresignEnd = performance.now();
 
-    console.log("Time to create presignUrls in ms: ", createPresignEnd - createPresignStart);
+    console.log(
+      'Time to create presignUrls in ms: ',
+      createPresignEnd - createPresignStart
+    );
 
     console.log('s3PayloadResults ', s3PayloadResults);
 
@@ -158,8 +174,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const uploadEnd = performance.now();
 
-    console.log("Time to upload files to s3 in ms: ", uploadEnd - uploadStart);
-    console.log("finalizedUploadResults ", finalizedUploadResults);
+    console.log('Time to upload files to s3 in ms: ', uploadEnd - uploadStart);
+    console.log('finalizedUploadResults ', finalizedUploadResults);
 
     /*
       6) Verify media uploads were successful, perform database updates to each 
@@ -178,7 +194,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
 
-    console.log("SHOULD FIRE TOAST");
+    console.log('SHOULD FIRE TOAST');
     toast.success(feedback.message, feedbackDuration);
 
     const sqs_message = {
@@ -237,7 +253,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     </div>
   );
 };
-
 
 /*
   TODO Dev Notes:

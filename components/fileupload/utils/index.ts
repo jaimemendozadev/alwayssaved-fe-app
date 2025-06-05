@@ -5,11 +5,13 @@ import {
   handleNoteDeletion,
   handleFileDeletion,
   noteFileResult,
-  fileInfo, s3FilePayload
+  fileInfo, s3FilePayload,
+  createFileDocuments,
+  createNoteDocument
 } from '@/actions/fileupload';
 
 
-export { createNoteFileDocs, handleFileDocUpdate };
+export { createNoteFileDocs, handleFileDocUpdate, createFileDocuments, createNoteDocument };
 
 /*************************************************
  * filterUploadedFiles
