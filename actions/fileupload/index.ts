@@ -21,7 +21,7 @@ export {
 }
 
 /*************************************************
- * handleNoteDeletion
+ * handleFileDeletion
  **************************************************/
 
 export const handleFileDeletion = async (
@@ -150,29 +150,24 @@ export const handleFileDocUpdate = async (
  * handlePresignedUrls
  **************************************************/
 
-export interface s3FilePayload {
+export interface presignPayload {
   s3_key: string;
   file_id: string;
   file_name: string;
   presigned_url: string;
 }
 
-// See Note #1 below.
 export const handlePresignedUrls = async (
   fileDocuments: LeanFile[]
-): Promise<s3FilePayload[]> => {
+): Promise<presignPayload[]> => {
   const presignResults = await Promise.allSettled(
     fileDocuments.map(async (fileDoc) => {
       const { file_name, note_id, user_id, _id } = fileDoc;
 
       const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
 
-      console.log('s3_key is ', s3_key);
-
       try {
         const presignedURL = await handlePresignedUrlsWithClient(s3_key);
-
-        console.log('presignedUrl ', presignedURL);
 
         return {
           s3_key,
