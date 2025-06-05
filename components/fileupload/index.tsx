@@ -108,7 +108,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     const presignPayloads = await handlePresignedUrls(createdFiles);
 
 
-
+    // 3a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if(presignPayloads.length === 0) {
       await handleNoteDeletion(createdNote);
 
@@ -125,28 +125,20 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     }
 
-
     if(presignPayloads.length !== currentFiles.length) {
       currentFiles = filterCurrentFiles(currentFiles, presignPayloads);
       toast.error("There was a problem uploading some of your files, try again later.", feedbackDuration);
-
     }
 
 
-
-    const uploadStart = performance.now();
-
-    // 5) Upload each media file to s3.
+    // 4) Upload each media file to s3.
     const finalizedUploadResults = await handleS3FileUploads(
       currentFiles,
       s3PayloadResults
     );
 
-    const uploadEnd = performance.now();
 
-    console.log('Time to upload files to s3 in ms: ', uploadEnd - uploadStart);
-    console.log('finalizedUploadResults ', finalizedUploadResults);
-
+   
     /*
       6) Verify media uploads were successful, perform database updates to each 
          File document with their s3_key, prep sqsPayload for sending SQS message.

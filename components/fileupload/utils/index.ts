@@ -51,14 +51,15 @@ export interface s3UploadResult {
 
 export const handleS3FileUploads = async <T extends File>(
   currentFiles: T[],
-  s3PayloadResults: presignPayload[]
+  presignPayloads: presignPayload[]
 ): Promise<s3UploadResult[]> => {
+  
   const uploadResults = await Promise.allSettled(
     currentFiles.map(async (file) => {
       const targetName = file.name;
       const targetType = file.type;
 
-      const [targetPayload] = s3PayloadResults.filter(
+      const [targetPayload] = presignPayloads.filter(
         (s3Payload) => s3Payload.file_name === targetName
       );
 
