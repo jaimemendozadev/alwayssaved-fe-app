@@ -14,7 +14,6 @@ export const createNoteDocument = async (
   try {
     await dbConnect();
 
-    // 1) Create a single MongoDB Note document.
     const userMongoID = getObjectIDFromString(currentUserID);
 
     const notePayload = {
