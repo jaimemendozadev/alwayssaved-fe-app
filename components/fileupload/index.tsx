@@ -14,9 +14,8 @@ import { sendSQSMessage } from '@/utils/aws';
 import {
   createFileDocuments,
   createNoteDocument,
-  createNoteFileDocs,
   handleS3FileUploads,
-  verifyCreateNoteFileDocsResult,
+  filterCurrentFiles,
   verifyUploadsUpdateFilesInDB
 } from './utils';
 interface FileUploadProps {
@@ -24,6 +23,7 @@ interface FileUploadProps {
 }
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
+const basicErrorMsg = 'There was an error uploading your files, try again later.';
 const feedbackDuration = { duration: 3000 };
 
 export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
@@ -65,7 +65,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     if (!createdNote) {
       toast.error(
-        'There was an error uploading your files, try again later.',
+        basicErrorMsg,
         feedbackDuration
       );
       return;
@@ -73,7 +73,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     let currentFiles = [...acceptedFiles];
 
-    const fileInfoArray = currentFiles.map((file) => ({
+    let fileInfoArray = currentFiles.map((file) => ({
       name: file.name,
       type: file.type
     }));
@@ -85,26 +85,27 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     );
 
     if (createdFiles.length === 0) {
+
+      await handleNoteDeletion(createdNote);
+
       toast.error(
-        'There was an error uploading your files, try again later.',
+        basicErrorMsg,
         feedbackDuration
       );
       return;
     }
 
-    /*
-      2) Verify the DB documents were created and only cancel file uploads to s3 if
-         the Note document wasn't created or if all the File documents were not created.
-         Return the fileInfo objects with names matching the File document names that were
-         successfully saved in the db.
-    */
-    const validationCheck = await verifyCreateNoteFileDocsResult(
-      noteFileDBResult,
-      fileInfoArray
-    );
+ 
+    if(createdFiles.length !== currentFiles.length) {
+
+      filterCurrentFiles(currentFiles, createdFiles);
+
+    }
+
+    
 
     console.log(
-      'validationCheck after verifyCreateNoteFileDocsResult ',
+      'validationCheck after filterCurrentFiles ',
       validationCheck
     );
 
@@ -119,7 +120,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       toast(message, feedbackDuration);
     }
 
-    const { noteFileResult, verifiedFiles } = validationCheck;
+    const {  verifiedFiles } = validationCheck;
 
     /* 
       3) Filter the currentFiles that will be uploaded to s3 because 
@@ -130,7 +131,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       verifiedFileNames.includes(file.name)
     );
 
-    const { fileDBResults, newNote } = noteFileResult;
+    const { fileDBResults, newNote }
 
     console.log('fileDBResults before handlePresignUrls ', fileDBResults);
 

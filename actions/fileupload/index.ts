@@ -5,7 +5,6 @@ import {
   LeanNote,
   NoteModel,
   FileModel,
-  deepLean,
   getObjectIDFromString
 } from '@/utils/mongodb';
 

@@ -1,110 +1,36 @@
 import { LeanFile, LeanNote } from '@/utils/mongodb';
 import {
-  createNoteFileDocs,
   handleFileDocUpdate,
   handleNoteDeletion,
   handleFileDeletion,
-  noteFileResult,
-  fileInfo, s3FilePayload,
+  s3FilePayload,
   createFileDocuments,
   createNoteDocument
 } from '@/actions/fileupload';
 
 
-export { createNoteFileDocs, handleFileDocUpdate, createFileDocuments, createNoteDocument };
+export { handleFileDocUpdate, createFileDocuments, createNoteDocument };
+
+
+
 
 /*************************************************
- * filterUploadedFiles
+ * filterCurrentFiles
  **************************************************/
 
-const filterUploadedFiles = (
-  currentFiles: fileInfo[],
-  fileDBResults: LeanFile[]
-) => {
-  const createdFiles = fileDBResults.map((leanFile) => leanFile.file_name);
+export const filterCurrentFiles =  <T extends File>(
+  currentFiles: T[], 
+  createdFiles: LeanFile[]
+): T[] => {
+
+  const arrayOfFileNames = createdFiles.map((leanFile) => leanFile.file_name);
 
   const filteredFiles = currentFiles.filter((file) =>
-    createdFiles.includes(file.name)
+    arrayOfFileNames.includes(file.name)
   );
 
   return filteredFiles;
-};
 
-/******************************************************/
-
-/*************************************************
- * verifyCreateNoteFileDocsResult
- **************************************************/
-
-interface noteFileResValidationCheck {
-  message: string;
-  continue: boolean;
-  noteFileResult: noteFileResult;
-  verifiedFiles: fileInfo[];
-}
-
-export const verifyCreateNoteFileDocsResult = async (
-  noteFileResult: noteFileResult,
-  fileInfoArray: fileInfo[]
-): Promise<noteFileResValidationCheck> => {
-  const { newNote, fileDBResults } = noteFileResult;
-
-  const validationCheck: noteFileResValidationCheck = {
-    message: '',
-    continue: false,
-    noteFileResult: { newNote: [], fileDBResults: [] },
-    verifiedFiles: []
-  };
-
-  let temp = [...fileInfoArray];
-
-  // 1) There was a problem creating a Note, delete all created File documents.
-  if (newNote.length === 0) {
-    validationCheck['message'] =
-      'There was a problem creating a Note for your files in the database. Try again later.';
-
-    if (fileDBResults.length > 0) {
-      const fileIDs = fileDBResults.map((leanFile) => leanFile._id);
-
-      await handleFileDeletion(fileIDs);
-    }
-
-    return validationCheck;
-  }
-
-  // 2) There was a problem creating File documents for all the uploaded files, delete the parent Note document.
-  if (fileDBResults.length === 0) {
-    if (newNote.length > 0) {
-      const [plucked] = newNote;
-      await handleNoteDeletion(plucked);
-    }
-
-    validationCheck['message'] =
-      'There was a problem saving your files in the database. Try uploading the files again later.';
-
-    return validationCheck;
-  }
-
-  // 3) One of the uploaded files didn't get its File doucment created in the database, continue uploading files to s3.
-  if (fileDBResults.length !== fileInfoArray.length) {
-    temp = filterUploadedFiles(temp, fileDBResults);
-
-    validationCheck['message'] =
-      "Small Warning: It appears one of your files couldn't be saved. Try saving it again to the same Note later.";
-  }
-
-  const validatedResult = {
-    newNote,
-    fileDBResults
-  };
-
-  validationCheck['noteFileResult'] = validatedResult;
-
-  validationCheck['verifiedFiles'] = temp;
-
-  validationCheck['continue'] = true;
-
-  return validationCheck;
 };
 
 /******************************************************/
