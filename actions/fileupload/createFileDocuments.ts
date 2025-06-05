@@ -81,7 +81,7 @@ export const createFileDocuments = async (
     return finalizedResults;
   } catch (error) {
     //TODO: Handle in telemetry.
-    console.log('Error in createNoteFileDocs ', error);
+    console.log('Error in createFileDocuments ', error);
   }
 
   return [];

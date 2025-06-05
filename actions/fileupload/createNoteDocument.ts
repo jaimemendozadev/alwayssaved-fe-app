@@ -25,7 +25,7 @@ export const createNoteDocument = async (
 
     if (!createdNote) {
       throw new Error(
-        `There was a problem creating a Note document for user ${currentUserID} in createNoteFileDocs.`
+        `There was a problem creating a Note document for user ${currentUserID} in createNoteDocument.`
       );
     }
 
