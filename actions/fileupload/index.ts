@@ -13,6 +13,12 @@ import { handlePresignedUrlsWithClient } from '@/utils/aws';
 
 import { s3UploadResult } from '@/components/fileupload/utils';
 
+import { createNoteDocument } from './createNoteDocument';
+
+export {
+  createNoteDocument
+}
+
 /*************************************************
  * handleNoteDeletion
  **************************************************/
