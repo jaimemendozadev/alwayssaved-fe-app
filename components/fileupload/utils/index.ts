@@ -3,7 +3,7 @@ import {
   handleFileDocUpdate,
   handleNoteDeletion,
   handleFileDeletion,
-  s3FilePayload,
+  presignPayload,
   createFileDocuments,
   createNoteDocument
 } from '@/actions/fileupload';
@@ -20,10 +20,10 @@ export { handleFileDocUpdate, createFileDocuments, createNoteDocument };
 
 export const filterCurrentFiles =  <T extends File>(
   currentFiles: T[], 
-  createdFiles: LeanFile[]
+  targetFiles: LeanFile[] | presignPayload[]
 ): T[] => {
 
-  const arrayOfFileNames = createdFiles.map((leanFile) => leanFile.file_name);
+  const arrayOfFileNames = targetFiles.map((leanFile) => leanFile.file_name);
 
   const filteredFiles = currentFiles.filter((file) =>
     arrayOfFileNames.includes(file.name)
@@ -51,7 +51,7 @@ export interface s3UploadResult {
 
 export const handleS3FileUploads = async <T extends File>(
   currentFiles: T[],
-  s3PayloadResults: s3FilePayload[]
+  s3PayloadResults: presignPayload[]
 ): Promise<s3UploadResult[]> => {
   const uploadResults = await Promise.allSettled(
     currentFiles.map(async (file) => {
@@ -126,7 +126,7 @@ interface validationFeedback {
 
 export const verifyUploadsUpdateFilesInDB = async (
   s3UploadResults: s3UploadResult[],
-  s3PayloadResults: s3FilePayload[],
+  s3PayloadResults: presignPayload[],
   newNote: LeanNote
 ): Promise<validationFeedback> => {
   // 1) Prep s3UploadResults for sendSQSMessage, if any.
