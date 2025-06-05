@@ -60,7 +60,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     const currentUserID = currentUser._id;
 
-    // 1) Create a Note Doc and all File Docs associated with that Note.
+    // 1) Create a Note document.
     const createdNote = await createNoteDocument(currentUserID, noteTitle);
 
     if (!createdNote) {
@@ -71,6 +71,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
 
+    // 2) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
     let fileInfoArray = currentFiles.map((file) => ({
@@ -96,74 +97,42 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     }
 
  
+    // 2a) If some of the File documents failed to be created, filter the acceptedFiles.
     if(createdFiles.length !== currentFiles.length) {
-
-      filterCurrentFiles(currentFiles, createdFiles);
-
+      currentFiles = filterCurrentFiles(currentFiles, createdFiles);
+      toast.error("There was a problem uploading some of your files, try again later.", feedbackDuration);
     }
 
-    
 
-    console.log(
-      'validationCheck after filterCurrentFiles ',
-      validationCheck
-    );
+    // 3) Create the presignUrls for each File document.
+    const presignPayloads = await handlePresignedUrls(createdFiles);
 
-    if (validationCheck.message.length > 0) {
-      const { message } = validationCheck;
 
-      if (validationCheck.continue === false) {
-        toast.error(message, feedbackDuration);
-        return;
+
+    if(presignPayloads.length === 0) {
+      await handleNoteDeletion(createdNote);
+
+      if(createdFiles.length > 0) {
+        const fileIDs = createdFiles.map(file => file._id);
+        await handleFileDeletion(fileIDs);
       }
 
-      toast(message, feedbackDuration);
-    }
-
-    const {  verifiedFiles } = validationCheck;
-
-    /* 
-      3) Filter the currentFiles that will be uploaded to s3 because 
-         they have corresponding File documents created in the db.
-    */
-    const verifiedFileNames = verifiedFiles.map((fileInfo) => fileInfo.name);
-    currentFiles = currentFiles.filter((file) =>
-      verifiedFileNames.includes(file.name)
-    );
-
-    const { fileDBResults, newNote }
-
-    console.log('fileDBResults before handlePresignUrls ', fileDBResults);
-
-    const [pluckedNote] = newNote;
-
-    const createPresignStart = performance.now();
-
-    // 4) Create the presignUrls for each File document.
-    const s3PayloadResults = await handlePresignedUrls(fileDBResults);
-
-    const createPresignEnd = performance.now();
-
-    console.log(
-      'Time to create presignUrls in ms: ',
-      createPresignEnd - createPresignStart
-    );
-
-    console.log('s3PayloadResults ', s3PayloadResults);
-
-    if (s3PayloadResults.length === 0) {
-      const fileIDs = fileDBResults.map((leanFile) => leanFile._id);
-
-      await handleFileDeletion(fileIDs);
-
-      await handleNoteDeletion(pluckedNote);
-
       toast.error(
-        'There was a problem uploading your files to the cloud. Try again later.',
+        basicErrorMsg,
         feedbackDuration
       );
       return;
+
     }
+
+
+    if(presignPayloads.length !== currentFiles.length) {
+      currentFiles = filterCurrentFiles(currentFiles, presignPayloads);
+      toast.error("There was a problem uploading some of your files, try again later.", feedbackDuration);
+
+    }
+
+
 
     const uploadStart = performance.now();
 
