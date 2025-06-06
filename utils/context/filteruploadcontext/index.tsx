@@ -1,18 +1,27 @@
 'use client';
 import { useState, ReactNode, createContext, useEffect } from 'react';
+import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { getUserFromDB } from '@/actions';
 import {
   handleFileDeletion,
   handleNoteDeletion,
   handlePresignedUrls,
-} from '@/actions/fileupload';
+  createNoteDocument,
+  createFileDocuments,
+} from '@/actions/fileuploadcontext';
 import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
 
+const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
+const basicErrorMsg = 'There was an error uploading your files, try again later.';
+const feedbackDuration = { duration: 3000 };
 
-const errorMessage =
-  'Looks like you might have never registered to AlwaysSaved. 😬 Try again later.';
+
+
+import { filterCurrentFiles } from './utils';
+
+
 
 interface FileUploadContext {
   inFlight: boolean;
@@ -20,12 +29,14 @@ interface FileUploadContext {
 
 export const FileUploadContext = createContext({});
 
+
 export const FileUploadProvider = ({
   children
 }: {
   children: ReactNode;
 }): ReactNode => {
 
+  const [noteTitle, setNoteTitle] = useState(defaultNoteTitle);
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
 
   useEffect(() => {
@@ -36,8 +47,9 @@ export const FileUploadProvider = ({
           setCurrentUser(currentUser);
           return;
         }
+
+        // QUESTION: If an error is throw in the context, where can it be caught?
   
-        throw new Error(errorMessage);
       }
   
       loadCurrentUser();
