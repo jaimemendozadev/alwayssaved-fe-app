@@ -8,7 +8,7 @@ import { InputEvent } from '@/utils/ts';
 import {
   handleFileDeletion,
   handleNoteDeletion,
-  handlePresignedUrls
+  handlePresignedUrls,
 } from '@/actions/fileupload';
 import { sendSQSMessage } from '@/utils/aws';
 import {
@@ -16,7 +16,7 @@ import {
   createNoteDocument,
   handleS3FileUploads,
   filterCurrentFiles,
-  verifyUploadsUpdateFilesInDB
+  verifyProcessUploadResults
 } from './utils';
 interface FileUploadProps {
   currentUser: LeanUser | null;
@@ -55,8 +55,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
   };
 
   const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
-    console.log('acceptedFiles ', acceptedFiles);
-    console.log('\n');
 
     const currentUserID = currentUser._id;
 
@@ -74,7 +72,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     // 2) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
-    let fileInfoArray = currentFiles.map((file) => ({
+    const fileInfoArray = currentFiles.map((file) => ({
       name: file.name,
       type: file.type
     }));
@@ -132,31 +130,27 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
 
     // 4) Upload each media file to s3.
-    const finalizedUploadResults = await handleS3FileUploads(
+    const uploadResults = await handleS3FileUploads(
       currentFiles,
-      s3PayloadResults
+      presignPayloads
     );
-
 
    
     /*
-      6) Verify media uploads were successful, perform database updates to each 
+      5) Verify media uploads were successful, perform database updates to each 
          File document with their s3_key, prep sqsPayload for sending SQS message.
     */
-    const feedback = await verifyUploadsUpdateFilesInDB(
-      finalizedUploadResults,
-      s3PayloadResults,
-      pluckedNote
+    const feedback = await verifyProcessUploadResults(
+      uploadResults,
+      presignPayloads,
+      createdNote
     );
-
-    console.log('feedback ', feedback);
 
     if (feedback.error) {
       toast.error(feedback.message, feedbackDuration);
       return;
     }
 
-    console.log('SHOULD FIRE TOAST');
     toast.success(feedback.message, feedbackDuration);
 
     const sqs_message = {
@@ -164,8 +158,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       media_uploads: feedback.sqsPayload
     };
 
-    // 7) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
-    // await sendSQSMessage(sqs_message);
+    // 6) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
+    await sendSQSMessage(sqs_message);
   };
 
   return (

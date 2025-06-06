@@ -53,7 +53,7 @@ export const handleS3FileUploads = async <T extends File>(
   currentFiles: T[],
   presignPayloads: presignPayload[]
 ): Promise<s3UploadResult[]> => {
-  
+
   const uploadResults = await Promise.allSettled(
     currentFiles.map(async (file) => {
       const targetName = file.name;
@@ -110,7 +110,7 @@ export const handleS3FileUploads = async <T extends File>(
 /******************************************************/
 
 /*************************************************
- * verifyUploadsUpdateFilesInDB
+ * verifyProcessUploadResults
  **************************************************/
 
 export interface s3MediaUpload {
@@ -125,9 +125,9 @@ interface validationFeedback {
   sqsPayload: s3MediaUpload[];
 }
 
-export const verifyUploadsUpdateFilesInDB = async (
+export const verifyProcessUploadResults = async (
   s3UploadResults: s3UploadResult[],
-  s3PayloadResults: presignPayload[],
+  s3RequestPayloads: presignPayload[],
   newNote: LeanNote
 ): Promise<validationFeedback> => {
   // 1) Prep s3UploadResults for sendSQSMessage, if any.
@@ -154,7 +154,7 @@ export const verifyUploadsUpdateFilesInDB = async (
 
   // 2) None of the s3 Uploads were successful. Delete the created parent Note Document and File documents.
   if (s3UploadResults.length === 0) {
-    const fileIDs = s3PayloadResults.map((filePayload) => filePayload.file_id);
+    const fileIDs = s3RequestPayloads.map((filePayload) => filePayload.file_id);
 
     await handleFileDeletion(fileIDs);
 
@@ -167,10 +167,10 @@ export const verifyUploadsUpdateFilesInDB = async (
   }
 
   // 3) Some of the files failed to upload. Only delete the failed File uploads from the database.
-  if (s3UploadResults.length !== s3PayloadResults.length) {
+  if (s3UploadResults.length !== s3RequestPayloads.length) {
     const uploadIDs = s3UploadResults.map((uploadRes) => uploadRes.file_id);
 
-    const failedFilePayloads = s3PayloadResults.filter((payloadRes) => {
+    const failedFilePayloads = s3RequestPayloads.filter((payloadRes) => {
       const targetID = payloadRes.file_id;
 
       return uploadIDs.includes(targetID) === false;
