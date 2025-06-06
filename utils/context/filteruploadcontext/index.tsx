@@ -17,9 +17,10 @@ const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg = 'There was an error uploading your files, try again later.';
 const feedbackDuration = { duration: 3000 };
 
+import { verifyProcessUploadResults } from '@/components/fileupload/utils';
 
 
-import { filterCurrentFiles } from './utils';
+import { filterCurrentFiles, handleS3FileUploads } from './utils';
 
 
 

@@ -1,16 +1,10 @@
 'use client';
+import {ReactNode} from 'react';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
 import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
 
-
-import {
-  createFileDocuments,
-  createNoteDocument,
-  handleS3FileUploads,
-  verifyProcessUploadResults
-} from './utils';
 
 interface FileUploadProps {
   currentUser: LeanUser | null;
