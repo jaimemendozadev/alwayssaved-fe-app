@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode, createContext, useEffect } from 'react';
+import { useState, ReactNode, createContext, useEffect, Dispatch, SetStateAction } from 'react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { getUserFromDB } from '@/actions';
@@ -10,6 +10,7 @@ import {
   createNoteDocument,
   createFileDocuments,
 } from '@/actions/fileuploadcontext';
+import { filterCurrentFiles, handleS3FileUploads, verifyProcessUploadResults } from './utils';
 import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
 
@@ -17,18 +18,16 @@ const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg = 'There was an error uploading your files, try again later.';
 const feedbackDuration = { duration: 3000 };
 
-import { verifyProcessUploadResults } from '@/components/fileupload/utils';
-
-
-import { filterCurrentFiles, handleS3FileUploads } from './utils';
 
 
 
 interface FileUploadContext {
   inFlight: boolean;
+  setNoteTitle?: Dispatch<SetStateAction<string>>;
+  handleUpload?: <T extends File>(acceptedFiles: T[]) => void;
 }
 
-export const FileUploadContext = createContext({});
+export const FileUploadContext = createContext<FileUploadContext>({inFlight: false});
 
 
 export const FileUploadProvider = ({
@@ -37,6 +36,7 @@ export const FileUploadProvider = ({
   children: ReactNode;
 }): ReactNode => {
 
+  const [inFlight, setFlightStatus] = useState(false);
   const [noteTitle, setNoteTitle] = useState(defaultNoteTitle);
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
 
@@ -60,13 +60,16 @@ export const FileUploadProvider = ({
   const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
 
     if(!currentUser) return;
-    
+
+    setFlightStatus(true);
+
     const currentUserID = currentUser._id;
 
     // 1) Create a Note document.
     const createdNote = await createNoteDocument(currentUserID, noteTitle);
 
     if (!createdNote) {
+      setFlightStatus(false);
       toast.error(basicErrorMsg, feedbackDuration);
       return;
     }
@@ -87,6 +90,8 @@ export const FileUploadProvider = ({
 
     if (createdFiles.length === 0) {
       await handleNoteDeletion(createdNote);
+
+      setFlightStatus(false);
 
       toast.error(basicErrorMsg, feedbackDuration);
       return;
@@ -112,6 +117,8 @@ export const FileUploadProvider = ({
         const fileIDs = createdFiles.map((file) => file._id);
         await handleFileDeletion(fileIDs);
       }
+
+      setFlightStatus(false);
 
       toast.error(basicErrorMsg, feedbackDuration);
       return;
@@ -142,6 +149,7 @@ export const FileUploadProvider = ({
     );
 
     if (feedback.error) {
+      setFlightStatus(false);
       toast.error(feedback.message, feedbackDuration);
       return;
     }
@@ -155,9 +163,11 @@ export const FileUploadProvider = ({
 
     // 6) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
     await sendSQSMessage(sqs_message);
+
+    setFlightStatus(false);
   };
 
   return (
-    <FileUploadContext.Provider value={}>{children}</FileUploadContext.Provider>
+    <FileUploadContext.Provider value={{inFlight, handleUpload, setNoteTitle}}>{children}</FileUploadContext.Provider>
   );
 };

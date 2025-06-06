@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';;
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
+import { FileUploadProvider } from '@/utils/context/filteruploadcontext';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin']
@@ -28,7 +29,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <FileUploadProvider>
+        <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
@@ -36,6 +38,7 @@ export default function RootLayout({
           <HeroUIProvider>{children}</HeroUIProvider>
         </body>
       </html>
+      </FileUploadProvider>
     </ClerkProvider>
   );
 }
