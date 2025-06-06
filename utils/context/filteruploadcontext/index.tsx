@@ -14,7 +14,6 @@ import { filterCurrentFiles, handleS3FileUploads, verifyProcessUploadResults } f
 import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
 
-const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg = 'There was an error uploading your files, try again later.';
 const feedbackDuration = { duration: 3000 };
 
@@ -23,11 +22,12 @@ const feedbackDuration = { duration: 3000 };
 
 interface FileUploadContext {
   inFlight: boolean;
+  noteTitle: string;
   setNoteTitle?: Dispatch<SetStateAction<string>>;
   handleUpload?: <T extends File>(acceptedFiles: T[]) => void;
 }
 
-export const FileUploadContext = createContext<FileUploadContext>({inFlight: false});
+export const FileUploadContext = createContext<FileUploadContext>({inFlight: false, noteTitle: ''});
 
 
 export const FileUploadProvider = ({
@@ -37,7 +37,7 @@ export const FileUploadProvider = ({
 }): ReactNode => {
 
   const [inFlight, setFlightStatus] = useState(false);
-  const [noteTitle, setNoteTitle] = useState(defaultNoteTitle);
+  const [noteTitle, setNoteTitle] = useState(`Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`);
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
 
   useEffect(() => {
@@ -165,6 +165,9 @@ export const FileUploadProvider = ({
     await sendSQSMessage(sqs_message);
 
     setFlightStatus(false);
+
+
+    setNoteTitle(`Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`); // TODO: May have to play around with this if the user
   };
 
   return (

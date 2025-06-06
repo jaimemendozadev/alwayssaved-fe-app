@@ -1,23 +1,20 @@
 'use client';
-import {ReactNode} from 'react';
+import {ReactNode, useContext} from 'react';
 import dayjs from 'dayjs';
 import Dropzone from 'react-dropzone';
-import { LeanUser } from '@/utils/mongodb';
 import { InputEvent } from '@/utils/ts';
+import { FileUploadContext } from '@/utils/context/filteruploadcontext';
 
-
-interface FileUploadProps {
-  currentUser: LeanUser | null;
-}
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
 
-export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
-  console.log('currentUser in FileUpload: ', currentUser);
+
+export const FileUpload = (): ReactNode => {
 
 
-  if (!currentUser) return null;
+  const {handleUpload, inFlight, setNoteTitle, noteTitle} = useContext(FileUploadContext)
+
 
   const handleChange = (evt: InputEvent) => {
     if (evt?.type === 'focus') {
@@ -39,6 +36,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       return;
     }
   };
+
+  if(!handleUpload) return null;
 
 
   return (
@@ -75,7 +74,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
         </label>
       </form>
 
-      <Dropzone onDrop={(acceptedFiles) => handleUpload(acceptedFiles)}>
+      <Dropzone disabled={inFlight} onDrop={(acceptedFiles) => handleUpload(acceptedFiles)}>
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
             <div {...getRootProps()}>
