@@ -1,4 +1,4 @@
-import { LeanFile, LeanNote } from '@/utils/mongodb';
+import { LeanNote } from '@/utils/mongodb';
 import {
   handleFileDocUpdate,
   handleNoteDeletion,
@@ -6,36 +6,9 @@ import {
   presignPayload,
   createFileDocuments,
   createNoteDocument
-} from '@/actions/fileupload';
-
+} from '@/actions/fileuploadcontext';
 
 export { handleFileDocUpdate, createFileDocuments, createNoteDocument };
-
-
-
-
-/*************************************************
- * filterCurrentFiles
- **************************************************/
-
-export const filterCurrentFiles =  <T extends File>(
-  currentFiles: T[], 
-  targetFiles: LeanFile[] | presignPayload[]
-): T[] => {
-
-  const arrayOfFileNames = targetFiles.map((leanFile) => leanFile.file_name);
-
-  const filteredFiles = currentFiles.filter((file) =>
-    arrayOfFileNames.includes(file.name)
-  );
-
-  return filteredFiles;
-
-};
-
-/******************************************************/
-
-
 
 /*************************************************
  * handleS3FileUploads
@@ -48,12 +21,10 @@ export interface s3UploadResult {
   };
 }
 
-
 export const handleS3FileUploads = async <T extends File>(
   currentFiles: T[],
   presignPayloads: presignPayload[]
 ): Promise<s3UploadResult[]> => {
-
   const uploadResults = await Promise.allSettled(
     currentFiles.map(async (file) => {
       const targetName = file.name;
@@ -86,7 +57,7 @@ export const handleS3FileUploads = async <T extends File>(
     })
   );
 
-  console.log("uploadResults in handleS3FileUploads ", uploadResults);
+  console.log('uploadResults in handleS3FileUploads ', uploadResults);
 
   // Log s3FileUpload Failures
   uploadResults.forEach((result) => {
