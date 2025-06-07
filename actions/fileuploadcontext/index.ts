@@ -4,12 +4,10 @@ import {
   LeanFile,
   LeanNote,
   NoteModel,
-  FileModel,
   getObjectIDFromString
 } from '@/utils/mongodb';
 
 import { handlePresignedUrlsWithClient } from '@/utils/aws';
-import { s3UploadResult } from '@/utils/context/filteruploadcontext/utils';
 
 import { createNoteDocument } from './createNoteDocument';
 import { createFileDocuments } from './createFileDocuments';
@@ -43,68 +41,6 @@ export const handleNoteDeletion = async (newNote: LeanNote): Promise<void> => {
       error
     );
   }
-};
-
-/***************************************************/
-
-/*************************************************
- * handleFileDocUpdate
- **************************************************/
-
-interface UpdateStatus {
-  file_id: string;
-  update_status: string;
-}
-
-export const handleFileDocUpdate = async (
-  fileUpdates: s3UploadResult[]
-): Promise<UpdateStatus[]> => {
-  const updateResults = await Promise.allSettled(
-    fileUpdates.map(async (updateInfo) => {
-      const { file_id, update } = updateInfo;
-
-      try {
-        const targetID = getObjectIDFromString(file_id);
-
-        const updatedFile = await FileModel.findByIdAndUpdate(
-          targetID,
-          update,
-          {
-            new: true
-          }
-        ).exec();
-
-        console.log('updatedFile ', updatedFile);
-
-        return {
-          file_id,
-          update_status: 'success'
-        };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-
-        throw new Error(
-          `Error in handleFileDocUpdate for file_id ${file_id}: ${message}`
-        );
-      }
-    })
-  );
-
-  // Log File Deletion Failures
-  updateResults.forEach((result) => {
-    if (result.status === 'rejected') {
-      // TODO: Handle in telemetry.
-      console.error('File document update failed:', result.reason);
-    }
-  });
-
-  const filteredResults = updateResults.filter(
-    (result) => result.status === 'fulfilled'
-  );
-
-  const finalizedResults = filteredResults.map((result) => result.value);
-
-  return finalizedResults;
 };
 
 /***************************************************/
