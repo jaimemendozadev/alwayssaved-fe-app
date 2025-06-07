@@ -1,12 +1,25 @@
 import {
-  handleFileDocUpdate,
-  handleNoteDeletion,
   handleFileDeletion,
+  handleNoteDeletion,
+  handlePresignedUrls,
+  createNoteDocument,
+  createFileDocuments,
 } from '@/actions/fileuploadcontext';
-
-import { LeanFile, LeanNote } from '@/utils/mongodb';
+import { LeanFile } from '@/utils/mongodb';
 import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
+import { handleS3FileUploads } from './handleS3FileUploads';
+import { verifyProcessUploadResults } from './verifyProcessUploadResults';
 
+
+export {
+    handleS3FileUploads,
+    verifyProcessUploadResults,
+    handleFileDeletion,
+    handleNoteDeletion,
+    handlePresignedUrls,
+    createNoteDocument,
+    createFileDocuments
+}
 
 /*************************************************
  * filterCurrentFiles
@@ -27,25 +40,4 @@ export const filterCurrentFiles = <T extends File>(
 
 /******************************************************/
 
-
-
-/*************************************************
- * verifyProcessUploadResults
- **************************************************/
-
-
-/******************************************************/
-
-/********************************************
- * Notes
- ********************************************
-
- 1) Media assets are stored in s3 in the following s3 Key format: 
-
-    /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
-
-    fileOwner: is the User._id
-    fileName: is the name of the file with the fileType extension 
-
-*/
 

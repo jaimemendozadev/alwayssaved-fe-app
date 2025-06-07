@@ -1,24 +1,33 @@
 'use client';
-import { useState, ReactNode, createContext, useEffect, Dispatch, SetStateAction } from 'react';
+import {
+  useState,
+  ReactNode,
+  createContext,
+  useEffect,
+  Dispatch,
+  SetStateAction
+} from 'react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { getUserFromDB } from '@/actions';
+
 import {
+  filterCurrentFiles,
+  handleS3FileUploads,
+  verifyProcessUploadResults,
   handleFileDeletion,
   handleNoteDeletion,
   handlePresignedUrls,
   createNoteDocument,
-  createFileDocuments,
-} from '@/actions/fileuploadcontext';
-import { filterCurrentFiles, handleS3FileUploads, verifyProcessUploadResults } from './utils';
+  createFileDocuments
+} from './utils';
+
 import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
 
-const basicErrorMsg = 'There was an error uploading your files, try again later.';
+const basicErrorMsg =
+  'There was an error uploading your files, try again later.';
 const feedbackDuration = { duration: 3000 };
-
-
-
 
 interface FileUploadContext {
   inFlight: boolean;
@@ -27,39 +36,39 @@ interface FileUploadContext {
   handleUpload?: <T extends File>(acceptedFiles: T[]) => void;
 }
 
-export const FileUploadContext = createContext<FileUploadContext>({inFlight: false, noteTitle: ''});
-
+export const FileUploadContext = createContext<FileUploadContext>({
+  inFlight: false,
+  noteTitle: ''
+});
 
 export const FileUploadProvider = ({
   children
 }: {
   children: ReactNode;
 }): ReactNode => {
-
   const [inFlight, setFlightStatus] = useState(false);
-  const [noteTitle, setNoteTitle] = useState(`Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`);
+  const [noteTitle, setNoteTitle] = useState(
+    `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
+  );
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
 
   useEffect(() => {
-      async function loadCurrentUser() {
-        const currentUser = await getUserFromDB();
-  
-        if (currentUser) {
-          setCurrentUser(currentUser);
-          return;
-        }
+    async function loadCurrentUser() {
+      const currentUser = await getUserFromDB();
 
-        // QUESTION: If an error is throw in the context, where can it be caught?
-  
+      if (currentUser) {
+        setCurrentUser(currentUser);
+        return;
       }
-  
-      loadCurrentUser();
-    }, []);
 
+      // QUESTION: If an error is throw in the context, where can it be caught?
+    }
+
+    loadCurrentUser();
+  }, []);
 
   const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
-
-    if(!currentUser) return;
+    if (!currentUser) return;
 
     setFlightStatus(true);
 
@@ -166,11 +175,16 @@ export const FileUploadProvider = ({
 
     setFlightStatus(false);
 
-
-    setNoteTitle(`Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`); // TODO: May have to play around with this if the user
+    setNoteTitle(
+      `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
+    ); // TODO: May have to play around with this if the user
   };
 
   return (
-    <FileUploadContext.Provider value={{inFlight, handleUpload, noteTitle, setNoteTitle}}>{children}</FileUploadContext.Provider>
+    <FileUploadContext.Provider
+      value={{ inFlight, handleUpload, noteTitle, setNoteTitle }}
+    >
+      {children}
+    </FileUploadContext.Provider>
   );
 };

@@ -63,3 +63,17 @@ export const handleS3FileUploads = async <T extends File>(
 
   return finalizedUploadResults;
 };
+
+
+/********************************************
+ * Notes
+ ********************************************
+
+ 1) Media assets are stored in s3 in the following s3 Key format: 
+
+    /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
+
+    fileOwner: is the User._id
+    fileName: is the name of the file with the fileType extension 
+
+*/
