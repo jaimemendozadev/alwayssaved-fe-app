@@ -171,6 +171,6 @@ export const FileUploadProvider = ({
   };
 
   return (
-    <FileUploadContext.Provider value={{inFlight, handleUpload, setNoteTitle}}>{children}</FileUploadContext.Provider>
+    <FileUploadContext.Provider value={{inFlight, handleUpload, noteTitle, setNoteTitle}}>{children}</FileUploadContext.Provider>
   );
 };
