@@ -11,38 +11,50 @@ interface UpdateStatus {
 export const handleFileDocUpdate = async (
   fileUpdates: s3UploadResult[]
 ): Promise<UpdateStatus[]> => {
-  const updateResults = await Promise.allSettled(
-    fileUpdates.map(async (updateInfo) => {
-      const { file_id, update } = updateInfo;
+  let updateResults: PromiseSettledResult<{
+    file_id: string;
+    update_status: string;
+  }>[] = [];
 
-      try {
-        await dbConnect();
+  try {
+    await dbConnect();
 
-        const targetID = getObjectIDFromString(file_id);
+    updateResults = await Promise.allSettled(
+      fileUpdates.map(async (updateInfo) => {
+        const { file_id, update } = updateInfo;
 
-        const updatedFile = await FileModel.findByIdAndUpdate(
-          targetID,
-          update,
-          {
-            new: true
-          }
-        ).exec();
+        try {
+          await dbConnect();
 
-        console.log('updatedFile ', updatedFile);
+          const targetID = getObjectIDFromString(file_id);
 
-        return {
-          file_id,
-          update_status: 'success'
-        };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
+          const updatedFile = await FileModel.findByIdAndUpdate(
+            targetID,
+            update,
+            {
+              new: true
+            }
+          ).exec();
 
-        throw new Error(
-          `Error in handleFileDocUpdate for file_id ${file_id}: ${message}`
-        );
-      }
-    })
-  );
+          console.log('updatedFile ', updatedFile);
+
+          return {
+            file_id,
+            update_status: 'success'
+          };
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : String(error);
+
+          throw new Error(
+            `Error in handleFileDocUpdate for file_id ${file_id}: ${message}`
+          );
+        }
+      })
+    );
+  } catch (error) {
+    console.log('Error top level of try of handleFileDocUpdate: ', error);
+  }
 
   // Log File Deletion Failures
   updateResults.forEach((result) => {
