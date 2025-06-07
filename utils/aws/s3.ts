@@ -12,8 +12,6 @@ export const handlePresignedUrlsWithClient = async (
 ): Promise<string> => {
   const config = getAWSConfigByEnv(NODE_ENV);
 
-  console.log('aws s3 config ', config);
-
   const client = new S3Client(config);
 
   const command = new PutObjectCommand({ Bucket: AWS_BUCKET, Key: key });

@@ -1,24 +1,24 @@
 'use server';
 import {
   dbConnect,
-  LeanFile,
   LeanNote,
   NoteModel,
   getObjectIDFromString
 } from '@/utils/mongodb';
 
-import { handlePresignedUrlsWithClient } from '@/utils/aws';
-
-import { createNoteDocument } from './createNoteDocument';
 import { createFileDocuments } from './createFileDocuments';
-
+import { createNoteDocument } from './createNoteDocument';
 import { handleFileDeletion } from './handleFileDeletion';
+import { handleFileDocUpdate } from './handleFileDocUpdate';
+import { handlePresignedUrls } from './handlePresignedUrls';
+
 
 export {
-  createNoteDocument,
   createFileDocuments,
-  handleFileDeletion
-
+  createNoteDocument,  
+  handleFileDeletion,
+  handleFileDocUpdate,
+  handlePresignedUrls,
 }
 
 
@@ -45,62 +45,3 @@ export const handleNoteDeletion = async (newNote: LeanNote): Promise<void> => {
 
 /***************************************************/
 
-
-
-/*************************************************
- * handlePresignedUrls
- **************************************************/
-
-export interface presignPayload {
-  s3_key: string;
-  file_id: string;
-  file_name: string;
-  presigned_url: string;
-}
-
-export const handlePresignedUrls = async (
-  fileDocuments: LeanFile[]
-): Promise<presignPayload[]> => {
-  const presignResults = await Promise.allSettled(
-    fileDocuments.map(async (fileDoc) => {
-      const { file_name, note_id, user_id, _id } = fileDoc;
-
-      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
-
-      try {
-        const presignedURL = await handlePresignedUrlsWithClient(s3_key);
-
-        return {
-          s3_key,
-          file_id: _id,
-          file_name,
-          presigned_url: presignedURL
-        };
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-
-        throw new Error(
-          `Error in handlePresignedUrls for s3_key: ${s3_key}: ${message}`
-        );
-      }
-    })
-  );
-
-  // Log preSignUrl Failures
-  presignResults.forEach((result) => {
-    if (result.status === 'rejected') {
-      // TODO: Handle in telemetry.
-      console.error('Creating PresignUrl failed: ', result.reason);
-    }
-  });
-
-  const filteredResults = presignResults.filter(
-    (result) => result.status === 'fulfilled'
-  );
-
-  const finalizedResults = filteredResults.map((result) => result.value);
-
-  return finalizedResults;
-};
-
-/******************************************************/
