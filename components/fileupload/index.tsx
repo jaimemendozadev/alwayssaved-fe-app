@@ -1,6 +1,7 @@
 'use client';
 import {ReactNode, useContext} from 'react';
 import dayjs from 'dayjs';
+import {CircularProgress} from "@heroui/react";
 import Dropzone from 'react-dropzone';
 import { InputEvent } from '@/utils/ts';
 import { FileUploadContext } from '@/utils/context/filteruploadcontext';
@@ -17,6 +18,8 @@ export const FileUpload = (): ReactNode => {
 
 
   const handleChange = (evt: InputEvent) => {
+    if(!setNoteTitle) return;
+
     if (evt?.type === 'focus') {
       if (noteTitle === defaultNoteTitle) {
         setNoteTitle('');
@@ -59,6 +62,8 @@ export const FileUpload = (): ReactNode => {
           else. We&apos;ll let you know when it&apos;s done.
         </p>
       </article>
+
+      {inFlight && (<CircularProgress label="Loading..." />)}
 
       <form className="mb-8 border-2 p-4">
         <label htmlFor="noteTitle" className="text-lg">
