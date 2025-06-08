@@ -1,24 +1,21 @@
 'use client';
-import {ReactNode, useContext} from 'react';
+import { ReactNode, useContext } from 'react';
 import dayjs from 'dayjs';
-import {CircularProgress} from "@heroui/react";
+import { Spinner } from '@heroui/react';
 import Dropzone from 'react-dropzone';
 import { InputEvent } from '@/utils/ts';
 import { FileUploadContext } from '@/utils/context/filteruploadcontext';
 
-
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
-
-
 export const FileUpload = (): ReactNode => {
+  const { handleUpload, inFlight, setNoteTitle, noteTitle } =
+    useContext(FileUploadContext);
 
-
-  const {handleUpload, inFlight, setNoteTitle, noteTitle} = useContext(FileUploadContext)
-
+  console.log('inFlight in FileUpload ', inFlight);
 
   const handleChange = (evt: InputEvent) => {
-    if(!setNoteTitle) return;
+    if (!setNoteTitle) return;
 
     if (evt?.type === 'focus') {
       if (noteTitle === defaultNoteTitle) {
@@ -40,8 +37,9 @@ export const FileUpload = (): ReactNode => {
     }
   };
 
-  if(!handleUpload) return null;
+  if (!handleUpload) return null;
 
+  console.log('Spinner ', Spinner);
 
   return (
     <div className="w-[900px]">
@@ -63,7 +61,9 @@ export const FileUpload = (): ReactNode => {
         </p>
       </article>
 
-      {inFlight && (<CircularProgress label="Loading..." />)}
+      <div className="flex min-h-24 justify-center">
+        {inFlight && <Spinner size="lg" color="primary" label="Loading..." />}
+      </div>
 
       <form className="mb-8 border-2 p-4">
         <label htmlFor="noteTitle" className="text-lg">
@@ -79,7 +79,10 @@ export const FileUpload = (): ReactNode => {
         </label>
       </form>
 
-      <Dropzone disabled={inFlight} onDrop={(acceptedFiles) => handleUpload(acceptedFiles)}>
+      <Dropzone
+        disabled={inFlight}
+        onDrop={(acceptedFiles) => handleUpload(acceptedFiles)}
+      >
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
             <div {...getRootProps()}>

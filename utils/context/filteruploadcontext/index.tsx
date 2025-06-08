@@ -8,21 +8,21 @@ import {
   SetStateAction
 } from 'react';
 import dayjs from 'dayjs';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 import { getUserFromDB } from '@/actions';
 
-import {
-  filterCurrentFiles,
-  handleS3FileUploads,
-  verifyProcessUploadResults,
-  handleFileDeletion,
-  handleNoteDeletion,
-  handlePresignedUrls,
-  createNoteDocument,
-  createFileDocuments
-} from './utils';
+// import {
+//   filterCurrentFiles,
+//   handleS3FileUploads,
+//   verifyProcessUploadResults,
+//   handleFileDeletion,
+//   handleNoteDeletion,
+//   handlePresignedUrls,
+//   createNoteDocument,
+//   createFileDocuments
+// } from './utils';
 
-import { sendSQSMessage } from '@/utils/aws';
+// import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
 
 const basicErrorMsg =
@@ -73,6 +73,8 @@ export const FileUploadProvider = ({
     setFlightStatus(true);
 
     const currentUserID = currentUser._id;
+
+    /*
 
     // 1) Create a Note document.
     const createdNote = await createNoteDocument(currentUserID, noteTitle);
@@ -147,10 +149,10 @@ export const FileUploadProvider = ({
       presignPayloads
     );
 
-    /*
-      5) Verify media uploads were successful, perform database updates to each 
-         File document with their s3_key, prep sqsPayload for sending SQS message.
-    */
+    
+      // 5) Verify media uploads were successful, perform database updates to each 
+      //   File document with their s3_key, prep sqsPayload for sending SQS message.
+    
     const feedback = await verifyProcessUploadResults(
       uploadResults,
       presignPayloads,
@@ -178,6 +180,8 @@ export const FileUploadProvider = ({
     setNoteTitle(
       `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
     ); // TODO: May have to play around with this if the user
+
+    */
   };
 
   return (
