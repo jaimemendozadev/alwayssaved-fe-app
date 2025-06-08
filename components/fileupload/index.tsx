@@ -1,7 +1,7 @@
 'use client';
 import { ReactNode, useContext } from 'react';
 import dayjs from 'dayjs';
-import { Spinner } from '@heroui/react';
+import { Progress } from '@heroui/react';
 import Dropzone from 'react-dropzone';
 import { InputEvent } from '@/utils/ts';
 import { FileUploadContext } from '@/utils/context/filteruploadcontext';
@@ -9,7 +9,7 @@ import { FileUploadContext } from '@/utils/context/filteruploadcontext';
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
 export const FileUpload = (): ReactNode => {
-  const { handleUpload, inFlight, setNoteTitle, noteTitle } =
+  const { handleUpload, inFlight, setNoteTitle, noteTitle, progressValue } =
     useContext(FileUploadContext);
 
   console.log('inFlight in FileUpload ', inFlight);
@@ -39,8 +39,6 @@ export const FileUpload = (): ReactNode => {
 
   if (!handleUpload) return null;
 
-  console.log('Spinner ', Spinner);
-
   return (
     <div className="w-[900px]">
       <article className="mb-16">
@@ -62,7 +60,17 @@ export const FileUpload = (): ReactNode => {
       </article>
 
       <div className="flex min-h-24 justify-center">
-        {inFlight && <Spinner size="lg" color="primary" label="Loading..." />}
+        {inFlight && (
+          <Progress
+            aria-label="Uploading..."
+            label="Uploading..."
+            className="max-w-md"
+            color="success"
+            showValueLabel={true}
+            size="md"
+            value={progressValue}
+          />
+        )}
       </div>
 
       <form className="mb-8 border-2 p-4">

@@ -8,21 +8,21 @@ import {
   SetStateAction
 } from 'react';
 import dayjs from 'dayjs';
-// import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { getUserFromDB } from '@/actions';
 
-// import {
-//   filterCurrentFiles,
-//   handleS3FileUploads,
-//   verifyProcessUploadResults,
-//   handleFileDeletion,
-//   handleNoteDeletion,
-//   handlePresignedUrls,
-//   createNoteDocument,
-//   createFileDocuments
-// } from './utils';
+import {
+  filterCurrentFiles,
+  handleS3FileUploads,
+  verifyProcessUploadResults,
+  handleFileDeletion,
+  handleNoteDeletion,
+  handlePresignedUrls,
+  createNoteDocument,
+  createFileDocuments
+} from './utils';
 
-// import { sendSQSMessage } from '@/utils/aws';
+import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
 
 const basicErrorMsg =
@@ -32,13 +32,15 @@ const feedbackDuration = { duration: 3000 };
 interface FileUploadContext {
   inFlight: boolean;
   noteTitle: string;
+  progressValue: number;
   setNoteTitle?: Dispatch<SetStateAction<string>>;
   handleUpload?: <T extends File>(acceptedFiles: T[]) => void;
 }
 
 export const FileUploadContext = createContext<FileUploadContext>({
   inFlight: false,
-  noteTitle: ''
+  noteTitle: '',
+  progressValue: 0,
 });
 
 export const FileUploadProvider = ({
@@ -51,6 +53,8 @@ export const FileUploadProvider = ({
     `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
   );
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
+
+  const [progressValue, updateProgress] = useState(0);
 
   useEffect(() => {
     async function loadCurrentUser() {
@@ -74,16 +78,21 @@ export const FileUploadProvider = ({
 
     const currentUserID = currentUser._id;
 
-    /*
 
     // 1) Create a Note document.
+    updateProgress(1);
     const createdNote = await createNoteDocument(currentUserID, noteTitle);
+
+    updateProgress(3);
 
     if (!createdNote) {
       setFlightStatus(false);
+      updateProgress(0);
       toast.error(basicErrorMsg, feedbackDuration);
       return;
     }
+
+    updateProgress(13);
 
     // 2) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
@@ -99,14 +108,20 @@ export const FileUploadProvider = ({
       createdNote._id
     );
 
+    updateProgress(20);
+
     if (createdFiles.length === 0) {
       await handleNoteDeletion(createdNote);
 
       setFlightStatus(false);
 
+      updateProgress(0);
+
       toast.error(basicErrorMsg, feedbackDuration);
       return;
     }
+
+    updateProgress(26);
 
     // 2a) If some of the File documents failed to be created, filter the acceptedFiles.
     if (createdFiles.length !== currentFiles.length) {
@@ -117,8 +132,12 @@ export const FileUploadProvider = ({
       );
     }
 
+    updateProgress(32);
+
     // 3) Create the presignUrls for each File document.
     const presignPayloads = await handlePresignedUrls(createdFiles);
+
+    updateProgress(35);
 
     // 3a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if (presignPayloads.length === 0) {
@@ -130,6 +149,7 @@ export const FileUploadProvider = ({
       }
 
       setFlightStatus(false);
+      updateProgress(0);
 
       toast.error(basicErrorMsg, feedbackDuration);
       return;
@@ -143,15 +163,22 @@ export const FileUploadProvider = ({
       );
     }
 
+    updateProgress(38);
+
+
     // 4) Upload each media file to s3.
     const uploadResults = await handleS3FileUploads(
       currentFiles,
       presignPayloads
     );
 
+    updateProgress(60);
+
     
-      // 5) Verify media uploads were successful, perform database updates to each 
-      //   File document with their s3_key, prep sqsPayload for sending SQS message.
+      /* 
+        5) Verify media uploads were successful, perform database updates to each 
+         File document with their s3_key, prep sqsPayload for sending SQS message.
+      */
     
     const feedback = await verifyProcessUploadResults(
       uploadResults,
@@ -159,11 +186,16 @@ export const FileUploadProvider = ({
       createdNote
     );
 
+    updateProgress(80);
+
     if (feedback.error) {
       setFlightStatus(false);
+      updateProgress(0);
       toast.error(feedback.message, feedbackDuration);
       return;
     }
+
+    updateProgress(90);
 
     toast.success(feedback.message, feedbackDuration);
 
@@ -175,18 +207,21 @@ export const FileUploadProvider = ({
     // 6) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
     await sendSQSMessage(sqs_message);
 
+    updateProgress(100);
+
     setFlightStatus(false);
+
+    updateProgress(0);
 
     setNoteTitle(
       `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
     ); // TODO: May have to play around with this if the user
 
-    */
   };
 
   return (
     <FileUploadContext.Provider
-      value={{ inFlight, handleUpload, noteTitle, setNoteTitle }}
+      value={{ inFlight, handleUpload, noteTitle, setNoteTitle, progressValue }}
     >
       {children}
     </FileUploadContext.Provider>
