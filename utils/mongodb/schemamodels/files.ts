@@ -14,7 +14,6 @@ export interface IFile {
     file_name: string;
     file_type: string;
     date_uploaded: Date;
-    embedding_status: string; // "pending" | "complete" | "failed"
 }
 
 
@@ -37,7 +36,6 @@ const FileSchema = new Schema<IFile>({
   file_name: {type: String, required: true, default: `Untitled File - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`},
   file_type: {type: String, required: true,},
   date_uploaded: {type: Date, default: Date.now},
-  embedding_status: {type: String, default: 'pending'},
 });
 
 export const FileModel = mongoose.models?.File || model<IFile>('File', FileSchema);
