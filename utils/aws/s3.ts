@@ -1,5 +1,10 @@
 'use server';
-import { PutObjectCommand, S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  PutObjectCommand,
+  S3Client,
+  DeleteObjectCommand,
+  DeleteObjectCommandOutput
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getAWSConfigByEnv } from './index';
 
@@ -20,8 +25,9 @@ export const handlePresignedUrlsWithClient = async (
   return signedUrl;
 };
 
-export const deleteFileFromS3 = async (s3_key: string) => {
-
+export const deleteFileFromS3 = async (
+  s3_key: string
+): Promise<DeleteObjectCommandOutput> => {
   const config = getAWSConfigByEnv(NODE_ENV);
 
   const client = new S3Client(config);
@@ -29,13 +35,13 @@ export const deleteFileFromS3 = async (s3_key: string) => {
   const command = new DeleteObjectCommand({
     Bucket: AWS_BUCKET,
     Key: s3_key
-  })
+  });
 
   const response = await client.send(command);
 
   console.log(`Object with s3_key ${s3_key} successfully deleted: `, response);
 
-
+  return response;
 };
 
 /*************************************
