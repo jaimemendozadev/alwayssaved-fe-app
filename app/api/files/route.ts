@@ -13,22 +13,16 @@ export async function PATCH(request: NextRequest): Promise<void | Response> {
 
   const body = await request.json();
 
-  const { file_id, s3_key } = body;
+  const { file_id, update } = body;
 
   try {
     await dbConnect();
 
     const targetID = getObjectIDFromString(file_id);
 
-    const updatedFile = await FileModel.findByIdAndUpdate(
-      targetID,
-      {
-        s3_key
-      },
-      {
-        new: true
-      }
-    ).exec();
+    const updatedFile = await FileModel.findByIdAndUpdate(targetID, update, {
+      new: true
+    }).exec();
 
     console.log('updatedFile in PATCH /api/files', updatedFile);
 

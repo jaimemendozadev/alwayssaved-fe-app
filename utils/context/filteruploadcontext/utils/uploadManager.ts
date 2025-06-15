@@ -44,7 +44,7 @@ class UploadManager {
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ file_id, s3_key })
+          body: JSON.stringify({ file_id, update: { s3_key } })
         }
       );
 
