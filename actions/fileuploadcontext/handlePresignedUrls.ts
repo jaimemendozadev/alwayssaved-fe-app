@@ -7,6 +7,8 @@ import { handlePresignedUrlsWithClient } from '@/utils/aws';
 
 export interface presignPayload {
   s3_key: string;
+  note_id: string;
+  user_id: string;
   file_id: string;
   file_name: string;
   presigned_url: string;
@@ -26,6 +28,8 @@ export const handlePresignedUrls = async (
 
         return {
           s3_key,
+          note_id,
+          user_id,
           file_id: _id,
           file_name,
           presigned_url: presignedURL
