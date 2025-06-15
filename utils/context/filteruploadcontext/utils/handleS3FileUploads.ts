@@ -64,7 +64,6 @@ export const handleS3FileUploads = async <T extends File>(
   return finalizedUploadResults;
 };
 
-
 /********************************************
  * Notes
  ********************************************
