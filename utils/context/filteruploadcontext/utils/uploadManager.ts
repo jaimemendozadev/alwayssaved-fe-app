@@ -1,5 +1,18 @@
 import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
+import { BackendResponse } from '@/utils/ts';
 
+import {
+  handleFileDeletion,
+  handleNoteDeletion
+} from '@/actions/fileuploadcontext';
+
+/*
+
+await handleFileDeletion(fileIDs);
+
+    await handleNoteDeletion(newNote);
+
+ */
 class UploadManager {
   uploads = new Map();
 
@@ -23,44 +36,46 @@ class UploadManager {
         signal: controller.signal
       });
 
+      this.uploads.set(file.name, controller);
+
       // 2) Make /api request to update File document s3_key property.
-      await fetch('/api/files', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ file_id, s3_key })
-      });
+      const updateResponse: BackendResponse<unknown> = await fetch(
+        '/api/files',
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file_id, s3_key })
+        }
+      );
 
-      /*
-          SQS Payload Shape
-
+      if (updateResponse.status === 200) {
+        // 3) Send SQS Message in Backend.
+        const sqsResponse: BackendResponse<unknown> = await fetch(
+          '/api/extractorqueue',
           {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note_id, user_id, s3_key })
+          }
+        );
+
+        if (sqsResponse.status === 200) {
+          return {
             s3_key,
             note_id,
             user_id
-          }
-
-     */
-
-      // 3) Send SQS Message in Backend.
-
-
-      
-      return {
-        s3_key,
-        note_id,
-        user_id
+          };
+        }
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      throw new Error(
-        `Error in handleS3FileUploads for s3_key: ${s3_key}: ${message}`
+      console.log(
+        `Error in UploadManager.uploadFile for s3_key: ${s3_key}: ${message}`
       );
     }
 
-    this.uploads.set(file.name, controller);
-
-    return promise;
+    return {};
   }
 
   abortUpload(fileName) {
