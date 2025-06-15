@@ -29,7 +29,8 @@ class UploadManager {
 
     const uploadStatus = {
       s3_upload_status: 'failure',
-      file_db_update_status: 'failure'
+      file_db_update_status: 'failure',
+      send_sqs_message_status: 'failure'
     };
 
     // 1) Upload file to s3.
@@ -50,6 +51,8 @@ class UploadManager {
       console.log(
         `Error in UploadManager.uploadFile uploading file with s3_key: ${s3_key}: ${message}`
       );
+
+      return uploadStatus;
     }
 
     // 2) Make /api request to update File document s3_key property.
@@ -65,6 +68,10 @@ class UploadManager {
 
       if (updateResponse.status === 200) {
         uploadStatus['file_db_update_status'] = 'success';
+      } else {
+        throw new Error(
+          `There was a problem updating the file ${file_id} with s3_key ${s3_key} in the database.`
+        );
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -72,6 +79,8 @@ class UploadManager {
       console.log(
         `Error in UploadManager.uploadFile updating File ${file_id} in database: ${message}`
       );
+
+      return uploadStatus;
     }
 
     // 3) Send SQS Message in Backend.
@@ -86,15 +95,21 @@ class UploadManager {
       );
 
       if (sqsResponse.status === 200) {
-        return {
-          s3_key,
-          note_id,
-          user_id
-        };
+        uploadStatus['send_sqs_message_status'] = 'success';
+      } else {
+        throw new Error(
+          `There was a problem sending a message to the Extractor Queue for user ${user_id} with s3_key ${s3_key}.`
+        );
       }
-    } catch (error) {}
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
 
-    return {};
+      console.log(
+        `Error in UploadManager.uploadFile sending Extractor Queue Message for s3_key ${s3_key}: ${message}`
+      );
+    }
+
+    return uploadStatus;
   }
 
   abortUpload(fileName) {
