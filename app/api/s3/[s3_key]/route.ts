@@ -1,11 +1,13 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { dbConnect, FileModel, getObjectIDFromString } from '@/utils/mongodb';
+import { deleteFileFromS3 } from '@/utils/aws';
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { s3_key: string } }
 ): Promise<void | Response> {
+
   const user = await currentUser();
 
   if (!user)
@@ -16,6 +18,10 @@ export async function DELETE(
 
   try {
     await dbConnect();
+
+    const {s3_key} = params;
+
+    await deleteFileFromS3(s3_key);
 
     return NextResponse.json({ status: 200 }, { status: 200 });
   } catch (error) {
