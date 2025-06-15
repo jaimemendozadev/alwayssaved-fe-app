@@ -27,8 +27,13 @@ class UploadManager {
 
     const { presigned_url, file_id, s3_key, note_id, user_id } = targetPayload;
 
+    const uploadStatus = {
+      s3_upload_status: 'failure',
+      file_db_update_status: 'failure'
+    };
+
+    // 1) Upload file to s3.
     try {
-      // 1) Upload file to s3.
       await fetch(presigned_url, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
@@ -36,9 +41,19 @@ class UploadManager {
         signal: controller.signal
       });
 
-      this.uploads.set(file.name, controller);
+      uploadStatus['s3_upload_status'] = 'success';
 
-      // 2) Make /api request to update File document s3_key property.
+      this.uploads.set(file.name, controller);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      console.log(
+        `Error in UploadManager.uploadFile uploading file with s3_key: ${s3_key}: ${message}`
+      );
+    }
+
+    // 2) Make /api request to update File document s3_key property.
+    try {
       const updateResponse: BackendResponse<unknown> = await fetch(
         '/api/files',
         {
@@ -49,31 +64,35 @@ class UploadManager {
       );
 
       if (updateResponse.status === 200) {
-        // 3) Send SQS Message in Backend.
-        const sqsResponse: BackendResponse<unknown> = await fetch(
-          '/api/extractorqueue',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note_id, user_id, s3_key })
-          }
-        );
-
-        if (sqsResponse.status === 200) {
-          return {
-            s3_key,
-            note_id,
-            user_id
-          };
-        }
+        uploadStatus['file_db_update_status'] = 'success';
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
       console.log(
-        `Error in UploadManager.uploadFile for s3_key: ${s3_key}: ${message}`
+        `Error in UploadManager.uploadFile updating File ${file_id} in database: ${message}`
       );
     }
+
+    // 3) Send SQS Message in Backend.
+    try {
+      const sqsResponse: BackendResponse<unknown> = await fetch(
+        '/api/extractorqueue',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note_id, user_id, s3_key })
+        }
+      );
+
+      if (sqsResponse.status === 200) {
+        return {
+          s3_key,
+          note_id,
+          user_id
+        };
+      }
+    } catch (error) {}
 
     return {};
   }
