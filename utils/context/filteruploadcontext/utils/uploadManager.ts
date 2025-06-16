@@ -1,5 +1,10 @@
 import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
 import { BackendResponse } from '@/utils/ts';
+
+export interface ProcessStatus {
+  s3_key: string;
+  process_status: 'success';
+}
 class UploadManager {
   uploads = new Map();
 
@@ -10,43 +15,41 @@ class UploadManager {
     onProgress,
     onDone,
     onError
-  ) {
+  ): Promise<ProcessStatus> {
     const controller = new AbortController();
 
     const { presigned_url, file_id, s3_key, note_id, user_id } = targetPayload;
 
-    const processStatus = {
+    const processStatus: ProcessStatus = {
       s3_key,
-      process_status: 'failure'
+      process_status: 'success'
     };
 
     const s3DeleteURL = `/api/s3/${s3_key}`;
     const fileDeleteURL = `/api/files/${file_id}`;
 
-    // 1) Upload file to s3.
     try {
-      await fetch(presigned_url, {
+      // 1) Upload file to s3.
+      const s3UploadRes = await fetch(presigned_url, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
         body: file,
         signal: controller.signal
       });
 
+      console.log('s3UploadRes \n ', s3UploadRes);
+
+      if (s3UploadRes.status !== 200) {
+        throw new Error(
+          `There was an error uploading the file with the s3_key of ${s3_key} to s3.`
+        );
+      }
+
       console.log('Step #1 s3 upload successful. \n');
 
       this.uploads.set(file.name, controller);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
 
-      console.log(
-        `Error in UploadManager.uploadFile uploading file with s3_key: ${s3_key}: ${message}`
-      );
-
-      return processStatus;
-    }
-
-    // 2) Make /api request to update File document s3_key property.
-    try {
+      // 2) Make /api request to update File document s3_key property.
       const updateResponse: BackendResponse<unknown> = await fetch(
         '/api/files',
         {
@@ -56,35 +59,25 @@ class UploadManager {
         }
       );
 
-      if (updateResponse.status === 200) {
-        console.log('Step #2 File database update successful. \n');
+      if (updateResponse.status !== 200) {
+        await fetch(s3DeleteURL, {
+          method: 'DELETE'
+        });
 
-        console.log('updateResponse \n', updateResponse);
-      } else {
+        await fetch(fileDeleteURL, {
+          method: 'DELETE'
+        });
+
         throw new Error(
           `There was a problem updating the file ${file_id} with s3_key ${s3_key} in the database.`
         );
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
 
-      console.log(
-        `Error in UploadManager.uploadFile updating File ${file_id} in database: ${message}`
-      );
+      console.log('Step #2 File database update successful. \n');
 
-      await fetch(s3DeleteURL, {
-        method: 'DELETE'
-      });
+      console.log('updateResponse \n', updateResponse);
 
-      await fetch(fileDeleteURL, {
-        method: 'DELETE'
-      });
-
-      return processStatus;
-    }
-
-    // 3) Send SQS Message in Backend.
-    try {
+      // 3) Send SQS Message in Backend.
       const sqsResponse: BackendResponse<unknown> = await fetch(
         '/api/extractorqueue',
         {
@@ -94,13 +87,15 @@ class UploadManager {
         }
       );
 
-      if (sqsResponse.status === 200) {
-        console.log(
-          'Step #3 SQS Extractor Queue message successfully sent. \n'
-        );
+      if (sqsResponse.status !== 200) {
+        await fetch(s3DeleteURL, {
+          method: 'DELETE'
+        });
 
-        console.log('sqsResponse \n', sqsResponse);
-      } else {
+        await fetch(fileDeleteURL, {
+          method: 'DELETE'
+        });
+
         throw new Error(
           `There was a problem sending a message to the Extractor Queue for user ${user_id} with s3_key ${s3_key}.`
         );
@@ -108,22 +103,10 @@ class UploadManager {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      console.log(
-        `Error in UploadManager.uploadFile sending Extractor Queue Message for s3_key ${s3_key}: ${message}`
+      throw new Error(
+        `Error in UploadManager.uploadFile uploading file with s3_key: ${s3_key}: ${message}`
       );
-
-      await fetch(s3DeleteURL, {
-        method: 'DELETE'
-      });
-
-      await fetch(fileDeleteURL, {
-        method: 'DELETE'
-      });
-
-      return processStatus;
     }
-
-    processStatus['process_status'] = 'success';
 
     return processStatus;
   }
