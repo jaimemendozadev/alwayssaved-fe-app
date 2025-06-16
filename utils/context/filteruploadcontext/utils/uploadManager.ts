@@ -33,7 +33,11 @@ class UploadManager {
       send_sqs_message_status: 'failure'
     };
 
-    // 1) Upload file to s3.
+    /*
+       1) Upload file to s3.
+         - Return early if s3 upload fails.
+
+    */
     try {
       await fetch(presigned_url, {
         method: 'PUT',
@@ -55,7 +59,10 @@ class UploadManager {
       return uploadStatus;
     }
 
-    // 2) Make /api request to update File document s3_key property.
+    /*
+       2) Make /api request to update File document s3_key property.
+         - Delete the uploaded file in s3 bucket and File document in database if File document update fails.
+    */
     try {
       const updateResponse: BackendResponse<unknown> = await fetch(
         '/api/files',
@@ -79,6 +86,18 @@ class UploadManager {
       console.log(
         `Error in UploadManager.uploadFile updating File ${file_id} in database: ${message}`
       );
+
+      const s3DeleteURL = `/api/s3/${s3_key}`;
+
+      await fetch(s3DeleteURL, {
+        method: 'DELETE'
+      });
+
+      const fileDeleteURL = `/api/files/${file_id}`;
+
+      await fetch(fileDeleteURL, {
+        method: 'DELETE'
+      });
 
       return uploadStatus;
     }
