@@ -40,7 +40,7 @@ interface FileUploadContext {
 export const FileUploadContext = createContext<FileUploadContext>({
   inFlight: false,
   noteTitle: '',
-  progressValue: 0,
+  progressValue: 0
 });
 
 export const FileUploadProvider = ({
@@ -77,7 +77,6 @@ export const FileUploadProvider = ({
     setFlightStatus(true);
 
     const currentUserID = currentUser._id;
-
 
     // 1) Create a Note document.
     updateProgress(1);
@@ -165,21 +164,29 @@ export const FileUploadProvider = ({
 
     updateProgress(38);
 
-
     // 4) Upload each media file to s3.
     const uploadResults = await handleS3FileUploads(
       currentFiles,
       presignPayloads
     );
 
+    await Promise.allSettled(
+      currentFiles.map(async (file) => {
+        const targetName = file.name;
+
+        const [targetPayload] = presignPayloads.filter(
+          (s3Payload) => s3Payload.file_name === targetName
+        );
+      })
+    );
+
     updateProgress(60);
 
-    
-      /* 
+    /* 
         5) Verify media uploads were successful, perform database updates to each 
          File document with their s3_key, prep sqsPayload for sending SQS message.
       */
-    
+
     const feedback = await verifyProcessUploadResults(
       uploadResults,
       presignPayloads,
@@ -216,7 +223,6 @@ export const FileUploadProvider = ({
     setNoteTitle(
       `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
     ); // TODO: May have to play around with this if the user
-
   };
 
   return (

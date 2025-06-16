@@ -1,23 +1,10 @@
 import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
 import { BackendResponse } from '@/utils/ts';
-
-import {
-  handleFileDeletion,
-  handleNoteDeletion
-} from '@/actions/fileuploadcontext';
-
-/*
-
-await handleFileDeletion(fileIDs);
-
-    await handleNoteDeletion(newNote);
-
- */
 class UploadManager {
   uploads = new Map();
 
   // See Dev Notes below.
-  async uploadFile<T extends File>(
+  async processFile<T extends File>(
     file: T,
     targetPayload: presignPayload,
     onProgress,
@@ -28,10 +15,9 @@ class UploadManager {
 
     const { presigned_url, file_id, s3_key, note_id, user_id } = targetPayload;
 
-    const uploadStatus = {
-      s3_upload_status: 'failure',
-      file_db_update_status: 'failure',
-      send_sqs_message_status: 'failure'
+    const processStatus = {
+      s3_key,
+      process_status: 'failure'
     };
 
     const s3DeleteURL = `/api/s3/${s3_key}`;
@@ -46,7 +32,7 @@ class UploadManager {
         signal: controller.signal
       });
 
-      uploadStatus['s3_upload_status'] = 'success';
+      console.log('Step #1 s3 upload successful. \n');
 
       this.uploads.set(file.name, controller);
     } catch (error) {
@@ -56,7 +42,7 @@ class UploadManager {
         `Error in UploadManager.uploadFile uploading file with s3_key: ${s3_key}: ${message}`
       );
 
-      return uploadStatus;
+      return processStatus;
     }
 
     // 2) Make /api request to update File document s3_key property.
@@ -71,7 +57,9 @@ class UploadManager {
       );
 
       if (updateResponse.status === 200) {
-        uploadStatus['file_db_update_status'] = 'success';
+        console.log('Step #2 File database update successful. \n');
+
+        console.log('updateResponse \n', updateResponse);
       } else {
         throw new Error(
           `There was a problem updating the file ${file_id} with s3_key ${s3_key} in the database.`
@@ -92,7 +80,7 @@ class UploadManager {
         method: 'DELETE'
       });
 
-      return uploadStatus;
+      return processStatus;
     }
 
     // 3) Send SQS Message in Backend.
@@ -107,7 +95,11 @@ class UploadManager {
       );
 
       if (sqsResponse.status === 200) {
-        uploadStatus['send_sqs_message_status'] = 'success';
+        console.log(
+          'Step #3 SQS Extractor Queue message successfully sent. \n'
+        );
+
+        console.log('sqsResponse \n', sqsResponse);
       } else {
         throw new Error(
           `There was a problem sending a message to the Extractor Queue for user ${user_id} with s3_key ${s3_key}.`
@@ -128,10 +120,12 @@ class UploadManager {
         method: 'DELETE'
       });
 
-      return uploadStatus;
+      return processStatus;
     }
 
-    return uploadStatus;
+    processStatus['process_status'] = 'success';
+
+    return processStatus;
   }
 
   abortUpload(fileName) {
