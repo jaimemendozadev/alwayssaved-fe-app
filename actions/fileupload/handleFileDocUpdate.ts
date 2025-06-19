@@ -1,6 +1,6 @@
 'use server';
 import { dbConnect, FileModel, getObjectIDFromString } from '@/utils/mongodb';
-import { s3UploadResult } from '@/utils/context/filteruploadcontext/utils/handleS3FileUploads';
+import { s3UploadResult } from '@/components/fileupload/utils/handleS3FileUploads';
 
 
 interface UpdateStatus {

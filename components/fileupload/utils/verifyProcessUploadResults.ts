@@ -2,10 +2,10 @@ import {
   handleFileDocUpdate,
   handleNoteDeletion,
   handleFileDeletion,
-} from '@/actions/fileuploadcontext';
+} from '@/actions/fileupload';
 
 import { LeanNote } from '@/utils/mongodb';
-import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
+import { presignPayload } from '@/actions/fileupload/handlePresignedUrls';
 
 import { s3UploadResult } from './handleS3FileUploads';
 

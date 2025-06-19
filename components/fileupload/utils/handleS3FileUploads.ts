@@ -1,4 +1,4 @@
-import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
+import { presignPayload } from '@/actions/fileupload/handlePresignedUrls';
 
 export interface s3UploadResult {
   file_id: string;

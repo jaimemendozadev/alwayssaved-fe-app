@@ -2,7 +2,7 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { getAWSConfigByEnv } from './index';
 import { getSecret } from './ssm';
-import { s3MediaUpload } from '../context/filteruploadcontext/utils/verifyProcessUploadResults';
+import { s3MediaUpload } from '../../components/fileupload/utils/verifyProcessUploadResults';
 
 
 const { NODE_ENV } = process.env;

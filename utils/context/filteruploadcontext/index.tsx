@@ -20,11 +20,11 @@ import {
   handlePresignedUrls,
   createNoteDocument,
   createFileDocuments
-} from './utils';
+} from '../../../components/fileupload/utils';
 
 import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
-import { ProcessStatus, uploadManager } from './utils/uploadManager';
+import { ProcessStatus, uploadManager } from '../../../components/fileupload/utils/uploadManager';
 
 const basicErrorMsg =
   'There was an error uploading your files, try again later.';

@@ -4,9 +4,9 @@ import {
   handlePresignedUrls,
   createNoteDocument,
   createFileDocuments,
-} from '@/actions/fileuploadcontext';
+} from '@/actions/fileupload';
 import { LeanFile } from '@/utils/mongodb';
-import { presignPayload } from '@/actions/fileuploadcontext/handlePresignedUrls';
+import { presignPayload } from '@/actions/fileupload/handlePresignedUrls';
 import { handleS3FileUploads } from './handleS3FileUploads';
 import { verifyProcessUploadResults } from './verifyProcessUploadResults';
 

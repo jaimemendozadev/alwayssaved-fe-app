@@ -12,11 +12,11 @@ import {
   createFileDocuments,
   handleNoteDeletion,
   handleFileDeletion
-} from '@/actions/fileuploadcontext';
-import { handlePresignedUrls } from '@/actions/fileuploadcontext';
-import { filterCurrentFiles } from '@/utils/context/filteruploadcontext/utils';
+} from '@/actions/fileupload';
+import { handlePresignedUrls } from '@/actions/fileupload';
+import { filterCurrentFiles } from '@/components/fileupload/utils';
 
-import { processFile } from '@/utils/context/filteruploadcontext/utils/processFile';
+import { processFile } from '@/components/fileupload/utils/processFile';
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg =
