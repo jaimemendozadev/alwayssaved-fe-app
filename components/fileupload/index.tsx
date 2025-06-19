@@ -144,12 +144,10 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     updateProgress(38);
 
-    // 4) Upload each media file to s3.
-    // const uploadResults = await handleS3FileUploads(
-    //   currentFiles,
-    //   presignPayloads
-    // );
-
+    /*
+      4) Upload each media file to s3, update the File document with the
+         s3_key in the database, send SQS message to the Extractor Queue. 
+    */
     const uploadResuts = await Promise.allSettled(
       currentFiles.map(async (file) => {
         const targetName = file.name;
@@ -179,6 +177,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     updateProgress(100);
 
+
+    // 5) Trigger user feedback toast message and reset local state.
     switch (successfulResults.length) {
       case 0: {
         toast.error(
@@ -206,47 +206,9 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     updateProgress(0);
 
-    /* 
-        5) Verify media uploads were successful, perform database updates to each 
-         File document with their s3_key, prep sqsPayload for sending SQS message.
-      */
-
-    // const feedback = await verifyProcessUploadResults(
-    //   uploadResults,
-    //   presignPayloads,
-    //   createdNote
-    // );
-
-    // updateProgress(80);
-
-    // if (feedback.error) {
-    //   setFlightStatus(false);
-    //   updateProgress(0);
-    //   toast.error(feedback.message, feedbackDuration);
-    //   return;
-    // }
-
-    // updateProgress(90);
-
-    // toast.success(feedback.message, feedbackDuration);
-
-    // const sqs_message = {
-    //   user_id: currentUserID,
-    //   media_uploads: feedback.sqsPayload
-    // };
-
-    // 6) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
-    // await sendSQSMessage(sqs_message);
-
-    // updateProgress(100);
-
-    // setFlightStatus(false);
-
-    // updateProgress(0);
-
     setNoteTitle(
       `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
-    ); // TODO: May have to play around with this if the user
+    );
   };
 
   if (!currentUser) return null;
@@ -331,7 +293,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
   - If you have multiple long format videos (> 15 minutes), it will take a long time to
     upload all the files to s3. Need feedback to tell user to wait.
 
-  - Address issue on Backend to somehow delay processing incoming SQS message from Frontend
-    because s3 videos might not be immediately available for processing.
+  - Should we delete the Note if all the processFile operations failed? 🤔
 
 */

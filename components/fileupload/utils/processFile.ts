@@ -1,4 +1,5 @@
 import { presignPayload } from '@/actions/fileupload/handlePresignedUrls';
+import { BackendResponse } from '@/utils/ts';
 
 export interface ProcessStatus {
   s3_key: string;
@@ -49,6 +50,7 @@ export const processFile = async <T extends File>(
 
     console.log('Performing Step 2) Make /api request to update File document');
     console.log('\n');
+
     // 2) Make /api request to update File document s3_key property.
     const updateResponse: BackendResponse<unknown> = await fetch('/api/files', {
       method: 'PATCH',
@@ -137,7 +139,7 @@ export const processFile = async <T extends File>(
     fileName: is the name of the file with the fileType extension 
 
 
-2) uploadFile has 3 steps where we:
+2) processFile has 3 steps where we:
       - Upload the file to s3;
       - Update the File document with the uploaded s3_key; and
       - Send a Message to the SQS Extractor Queue.
