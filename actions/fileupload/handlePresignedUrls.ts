@@ -1,7 +1,5 @@
 'use server';
-import {
-  LeanFile,
-} from '@/utils/mongodb';
+import { LeanFile } from '@/utils/mongodb';
 
 import { handlePresignedUrlsWithClient } from '@/utils/aws';
 
@@ -21,15 +19,18 @@ export const handlePresignedUrls = async (
     fileDocuments.map(async (fileDoc) => {
       const { file_name, note_id, user_id, _id } = fileDoc;
 
-      const s3_key = `${user_id}/${note_id}/${_id}/${file_name}`;
+      const noteID = typeof note_id === 'string' ? note_id : note_id._id;
+      const userID = typeof user_id === 'string' ? user_id : user_id._id;
+
+      const s3_key = `${userID}/${noteID}/${_id}/${file_name}`;
 
       try {
         const presignedURL = await handlePresignedUrlsWithClient(s3_key);
 
         return {
           s3_key,
-          note_id,
-          user_id,
+          note_id: noteID,
+          user_id: userID,
           file_id: _id,
           file_name,
           presigned_url: presignedURL
