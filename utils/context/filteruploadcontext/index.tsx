@@ -24,6 +24,7 @@ import {
 
 import { sendSQSMessage } from '@/utils/aws';
 import { LeanUser } from '@/utils/mongodb';
+import { ProcessStatus, uploadManager } from './utils/uploadManager';
 
 const basicErrorMsg =
   'There was an error uploading your files, try again later.';
@@ -126,7 +127,7 @@ export const FileUploadProvider = ({
     if (createdFiles.length !== currentFiles.length) {
       currentFiles = filterCurrentFiles(currentFiles, createdFiles);
       toast.error(
-        'There was a problem uploading some of your files, try again later.',
+        'There was a problem uploading some of your files, try saving those files again later.',
         feedbackDuration
       );
     }
@@ -165,60 +166,104 @@ export const FileUploadProvider = ({
     updateProgress(38);
 
     // 4) Upload each media file to s3.
-    const uploadResults = await handleS3FileUploads(
-      currentFiles,
-      presignPayloads
-    );
+    // const uploadResults = await handleS3FileUploads(
+    //   currentFiles,
+    //   presignPayloads
+    // );
 
-    await Promise.allSettled(
+    const uploadResuts = await Promise.allSettled(
       currentFiles.map(async (file) => {
         const targetName = file.name;
 
         const [targetPayload] = presignPayloads.filter(
           (s3Payload) => s3Payload.file_name === targetName
         );
+
+        const status = await uploadManager.processFile(file, targetPayload);
+
+        return status;
       })
     );
 
-    updateProgress(60);
+    updateProgress(75);
+
+    uploadResuts.forEach((result) => {
+      if (result.status === 'rejected') {
+        // TODO: Handle in telemetry.
+        console.error('Uploading file to s3 failed: ', result.reason);
+      }
+    });
+
+    const successfulResults = uploadResuts.filter(
+      (result) => result.status === 'fulfilled'
+    );
+
+    updateProgress(100);
+
+    switch (successfulResults.length) {
+      case 0: {
+        toast.error(
+          'There was a problem saving your files. Try again later.',
+          feedbackDuration
+        );
+        break;
+      }
+      case currentFiles.length: {
+        toast.success(
+          'Your files were successfully uploaded.',
+          feedbackDuration
+        );
+      }
+
+      default: {
+        toast.success(
+          'Some but not all your files were saved. Try saving those files again later.',
+          feedbackDuration
+        );
+      }
+    }
+
+    setFlightStatus(false);
+
+    updateProgress(0);
 
     /* 
         5) Verify media uploads were successful, perform database updates to each 
          File document with their s3_key, prep sqsPayload for sending SQS message.
       */
 
-    const feedback = await verifyProcessUploadResults(
-      uploadResults,
-      presignPayloads,
-      createdNote
-    );
+    // const feedback = await verifyProcessUploadResults(
+    //   uploadResults,
+    //   presignPayloads,
+    //   createdNote
+    // );
 
-    updateProgress(80);
+    // updateProgress(80);
 
-    if (feedback.error) {
-      setFlightStatus(false);
-      updateProgress(0);
-      toast.error(feedback.message, feedbackDuration);
-      return;
-    }
+    // if (feedback.error) {
+    //   setFlightStatus(false);
+    //   updateProgress(0);
+    //   toast.error(feedback.message, feedbackDuration);
+    //   return;
+    // }
 
-    updateProgress(90);
+    // updateProgress(90);
 
-    toast.success(feedback.message, feedbackDuration);
+    // toast.success(feedback.message, feedbackDuration);
 
-    const sqs_message = {
-      user_id: currentUserID,
-      media_uploads: feedback.sqsPayload
-    };
+    // const sqs_message = {
+    //   user_id: currentUserID,
+    //   media_uploads: feedback.sqsPayload
+    // };
 
     // 6) Send SQS Message to EXTRACTOR_PUSH_QUEUE to Kick-Off ML Pipeline.
-    await sendSQSMessage(sqs_message);
+    // await sendSQSMessage(sqs_message);
 
-    updateProgress(100);
+    // updateProgress(100);
 
-    setFlightStatus(false);
+    // setFlightStatus(false);
 
-    updateProgress(0);
+    // updateProgress(0);
 
     setNoteTitle(
       `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
