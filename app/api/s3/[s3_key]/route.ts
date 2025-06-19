@@ -15,7 +15,7 @@ export async function DELETE(
     );
 
   try {
-    const { s3_key } = params;
+    const { s3_key } = await params;
 
     const deleteRes = await deleteFileFromS3(s3_key);
 

@@ -15,7 +15,7 @@ export async function DELETE(
     );
 
   try {
-    const { fileID } = params;
+    const { fileID } = await params;
 
     const targetID = getObjectIDFromString(fileID);
 
