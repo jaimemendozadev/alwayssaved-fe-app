@@ -6,17 +6,8 @@ import { Progress } from '@heroui/react';
 import Dropzone from 'react-dropzone';
 import { InputEvent } from '@/utils/ts';
 import { LeanUser } from '@/utils/mongodb';
+import { filterCurrentFiles, createNoteDocument, createFileDocuments, handleNoteDeletion, handleFileDeletion, handlePresignedUrls, processFile } from '@/components/fileupload/utils';
 
-import {
-  createNoteDocument,
-  createFileDocuments,
-  handleNoteDeletion,
-  handleFileDeletion
-} from '@/actions/fileupload';
-import { handlePresignedUrls } from '@/actions/fileupload';
-import { filterCurrentFiles } from '@/components/fileupload/utils';
-
-import { processFile } from '@/components/fileupload/utils/processFile';
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg =

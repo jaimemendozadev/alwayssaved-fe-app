@@ -8,6 +8,7 @@ import {
 import { LeanFile } from '@/utils/mongodb';
 import { presignPayload } from '@/actions/fileupload/handlePresignedUrls';
 import { handleS3FileUploads } from './handleS3FileUploads';
+import { processFile } from './processFile';
 import { verifyProcessUploadResults } from './verifyProcessUploadResults';
 
 
@@ -18,7 +19,8 @@ export {
     handleNoteDeletion,
     handlePresignedUrls,
     createNoteDocument,
-    createFileDocuments
+    createFileDocuments,
+    processFile
 }
 
 /*************************************************

@@ -59,8 +59,6 @@ export const createFileDocuments = async (
       })
     );
 
-    console.log('fileDBResults ', fileDBResults);
-
     // Log File document creation failures
     fileDBResults.forEach((result) => {
       if (result.status === 'rejected') {
