@@ -19,6 +19,7 @@ export async function POST(request: NextRequest): Promise<void | Response> {
    const { note_id, user_id, s3_key } = body;
 
   try {
+    // TODO: Have to fix either getting EXTRACTOR_PUSH_QUEUE_URL from hardcoded .env or fix getSecret function
     const EXTRACTOR_PUSH_QUEUE_URL = await getSecret(
       'EXTRACTOR_PUSH_QUEUE_URL'
     );

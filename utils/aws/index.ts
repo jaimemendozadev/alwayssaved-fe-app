@@ -1,5 +1,4 @@
 export * from './s3';
-export * from './sqs';
 export * from './ssm'
 
 type AWSClientConfig = {

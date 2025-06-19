@@ -259,7 +259,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
         <label htmlFor="noteTitle" className="text-lg">
           <span className="font-bold">Your New Note Name</span>:<br />
           <input
-            className="w-[100%]"
+            className="w-[100%] p-3"
             onBlur={handleChange}
             onFocus={handleChange}
             onChange={handleChange}
