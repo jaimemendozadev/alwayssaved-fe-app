@@ -192,6 +192,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
           'Your files were successfully uploaded.',
           feedbackDuration
         );
+        break;
       }
 
       default: {
@@ -199,6 +200,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
           'Some but not all your files were saved. Try saving those files again later.',
           feedbackDuration
         );
+        break;
       }
     }
 
