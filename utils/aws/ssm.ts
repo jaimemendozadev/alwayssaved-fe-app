@@ -12,6 +12,7 @@ export const getSecret = async (paramName: string): Promise<string | null> => {
     });
 
     const response = await ssmClient.send(command);
+
     return response.Parameter?.Value || null;
 
   } catch (error: any) {

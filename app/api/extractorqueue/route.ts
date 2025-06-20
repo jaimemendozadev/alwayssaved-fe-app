@@ -19,9 +19,8 @@ export async function POST(request: NextRequest): Promise<void | Response> {
    const { note_id, user_id, s3_key } = body;
 
   try {
-    // TODO: Have to fix either getting EXTRACTOR_PUSH_QUEUE_URL from hardcoded .env or fix getSecret function
     const EXTRACTOR_PUSH_QUEUE_URL = await getSecret(
-      'EXTRACTOR_PUSH_QUEUE_URL'
+      '/alwayssaved/EXTRACTOR_PUSH_QUEUE_URL'
     );
 
     if (!EXTRACTOR_PUSH_QUEUE_URL) {
@@ -51,9 +50,7 @@ export async function POST(request: NextRequest): Promise<void | Response> {
 
     const client = new SQSClient(config);
 
-    const response = await client.send(command);
-
-    console.log('sendSQSMessage response: ', response);
+    await client.send(command);
 
     return NextResponse.json(
       {
