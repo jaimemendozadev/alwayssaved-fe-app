@@ -1,34 +1,38 @@
-import { useAuth } from "@clerk/nextjs";
-
+import { useAuth } from '@clerk/nextjs';
 
 const LLM_BASE_URL = process.env.NEXT_PUBLIC_LLM_BASE_URL;
 
-console.log("LLM_BASE_URL ", LLM_BASE_URL);
+console.log('LLM_BASE_URL ', LLM_BASE_URL);
 
 export const useLLM_Api = () => {
-  const {getToken} = useAuth();
+  const { getToken } = useAuth();
 
-  const makeLLM_Request = async(endpoint: string, options: {[key: string]: any}):Promise<any> => {
-
+  const makeLLM_Request = async (
+    endpoint: string,
+    options: { [key: string]: any } = {}
+  ) => {
     const token = await getToken();
 
-    const defaultOptions = {
+    const defaultHeaders = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    };
+
+    const res = await fetch(`${LLM_BASE_URL}/api${endpoint}`, {
+      method: options.method || 'GET',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    }
+        ...defaultHeaders,
+        ...(options.headers || {})
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined
+    });
 
-    const res = await fetch(`${LLM_BASE_URL}/${endpoint}`, {
-      ...defaultOptions,
-      ... options
-    })
+    console.log('res in makeLLM_Request ', res);
 
-    console.log("res in makeLLM_Request: ", res);
-  }
+    return res.json();
+  };
 
   return {
     makeLLM_Request
-  }
-
-}
+  };
+};
