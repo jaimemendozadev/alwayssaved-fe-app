@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { LeanUser } from '@/utils/mongodb';
 import { getUserFromDB } from '@/actions';
 
+import { useLLM_Api } from '@/utils/hooks';
+
 import { FileUpload } from '@/components/fileupload';
 
 const errorMessage =
@@ -10,6 +12,7 @@ const errorMessage =
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
+  const {makeLLM_Request} = useLLM_Api()
 
   console.log('currentUser in Home Page: ', currentUser);
 
