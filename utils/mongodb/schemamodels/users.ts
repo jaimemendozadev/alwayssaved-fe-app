@@ -2,6 +2,7 @@ import mongoose, { UpdateQuery } from 'mongoose';
 
 export interface IUser {
   _id: mongoose.Types.ObjectId;
+  clerk_id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -14,16 +15,16 @@ export type LeanUser = Omit<IUser, '_id'> & {
   _id: string;
 };
 
-
 const { Schema, model } = mongoose;
 
 const UserSchema = new Schema<IUser>({
+  clerk_id: { type: String, required: true, unique: true },
   first_name: { type: String, required: true }, // Ensure first_name, last_name is always present
   last_name: { type: String, required: true },
   email: { type: String, required: true, unique: true }, // Enforce email uniqueness
   sign_up_date: { type: Date, default: Date.now },
   cancel_date: { type: Date, default: null },
-  avatar_url: { type: String, default: null },
+  avatar_url: { type: String, default: null }
 });
 
 // Middleware to sanitize empty strings

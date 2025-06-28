@@ -12,6 +12,8 @@ export const registerNewUser = async (): Promise<LeanUser | void> => {
     );
   }
 
+  const clerk_id = clerkUser.id || '';
+
   const first_name = clerkUser?.firstName || '';
 
   const last_name = clerkUser?.lastName || '';
@@ -21,6 +23,7 @@ export const registerNewUser = async (): Promise<LeanUser | void> => {
   const avatar_url = clerkUser?.imageUrl || null;
 
   const payload = {
+    clerk_id,
     first_name,
     last_name,
     email,
