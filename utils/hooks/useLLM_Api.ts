@@ -2,8 +2,6 @@ import { useAuth } from '@clerk/nextjs';
 
 const LLM_BASE_URL = process.env.NEXT_PUBLIC_LLM_BASE_URL;
 
-console.log('LLM_BASE_URL ', LLM_BASE_URL);
-
 export const useLLM_Api = () => {
   const { getToken } = useAuth();
 

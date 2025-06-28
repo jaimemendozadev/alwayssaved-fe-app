@@ -2,8 +2,6 @@
 import { useEffect, useState } from 'react';
 import { LeanUser } from '@/utils/mongodb';
 import { getUserFromDB } from '@/actions';
-import { useLLM_Api } from '@/utils/hooks';
-
 import { FileUpload } from '@/components/fileupload';
 
 const errorMessage =
@@ -11,7 +9,6 @@ const errorMessage =
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
-  const { makeLLM_Request } = useLLM_Api();
 
   console.log('currentUser in Home Page: ', currentUser);
 
@@ -36,19 +33,6 @@ export default function HomePage() {
 
       <main className="p-6 w-[85%]">
         <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home Page</h1>
-        <button
-          onClick={async () => {
-            await makeLLM_Request('/notes/note123', {
-              method: 'POST',
-              body: {
-                file_ids: ['dummy_file_id_1'],
-                message: 'Hello from frontend'
-              }
-            });
-          }}
-        >
-          TEST API ROUTE
-        </button>
         <FileUpload currentUser={currentUser} />
       </main>
     </div>

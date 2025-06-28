@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import {Spinner} from "@heroui/react";
 import { LeanUser } from '@/utils/mongodb';
 import { registerNewUser } from '@/actions/onboard';
-const successMessage = "Yay! 🥳 You've been registered to AlwaysSaved. Welcome board! 👋🏼";
+const successMessage = "Yay! 🥳 You've been registered to AlwaysSaved. Welcome aboard! 👋🏼";
 const errorMessage = "Whoops! 😱 Looks like there was a problem registering you to AlwaysSaved. 🤦🏽 Try again later.";
 const duration = { duration: 5000 };
 
