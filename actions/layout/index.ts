@@ -1,9 +1,8 @@
 'use server';
-
-import { NoteModel } from '@/utils/mongodb';
+import { deepLean, getObjectIDFromString, LeanNote, NoteModel } from '@/utils/mongodb';
 import { getUserFromDB } from '..';
 
-export const getNotesForSideNav = async () => {
+export const getNotesForSideNav = async (): Promise<LeanNote[]> => {
   const currentUser = await getUserFromDB();
 
   if (!currentUser) {
@@ -15,9 +14,10 @@ export const getNotesForSideNav = async () => {
   const user_id = currentUser._id;
 
   const foundNotes = await NoteModel.aggregate([
-    { $match: { user_id } },
+    { $match: { user_id: getObjectIDFromString(user_id) } },
     { $project: { _id: 1, title: 1 } }
   ]);
 
-  console.log('foundNotes in getUserNotes ', foundNotes);
+
+  return deepLean(foundNotes)
 };
