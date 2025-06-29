@@ -2,9 +2,9 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { LeanUser, LeanNote } from '@/utils/mongodb';
-export default function NotePage({ params }: { params: { noteID: string } }):ReactNode {
+export default function NotePage():ReactNode {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
-  const [currentNote, setCurrentNote] = useState<LeanNote | null>(null);
+  const [appNotes, setAppNotes] = useState<LeanNote[] | null>(null);
 
 
 
@@ -24,9 +24,8 @@ export default function NotePage({ params }: { params: { noteID: string } }):Rea
   return (
     <main className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
-        Note Page for: {params.noteID}
+        Your App Notes
       </h1>
-      <FileUpload currentUser={currentUser} />
     </main>
   );
 }

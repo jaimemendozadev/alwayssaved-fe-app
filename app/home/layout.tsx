@@ -1,3 +1,4 @@
+'use server';
 import { getNotesForSideNav } from '@/actions/layout';
 import { ReactNode } from 'react';
 import Link from 'next/link';
