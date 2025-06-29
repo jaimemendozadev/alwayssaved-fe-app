@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, ReactNode } from 'react';
 import Link from 'next/link';
+import dayjs from 'dayjs';
 import { Spinner } from '@heroui/react';
 import { getUserFromDB } from '@/actions';
 import { LeanUser, LeanNote } from '@/utils/mongodb';
@@ -27,6 +28,11 @@ export default function NotesPage(): ReactNode {
           date_created: 1
         });
 
+        console.log(
+          'typeof foundNotes in getNotesByFields ',
+          typeof userNotes[0].date_created
+        );
+
         setAppNotes(userNotes);
         return;
       }
@@ -50,7 +56,7 @@ export default function NotesPage(): ReactNode {
   return (
     <main className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
-        {currentUser?.first_name}&#39;s Notes
+        📝 {currentUser?.first_name}&#39;s Notes
       </h1>
 
       {appNotes.length === 0 && (
@@ -65,15 +71,35 @@ export default function NotesPage(): ReactNode {
           .
         </p>
       )}
-      {appNotes.length > 0 &&
-        appNotes.map((noteDoc) => {
-          console.log('noteDoc ', noteDoc);
-          return (
-            <Link key={noteDoc._id} href={`/notes/${noteDoc._id}`}>
-              {noteDoc.title}
-            </Link>
-          );
-        })}
+      {appNotes.length > 0 && (
+        <ul>
+          {appNotes.map((noteDoc) => {
+            console.log('noteDoc ', noteDoc);
+            return (
+              <li className="border p-5" key={noteDoc._id}>
+                <Link
+                  className="hover:underline underline-offset-4"
+                  href={`/notes/${noteDoc._id}`}
+                >
+                  <span className="font-semibold">Note Name</span>:{' '}
+                  {noteDoc.title} &nbsp; | &nbsp;{' '}
+                  <span className="font-semibold">Date Created</span>:{' '}
+                  {dayjs(noteDoc.date_created).format('dddd, MMMM D, YYYY')}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </main>
   );
 }
+
+/********************************************
+ * Notes
+ ********************************************
+
+- Add delete Note functionality to list item? 🤔
+
+
+*/
