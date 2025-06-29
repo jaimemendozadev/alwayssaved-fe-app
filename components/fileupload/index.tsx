@@ -266,6 +266,8 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 /*
   TODO Dev Notes:
 
+  - Add router.refresh() after uploading the files? 🤔
+
   - If you have multiple long format videos (> 15 minutes), it will take a long time to
     upload all the files to s3. Need feedback to tell user to wait.
 
