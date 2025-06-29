@@ -217,32 +217,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
   return (
     <div className="w-[900px]">
-      <article className="mb-16">
-        <p className="text-xl mb-2">
-          <span className="font-bold">Media Upload Instructions</span>:
-        </p>
-        <p className="text-lg mb-3">
-          Create a new Note by giving your note a new name AND adding media
-          files to your note for transcribing.
-        </p>
-        <p className="text-lg mb-3">
-          Wait until all the media files are uploaded to the cloud for
-          transcribing. Then you can create a brand new Note with new media
-          files.
-        </p>
-
-        <p className="text-lg mb-3">
-          While you wait for the media files to be transcribed, go do something
-          else. We&apos;ll let you know when it&apos;s done.
-        </p>
-
-        <p className="text-lg">
-          You&apos;ll be able to navigate to other parts of the app and do other
-          things while the upload process finishes. You just won&apos;t be able
-          to upload new files until your current files have finished uploading.
-        </p>
-      </article>
-
       <div className="flex min-h-24 justify-center">
         {inFlight && (
           <Progress

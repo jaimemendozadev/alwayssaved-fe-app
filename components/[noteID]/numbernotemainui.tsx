@@ -42,6 +42,9 @@ export const NumberNoteMainUI = ({
           ))}
         </ul>
       )}
+
+
+      <h2 className="text-3xl lg:text-4xl mb-6">Upload Files to Note</h2>
     </main>
   );
 };
