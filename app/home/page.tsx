@@ -9,7 +9,6 @@ const errorMessage =
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
-
   console.log('currentUser in Home Page: ', currentUser);
 
   useEffect(() => {
@@ -27,14 +26,12 @@ export default function HomePage() {
     loadCurrentUser();
   }, []);
 
-  return (
-    <div className="flex">
-      <div className="w-[15%] bg-[#f9f9f9] min-h-screen"></div>
+  if (currentUser === null) return currentUser;
 
-      <main className="p-6 w-[85%]">
-        <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home Page</h1>
-        <FileUpload currentUser={currentUser} />
-      </main>
-    </div>
+  return (
+    <main className="p-6 w-[85%]">
+      <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home Page</h1>
+      <FileUpload currentUser={currentUser} />
+    </main>
   );
 }
