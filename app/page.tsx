@@ -1,3 +1,6 @@
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@heroui/react';
 import {
   SignedOut,
@@ -5,8 +8,23 @@ import {
   SignUpButton,
   SignOutButton
 } from '@clerk/nextjs';
+import { getUserFromDB } from '@/actions';
 
 export default function LandingPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    async function redirectToHomepage() {
+      const foundUser = await getUserFromDB();
+
+      if (foundUser) {
+        router.push('/home');
+      }
+    }
+
+    redirectToHomepage();
+  }, [router]);
+
   return (
     <div className="max-w-[90%] mx-auto p-28">
       <Navbar className="mb-36 flex justify-end">
