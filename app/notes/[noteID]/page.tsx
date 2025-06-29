@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { NumberNoteMainUI } from '@/components/[noteID]';
 import { getNoteByID } from '@/actions/schemamodels/notes';
+import { getFilesByNoteID } from '@/actions/schemamodels/files';
 
 export default async function NotePage({
   params
@@ -15,10 +16,18 @@ export default async function NotePage({
 
   const currentUser = await getUserFromDB();
 
-  if (currentUser && currentNote)
+  let files = null;
+
+  console.log('currentNote in NotePage Server component ', currentNote);
+
+  if (currentNote) {
+    files = await getFilesByNoteID(noteID);
+  }
+
+  if (currentUser && currentNote) {
     return (
       <NumberNoteMainUI currentUser={currentUser} currentNote={currentNote} />
     );
-
+  }
   throw new Error(`There was an error displaying the Note Page for ${noteID}`);
 }

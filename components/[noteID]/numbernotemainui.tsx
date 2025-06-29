@@ -18,6 +18,8 @@ export const NumberNoteMainUI = ({
       <h1 className="text-3xl lg:text-6xl mb-16">
         Note Page for: {currentNote?.title}
       </h1>
+
+      <h2 className="text-2xl lg:text-6xl mb-16">Note Files</h2>
     </main>
   );
 };
