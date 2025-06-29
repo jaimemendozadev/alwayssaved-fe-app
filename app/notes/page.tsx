@@ -46,7 +46,7 @@ export default function NotesPage(): ReactNode {
   if (!currentUser) {
     return (
       <main className="p-6 w-[85%]">
-        <div className="w-aut h-screen flex justify-center">
+        <div className="w-auto h-screen flex justify-center">
           <Spinner />
         </div>
       </main>

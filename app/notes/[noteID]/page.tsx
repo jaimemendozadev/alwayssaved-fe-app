@@ -1,31 +1,24 @@
-'use client';
-import { useEffect, useState, ReactNode } from 'react';
+'use server';
+import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { LeanUser, LeanNote } from '@/utils/mongodb';
-export default function NotePage({ params }: { params: { noteID: string } }):ReactNode {
-  const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
-  const [currentNote, setCurrentNote] = useState<LeanNote | null>(null);
+import { NumberNoteMainUI } from '@/components/[noteID]';
+import { getNoteByID } from '@/actions/schemamodels/notes';
 
+export default async function NotePage({
+  params
+}: {
+  params: { noteID: string };
+}): Promise<ReactNode> {
+  const { noteID } = await params;
 
+  const currentNote = await getNoteByID(noteID);
 
-  useEffect(() => {
-    async function loadCurrentUser() {
-      const currentUser = await getUserFromDB();
+  const currentUser = await getUserFromDB();
 
-      if (currentUser) {
-        setCurrentUser(currentUser);
-        return;
-      }
-    }
+  if (currentUser && currentNote)
+    return (
+      <NumberNoteMainUI currentUser={currentUser} currentNote={currentNote} />
+    );
 
-    loadCurrentUser();
-  }, []);
-
-  return (
-    <main className="p-6 w-[85%]">
-      <h1 className="text-3xl lg:text-6xl mb-16">
-        Note Page for: {params.noteID}
-      </h1>
-    </main>
-  );
+  throw new Error(`There was an error displaying the Note Page for ${noteID}`);
 }
