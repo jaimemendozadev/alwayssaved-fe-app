@@ -1,8 +1,6 @@
 'use client';
 import { ReactNode } from 'react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
-import { FileUpload } from '../fileupload';
-
 interface NumberNoteMainUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
@@ -46,8 +44,6 @@ export const NumberNoteMainUI = ({
 
 
       <h2 className="text-3xl lg:text-4xl mb-2">Upload More Files to Your Note</h2>
-
-      <FileUpload currentUser={currentUser} />
     </main>
   );
 };
