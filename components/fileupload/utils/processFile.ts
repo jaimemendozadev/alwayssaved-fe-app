@@ -24,10 +24,6 @@ export const processFile = async <T extends File>(
   const fileDeleteURL = `/api/files/${file_id}`;
 
   try {
-    console.log(`Start processing for ${s3_key}.`);
-    console.log(`Performing Step 1) Upload file to s3 for s3_key .`);
-    console.log('\n');
-
     // 1) Upload file to s3.
     const s3UploadRes = await fetch(presigned_url, {
       method: 'PUT',
@@ -36,20 +32,11 @@ export const processFile = async <T extends File>(
       signal: controller.signal
     });
 
-    console.log('s3UploadRes in Step #1 \n', s3UploadRes);
-    console.log('\n');
-
     if (s3UploadRes.status !== 200) {
       throw new Error(
         `There was an error uploading the file with the s3_key of ${s3_key} to s3.`
       );
     }
-
-    console.log('Step #1 s3 upload successful.');
-    console.log('\n');
-
-    console.log('Performing Step 2) Make /api request to update File document');
-    console.log('\n');
 
     // 2) Make /api request to update File document s3_key property.
     const updateResponse: BackendResponse<unknown> = await fetch('/api/files', {
@@ -57,12 +44,6 @@ export const processFile = async <T extends File>(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ file_id, update: { s3_key } })
     });
-
-    console.log(
-      'updateResponse for Step 2) Make /api request to update File document',
-      updateResponse
-    );
-    console.log('\n');
 
     if (updateResponse.status !== 200) {
       await fetch(s3DeleteURL, {
@@ -78,12 +59,6 @@ export const processFile = async <T extends File>(
       );
     }
 
-    console.log('Step #2 File database update successful.');
-    console.log('\n');
-
-    console.log('Performing Step 3) Send SQS Message in Backend.');
-    console.log('\n');
-
     // 3) Send SQS Message in Backend.
     const sqsResponse: BackendResponse<unknown> = await fetch(
       '/api/extractorqueue',
@@ -94,9 +69,6 @@ export const processFile = async <T extends File>(
       }
     );
 
-    console.log('sqsResponse for Step 3 ', sqsResponse);
-    console.log(`End processing for ${s3_key}.`);
-    console.log('\n');
 
     if (sqsResponse.status !== 200) {
       await fetch(s3DeleteURL, {
@@ -112,8 +84,6 @@ export const processFile = async <T extends File>(
       );
     }
 
-    console.log('Step #3 Send SQS Message in Backend was a success');
-    console.log('\n');
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 

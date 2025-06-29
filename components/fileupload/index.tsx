@@ -148,7 +148,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
       4) Upload each media file to s3, update the File document with the
          s3_key in the database, send SQS message to the Extractor Queue. 
     */
-    const uploadResuts = await Promise.allSettled(
+    const uploadResults = await Promise.allSettled(
       currentFiles.map(async (file) => {
         const targetName = file.name;
 
@@ -164,14 +164,14 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     updateProgress(75);
 
-    uploadResuts.forEach((result) => {
+    uploadResults.forEach((result) => {
       if (result.status === 'rejected') {
         // TODO: Handle in telemetry.
         console.error('Uploading file to s3 failed: ', result.reason);
       }
     });
 
-    const successfulResults = uploadResuts.filter(
+    const successfulResults = uploadResults.filter(
       (result) => result.status === 'fulfilled'
     );
 
