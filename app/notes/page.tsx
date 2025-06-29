@@ -28,6 +28,8 @@ export default function NotesPage(): ReactNode {
         setAppNotes(userNotes);
         return;
       }
+
+      throw new Error("User is not logged into app.")
     }
 
     loadPageData();
@@ -36,6 +38,8 @@ export default function NotesPage(): ReactNode {
   return (
     <main className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">Your App Notes</h1>
+
+
     </main>
   );
 }
