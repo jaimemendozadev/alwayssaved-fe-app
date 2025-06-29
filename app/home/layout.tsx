@@ -2,7 +2,7 @@ import { getNotesForSideNav } from '@/actions/layout';
 import { ReactNode } from 'react';
 import Link from 'next/link';
 
-export default async function HomePageLayout({
+export default async function CommonPageLayout({
   children
 }: {
   children: ReactNode;
