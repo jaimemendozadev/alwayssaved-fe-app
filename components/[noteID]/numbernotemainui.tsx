@@ -1,10 +1,11 @@
 'use client';
 import { ReactNode } from 'react';
-import { LeanUser, LeanNote } from '@/utils/mongodb';
+import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 
 interface NumberNoteMainUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
+  noteFiles: LeanFile[];
 }
 
 export const NumberNoteMainUI = ({

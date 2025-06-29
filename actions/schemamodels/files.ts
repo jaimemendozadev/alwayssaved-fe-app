@@ -14,5 +14,29 @@ export const getFilesByNoteID = async (
 
   console.log('noteFiles in getFilesByNoteID ', noteFiles);
 
+  if (noteFiles.length === 0) return;
+
   return deepLean(noteFiles);
+};
+
+interface SpecifiedFileFields {
+  _id?: number;
+  user_id?: number;
+  note_id?: number;
+  s3_key?: number;
+  file_name?: number;
+  file_type?: number;
+  date_uploaded?: number;
+}
+
+export const getFilesByFields = async (
+  userID: string,
+  docFields: SpecifiedFileFields
+): Promise<LeanFile[]> => {
+  const foundNotes = await FileModel.aggregate([
+    { $match: { user_id: getObjectIDFromString(userID) } },
+    { $project: docFields }
+  ]);
+
+  return deepLean(foundNotes);
 };
