@@ -74,7 +74,6 @@ export default function NotesPage(): ReactNode {
       {appNotes.length > 0 && (
         <ul>
           {appNotes.map((noteDoc) => {
-            console.log('noteDoc ', noteDoc);
             return (
               <li className="border p-5" key={noteDoc._id}>
                 <Link
