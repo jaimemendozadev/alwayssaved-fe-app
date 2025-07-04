@@ -4,7 +4,6 @@ import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { Progress } from '@heroui/react';
 import Dropzone from 'react-dropzone';
-import { InputEvent } from '@/utils/ts';
 import { LeanNote, LeanUser } from '@/utils/mongodb';
 import {
   filterCurrentFiles,
@@ -16,7 +15,6 @@ import {
   processFile
 } from '@/components/fileupload/utils';
 
-const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg =
   'There was an error uploading your files, try again later.';
 const feedbackDuration = { duration: 3000 };
@@ -40,29 +38,6 @@ export const FileUpload = ({
   const [progressValue, updateProgress] = useState(0);
 
   console.log('currentNote in FileUpload ', currentNote);
-
-  const handleChange = (evt: InputEvent) => {
-    if (!setNoteTitle) return;
-
-    if (evt?.type === 'focus') {
-      if (noteTitle === defaultNoteTitle) {
-        setNoteTitle('');
-        return;
-      }
-    }
-
-    if (evt?.type === 'blur') {
-      if (noteTitle.length === 0) {
-        setNoteTitle(defaultNoteTitle);
-        return;
-      }
-    }
-
-    if (evt?.type === 'change') {
-      setNoteTitle(evt.target.value);
-      return;
-    }
-  };
 
   const handleUploadFlow = async <T extends File>({
     acceptedFiles,
@@ -239,10 +214,6 @@ export const FileUpload = ({
 
   if (!currentUser) return null;
 
-  const formLabel = currentNote
-    ? 'Your Current Note Name'
-    : 'Your New Note Name';
-
   return (
     <div className="w-[900px]">
       <div className="flex min-h-24 justify-center">
@@ -258,21 +229,6 @@ export const FileUpload = ({
           />
         )}
       </div>
-
-      <form className="mb-8 border-2 p-4">
-        <label htmlFor="noteTitle" className="text-lg">
-          <span className="font-bold">{formLabel}</span>:<br />
-          <input
-            className="w-[100%] p-3"
-            onBlur={handleChange}
-            onFocus={handleChange}
-            onChange={handleChange}
-            id="noteTitle"
-            value={noteTitle}
-            disabled={inFlight}
-          />
-        </label>
-      </form>
 
       <Dropzone
         disabled={inFlight}
