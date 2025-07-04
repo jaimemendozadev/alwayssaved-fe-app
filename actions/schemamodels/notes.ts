@@ -37,3 +37,15 @@ export const getNotesByFields = async (
 
   return deepLean(foundNotes);
 };
+
+export const updateNoteByID = async (
+  noteID: string,
+  update: { [key: string]: any },
+  options: { [key: string]: any } = {}
+): Promise<void> => {
+  await NoteModel.findByIdAndUpdate(
+    getObjectIDFromString(noteID),
+    update,
+    options
+  );
+};
