@@ -59,7 +59,7 @@ export default function HomePage() {
         </p>
       </article>
 
-      <FileUpload currentUser={currentUser} />
+      <FileUpload currentUser={currentUser} currentNote={null} />
     </div>
   );
 }

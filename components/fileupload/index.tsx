@@ -4,23 +4,31 @@ import { LeanNote, LeanUser } from '@/utils/mongodb';
 
 import { Uploader } from './uploader';
 import { NoteForm } from './noteform';
+import { getNoteByID } from '@/actions/schemamodels/notes';
 
 interface FileUploadProps {
   currentUser: null | LeanUser;
-  currentNote: null | LeanNote;
+  currentNoteID: null | string;
 }
 
 export const FileUpload = ({
   currentUser,
-  currentNote
+  currentNoteID
 }: FileUploadProps): ReactNode => {
   const [localNote, setLocalNote] = useState<LeanNote | null>(null);
 
   useEffect(() => {
-    if (currentNote) {
-      setLocalNote(currentNote);
+    async function getTargetNote(targetNoteID: string): Promise<void> {
+      const foundNote = await getNoteByID(targetNoteID);
+
+      if (foundNote) {
+        setLocalNote(foundNote);
+      }
     }
-  }, [currentNote]);
+    if (currentNoteID) {
+      getTargetNote(currentNoteID);
+    }
+  }, [currentNoteID]);
 
   if (!currentUser) return null;
 
