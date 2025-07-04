@@ -66,7 +66,7 @@ export const NoteForm = ({
     toast.success('Your Note title has been update.', feedbackDuration);
   };
 
-  if (!currentUser || !currentNote) return null;
+  if (!currentUser) return null;
 
   return (
     <form onSubmit={handleSubmit} className="mb-8 border-2 p-4">
