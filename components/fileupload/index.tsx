@@ -39,7 +39,7 @@ export const FileUpload = ({
 
   const [progressValue, updateProgress] = useState(0);
 
-  console.log('inFlight in FileUpload ', inFlight);
+  console.log('currentNote in FileUpload ', currentNote);
 
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
@@ -64,28 +64,17 @@ export const FileUpload = ({
     }
   };
 
-  const handleNormalUpload = async <T extends File>(acceptedFiles: T[]) => {
-    if (!currentUser) return;
-
-    setFlightStatus(true);
-
-    const currentUserID = currentUser._id;
-
-    // 1) Create a Note document.
-    updateProgress(1);
-    const createdNote = await createNoteDocument(currentUserID, noteTitle);
-
-    updateProgress(3);
-
-    if (!createdNote) {
-      setFlightStatus(false);
-      updateProgress(0);
-      toast.error(basicErrorMsg, feedbackDuration);
-      return;
-    }
-
-    updateProgress(13);
-
+  const handleUploadFlow = async <T extends File>({
+    acceptedFiles,
+    userId,
+    targetNote,
+    isNewNote
+  }: {
+    acceptedFiles: T[];
+    userId: string;
+    targetNote: LeanNote;
+    isNewNote: boolean;
+  }) => {
     // 2) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
@@ -96,24 +85,19 @@ export const FileUpload = ({
 
     const createdFiles = await createFileDocuments(
       fileInfoArray,
-      currentUserID,
-      createdNote._id
+      userId,
+      targetNote._id
     );
-
     updateProgress(20);
 
     if (createdFiles.length === 0) {
-      await handleNoteDeletion(createdNote);
+      if (isNewNote) await handleNoteDeletion(targetNote);
 
       setFlightStatus(false);
-
       updateProgress(0);
-
       toast.error(basicErrorMsg, feedbackDuration);
       return;
     }
-
-    updateProgress(26);
 
     // 2a) If some of the File documents failed to be created, filter the acceptedFiles.
     if (createdFiles.length !== currentFiles.length) {
@@ -133,7 +117,7 @@ export const FileUpload = ({
 
     // 3a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if (presignPayloads.length === 0) {
-      await handleNoteDeletion(createdNote);
+      if (isNewNote) await handleNoteDeletion(targetNote);
 
       if (createdFiles.length > 0) {
         const fileIDs = createdFiles.map((file) => file._id);
@@ -142,7 +126,6 @@ export const FileUpload = ({
 
       setFlightStatus(false);
       updateProgress(0);
-
       toast.error(basicErrorMsg, feedbackDuration);
       return;
     }
@@ -161,17 +144,13 @@ export const FileUpload = ({
       4) Upload each media file to s3, update the File document with the
          s3_key in the database, send SQS message to the Extractor Queue. 
     */
+
     const uploadResults = await Promise.allSettled(
       currentFiles.map(async (file) => {
-        const targetName = file.name;
-
         const [targetPayload] = presignPayloads.filter(
-          (s3Payload) => s3Payload.file_name === targetName
+          (s3Payload) => s3Payload.file_name === file.name
         );
-
-        const status = await processFile(file, targetPayload);
-
-        return status;
+        return await processFile(file, targetPayload);
       })
     );
 
@@ -185,35 +164,30 @@ export const FileUpload = ({
     });
 
     const successfulResults = uploadResults.filter(
-      (result) => result.status === 'fulfilled'
+      (r) => r.status === 'fulfilled'
     );
-
     updateProgress(100);
 
     // 5) Trigger user feedback toast message and reset local state.
     switch (successfulResults.length) {
-      case 0: {
+      case 0:
         toast.error(
           'There was a problem saving your files. Try again later.',
           feedbackDuration
         );
         break;
-      }
-      case currentFiles.length: {
+      case currentFiles.length:
         toast.success(
           'Your files were successfully uploaded.',
           feedbackDuration
         );
         break;
-      }
-
-      default: {
+      default:
         toast.success(
           'Some but not all your files were saved. Try saving those files again later.',
           feedbackDuration
         );
         break;
-      }
     }
 
     setFlightStatus(false);
@@ -223,157 +197,51 @@ export const FileUpload = ({
     setNoteTitle(
       `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
     );
+  };
+
+  const handleNormalUpload = async <T extends File>(acceptedFiles: T[]) => {
+    if (!currentUser) return;
+
+    setFlightStatus(true);
+    updateProgress(3);
+
+    // 1) Create a Note document.
+    const note = await createNoteDocument(currentUser._id, noteTitle);
+
+    if (!note) {
+      setFlightStatus(false);
+      updateProgress(0);
+      toast.error(basicErrorMsg, feedbackDuration);
+      return;
+    }
+
+    updateProgress(13);
+
+    await handleUploadFlow({
+      acceptedFiles,
+      userId: currentUser._id,
+      targetNote: note,
+      isNewNote: true
+    });
   };
 
   const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser || !currentNote) return;
 
-    setFlightStatus(true);
-
-    const currentUserID = currentUser._id;
-
-    // 1) Create all the File documents associated with that Note.
-    updateProgress(1);
-
-    updateProgress(3);
-
-    updateProgress(13);
-
-    let currentFiles = [...acceptedFiles];
-
-    const fileInfoArray = currentFiles.map((file) => ({
-      name: file.name,
-      type: file.type
-    }));
-
-    const createdFiles = await createFileDocuments(
-      fileInfoArray,
-      currentUserID,
-      currentNote._id
-    );
-
-    updateProgress(20);
-
-    if (createdFiles.length === 0) {
-      setFlightStatus(false);
-
-      updateProgress(0);
-
-      toast.error(basicErrorMsg, feedbackDuration);
-      return;
-    }
-
-    updateProgress(26);
-
-    // 1a) If some of the File documents failed to be created, filter the acceptedFiles.
-    if (createdFiles.length !== currentFiles.length) {
-      currentFiles = filterCurrentFiles(currentFiles, createdFiles);
-      toast.error(
-        'There was a problem uploading some of your files, try saving those files again later.',
-        feedbackDuration
-      );
-    }
-
-    updateProgress(32);
-
-    // 2) Create the presignUrls for each File document.
-    const presignPayloads = await handlePresignedUrls(createdFiles);
-
-    updateProgress(35);
-
-    // 2a) If some or all of the presignURLs failed to be created, take the appropriate steps.
-    if (presignPayloads.length === 0) {
-      if (createdFiles.length > 0) {
-        const fileIDs = createdFiles.map((file) => file._id);
-        await handleFileDeletion(fileIDs);
-      }
-
-      setFlightStatus(false);
-      updateProgress(0);
-
-      toast.error(basicErrorMsg, feedbackDuration);
-      return;
-    }
-
-    if (presignPayloads.length !== currentFiles.length) {
-      currentFiles = filterCurrentFiles(currentFiles, presignPayloads);
-      toast.error(
-        'There was a problem uploading some of your files, try again later.',
-        feedbackDuration
-      );
-    }
-
-    updateProgress(38);
-
-    /*
-      3) Upload each media file to s3, update the File document with the
-         s3_key in the database, send SQS message to the Extractor Queue. 
-    */
-    const uploadResults = await Promise.allSettled(
-      currentFiles.map(async (file) => {
-        const targetName = file.name;
-
-        const [targetPayload] = presignPayloads.filter(
-          (s3Payload) => s3Payload.file_name === targetName
-        );
-
-        const status = await processFile(file, targetPayload);
-
-        return status;
-      })
-    );
-
-    updateProgress(75);
-
-    uploadResults.forEach((result) => {
-      if (result.status === 'rejected') {
-        // TODO: Handle in telemetry.
-        console.error('Uploading file to s3 failed: ', result.reason);
-      }
+    // 1) Create a Note document.
+    await handleUploadFlow({
+      acceptedFiles,
+      userId: currentUser._id,
+      targetNote: currentNote,
+      isNewNote: false
     });
-
-    const successfulResults = uploadResults.filter(
-      (result) => result.status === 'fulfilled'
-    );
-
-    updateProgress(100);
-
-    // 5) Trigger user feedback toast message and reset local state.
-    switch (successfulResults.length) {
-      case 0: {
-        toast.error(
-          'There was a problem saving your files. Try again later.',
-          feedbackDuration
-        );
-        break;
-      }
-      case currentFiles.length: {
-        toast.success(
-          'Your files were successfully uploaded.',
-          feedbackDuration
-        );
-        break;
-      }
-
-      default: {
-        toast.success(
-          'Some but not all your files were saved. Try saving those files again later.',
-          feedbackDuration
-        );
-        break;
-      }
-    }
-
-    setFlightStatus(false);
-
-    updateProgress(0);
-
-    setNoteTitle(
-      `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
-    );
   };
 
   if (!currentUser) return null;
+
+  const formLabel = currentNote
+    ? 'Your Current Note Name'
+    : 'Your New Note Name';
 
   return (
     <div className="w-[900px]">
@@ -393,7 +261,7 @@ export const FileUpload = ({
 
       <form className="mb-8 border-2 p-4">
         <label htmlFor="noteTitle" className="text-lg">
-          <span className="font-bold">Your New Note Name</span>:<br />
+          <span className="font-bold">{formLabel}</span>:<br />
           <input
             className="w-[100%] p-3"
             onBlur={handleChange}
@@ -408,14 +276,11 @@ export const FileUpload = ({
 
       <Dropzone
         disabled={inFlight}
-        onDrop={(acceptedFiles) => {
-          if (currentNote) {
-            handleUpdateUpload(acceptedFiles);
-            return;
-          }
-
-          handleNormalUpload(acceptedFiles);
-        }}
+        onDrop={(acceptedFiles) =>
+          currentNote
+            ? handleUpdateUpload(acceptedFiles)
+            : handleNormalUpload(acceptedFiles)
+        }
       >
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
