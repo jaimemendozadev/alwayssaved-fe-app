@@ -2,6 +2,7 @@
 import { ReactNode } from 'react';
 import { Button } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
+import { FileUpload } from '@/components/fileupload';
 
 interface NumberNoteMainUIProps {
   currentUser: LeanUser;
@@ -32,7 +33,7 @@ export const EditNoteMainUI = ({
       )}
 
       {noteFiles.length > 0 && (
-        <ul className="space-y-4 mb-20">
+        <ul className="space-y-4 mb-32">
           {noteFiles.map((fileDoc) => (
             <li key={fileDoc._id} className="border p-5">
               <span className="font-semibold">File Name</span>:{' '}
@@ -54,7 +55,7 @@ export const EditNoteMainUI = ({
         </ul>
       )}
 
-      <h2 className="text-3xl lg:text-4xl mb-16">
+      <h2 className="text-3xl lg:text-4xl mb-10">
         Upload More Files to Your Note
       </h2>
 
@@ -80,6 +81,8 @@ export const EditNoteMainUI = ({
           else. ☕️ We&apos;ll let you know when it&apos;s done.
         </p>
       </article>
+
+      {/* <FileUpload currentUser={currentUser} /> */}
     </main>
   );
 };
