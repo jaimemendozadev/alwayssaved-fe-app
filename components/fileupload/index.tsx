@@ -16,6 +16,7 @@ export const FileUpload = ({
   currentNoteID
 }: FileUploadProps): ReactNode => {
   const [localNote, setLocalNote] = useState<LeanNote | null>(null);
+  const [inFlight, setFlightStatus] = useState(false);
 
   useEffect(() => {
     async function getTargetNote(targetNoteID: string): Promise<void> {
@@ -34,7 +35,12 @@ export const FileUpload = ({
 
   return (
     <div className="w-[900px]">
-      <NoteForm currentUser={currentUser} currentNote={localNote} />
+      <NoteForm
+        currentUser={currentUser}
+        currentNote={localNote}
+        setNoteState={setLocalNote}
+        inFlight={inFlight}
+      />
 
       <Uploader currentUser={currentUser} currentNote={localNote} />
     </div>
