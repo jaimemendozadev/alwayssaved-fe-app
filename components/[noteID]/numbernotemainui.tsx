@@ -21,7 +21,7 @@ export const NumberNoteMainUI = ({
         Note Page for: {currentNote?.title}
       </h1>
 
-      <p className="mb-6">
+      <p className="mb-14">
         <Link
           className="hover:underline underline-offset-4"
           href={`${currentNote._id.toString()}/edit`}

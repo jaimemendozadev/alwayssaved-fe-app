@@ -46,9 +46,11 @@ export default function HomePage() {
         </p>
 
         <p className="text-lg mb-8">
-          <span className="font-bold">Wait until all the media files are uploaded</span> to the cloud for
-          transcribing. Then you can create a brand new Note with new media
-          files or navigate to another part of the app.
+          <span className="font-bold">
+            Wait until all the media files are uploaded
+          </span>{' '}
+          to the cloud for transcribing. Then you can create a brand new Note
+          with new media files or navigate to another part of the app.
         </p>
 
         <p className="text-lg mb-3">
