@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { InputEvent } from '@/utils/ts';
@@ -7,6 +7,7 @@ import { LeanNote, LeanUser } from '@/utils/mongodb';
 
 import { SubmitEvent } from '@/utils/ts';
 import { updateNoteByID } from '@/actions/schemamodels/notes';
+import { createNoteDocument } from './utils';
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
@@ -18,13 +19,16 @@ const feedbackDuration = { duration: 3000 };
 interface NoteFormProps {
   currentUser: null | LeanUser;
   currentNote: null | LeanNote;
+  inFlight: boolean;
+  setNoteState: Dispatch<SetStateAction<LeanNote | null>>;
 }
 
 export const NoteForm = ({
   currentUser,
-  currentNote
+  currentNote,
+  inFlight,
+  setNoteState
 }: NoteFormProps): ReactNode => {
-  const [inFlight, setFlightStatus] = useState(false);
   const [noteTitle, setNoteTitle] = useState(() =>
     currentNote
       ? currentNote.title
@@ -59,11 +63,22 @@ export const NoteForm = ({
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    if (!currentUser || !currentNote) return;
+    if (!currentUser) return;
 
-    await updateNoteByID(currentNote?._id, { title: noteTitle });
+    if (!currentNote) {
+      const newNote = await createNoteDocument(currentUser._id, noteTitle);
 
-    toast.success('Your Note title has been update.', feedbackDuration);
+      if (newNote) {
+        setNoteState(newNote);
+        return;
+      }
+    }
+
+    if (currentNote) {
+      await updateNoteByID(currentNote?._id, { title: noteTitle });
+    }
+
+    // toast.success('Your Note title has been update.', feedbackDuration);
   };
 
   if (!currentUser) return null;
