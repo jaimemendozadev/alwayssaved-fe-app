@@ -29,11 +29,6 @@ export const Uploader = ({
   currentNote
 }: UploaderProps): ReactNode => {
   const [inFlight, setFlightStatus] = useState(false);
-  const [noteTitle, setNoteTitle] = useState(() =>
-    currentNote
-      ? currentNote.title
-      : `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
-  );
 
   const [progressValue, updateProgress] = useState(0);
 
@@ -168,10 +163,6 @@ export const Uploader = ({
     setFlightStatus(false);
 
     updateProgress(0);
-
-    setNoteTitle(
-      `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
-    );
   };
 
   const handleNormalUpload = async <T extends File>(acceptedFiles: T[]) => {
@@ -181,9 +172,10 @@ export const Uploader = ({
     updateProgress(3);
 
     // 1) Create a Note document.
-    const note = await createNoteDocument(currentUser._id, noteTitle);
+    const newNoteTitle = `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+    const newNote = await createNoteDocument(currentUser._id, newNoteTitle);
 
-    if (!note) {
+    if (!newNote) {
       setFlightStatus(false);
       updateProgress(0);
       toast.error(basicErrorMsg, feedbackDuration);
@@ -195,7 +187,7 @@ export const Uploader = ({
     await handleUploadFlow({
       acceptedFiles,
       userId: currentUser._id,
-      targetNote: note,
+      targetNote: newNote,
       isNewNote: true
     });
   };
