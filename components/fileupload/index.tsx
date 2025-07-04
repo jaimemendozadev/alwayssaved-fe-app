@@ -31,8 +31,10 @@ export const FileUpload = ({
   currentNote
 }: FileUploadProps): ReactNode => {
   const [inFlight, setFlightStatus] = useState(false);
-  const [noteTitle, setNoteTitle] = useState(
-    `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
+  const [noteTitle, setNoteTitle] = useState(() =>
+    currentNote
+      ? currentNote.title
+      : `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
   );
 
   const [progressValue, updateProgress] = useState(0);
@@ -223,6 +225,154 @@ export const FileUpload = ({
     );
   };
 
+  const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
+    if (!currentUser || !currentNote) return;
+
+    setFlightStatus(true);
+
+    const currentUserID = currentUser._id;
+
+    // 1) Create all the File documents associated with that Note.
+    updateProgress(1);
+
+    updateProgress(3);
+
+    updateProgress(13);
+
+    let currentFiles = [...acceptedFiles];
+
+    const fileInfoArray = currentFiles.map((file) => ({
+      name: file.name,
+      type: file.type
+    }));
+
+    const createdFiles = await createFileDocuments(
+      fileInfoArray,
+      currentUserID,
+      currentNote._id
+    );
+
+    updateProgress(20);
+
+    if (createdFiles.length === 0) {
+      setFlightStatus(false);
+
+      updateProgress(0);
+
+      toast.error(basicErrorMsg, feedbackDuration);
+      return;
+    }
+
+    updateProgress(26);
+
+    // 1a) If some of the File documents failed to be created, filter the acceptedFiles.
+    if (createdFiles.length !== currentFiles.length) {
+      currentFiles = filterCurrentFiles(currentFiles, createdFiles);
+      toast.error(
+        'There was a problem uploading some of your files, try saving those files again later.',
+        feedbackDuration
+      );
+    }
+
+    updateProgress(32);
+
+    // 2) Create the presignUrls for each File document.
+    const presignPayloads = await handlePresignedUrls(createdFiles);
+
+    updateProgress(35);
+
+    // 2a) If some or all of the presignURLs failed to be created, take the appropriate steps.
+    if (presignPayloads.length === 0) {
+      if (createdFiles.length > 0) {
+        const fileIDs = createdFiles.map((file) => file._id);
+        await handleFileDeletion(fileIDs);
+      }
+
+      setFlightStatus(false);
+      updateProgress(0);
+
+      toast.error(basicErrorMsg, feedbackDuration);
+      return;
+    }
+
+    if (presignPayloads.length !== currentFiles.length) {
+      currentFiles = filterCurrentFiles(currentFiles, presignPayloads);
+      toast.error(
+        'There was a problem uploading some of your files, try again later.',
+        feedbackDuration
+      );
+    }
+
+    updateProgress(38);
+
+    /*
+      3) Upload each media file to s3, update the File document with the
+         s3_key in the database, send SQS message to the Extractor Queue. 
+    */
+    const uploadResults = await Promise.allSettled(
+      currentFiles.map(async (file) => {
+        const targetName = file.name;
+
+        const [targetPayload] = presignPayloads.filter(
+          (s3Payload) => s3Payload.file_name === targetName
+        );
+
+        const status = await processFile(file, targetPayload);
+
+        return status;
+      })
+    );
+
+    updateProgress(75);
+
+    uploadResults.forEach((result) => {
+      if (result.status === 'rejected') {
+        // TODO: Handle in telemetry.
+        console.error('Uploading file to s3 failed: ', result.reason);
+      }
+    });
+
+    const successfulResults = uploadResults.filter(
+      (result) => result.status === 'fulfilled'
+    );
+
+    updateProgress(100);
+
+    // 5) Trigger user feedback toast message and reset local state.
+    switch (successfulResults.length) {
+      case 0: {
+        toast.error(
+          'There was a problem saving your files. Try again later.',
+          feedbackDuration
+        );
+        break;
+      }
+      case currentFiles.length: {
+        toast.success(
+          'Your files were successfully uploaded.',
+          feedbackDuration
+        );
+        break;
+      }
+
+      default: {
+        toast.success(
+          'Some but not all your files were saved. Try saving those files again later.',
+          feedbackDuration
+        );
+        break;
+      }
+    }
+
+    setFlightStatus(false);
+
+    updateProgress(0);
+
+    setNoteTitle(
+      `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
+    );
+  };
+
   if (!currentUser) return null;
 
   return (
@@ -259,10 +409,12 @@ export const FileUpload = ({
       <Dropzone
         disabled={inFlight}
         onDrop={(acceptedFiles) => {
-          if (currentNote === null) {
-            handleNormalUpload(acceptedFiles);
+          if (currentNote) {
+            handleUpdateUpload(acceptedFiles);
             return;
           }
+
+          handleNormalUpload(acceptedFiles);
         }}
       >
         {({ getRootProps, getInputProps }) => (
