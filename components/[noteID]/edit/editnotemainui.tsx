@@ -1,6 +1,5 @@
 'use client';
 import { ReactNode } from 'react';
-import Link from 'next/link';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 interface NumberNoteMainUIProps {
   currentUser: LeanUser;
@@ -8,7 +7,7 @@ interface NumberNoteMainUIProps {
   noteFiles: LeanFile[];
 }
 
-export const NumberNoteMainUI = ({
+export const EditNoteMainUI = ({
   currentUser,
   currentNote,
   noteFiles
@@ -21,16 +20,14 @@ export const NumberNoteMainUI = ({
         Note Page for: {currentNote?.title}
       </h1>
 
-      <p className="mb-6">
-        <Link
-          className="hover:underline underline-offset-4"
-          href={`${currentNote._id.toString()}/edit`}
-        >
-          ✍🏼 Edit Your Note
-        </Link>
-      </p>
-
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
+
+      {noteFiles.length === 0 && (
+        <p className="text-xl">
+          You have no files attached to this Note. You can add files to the note
+          in the dropdown below.
+        </p>
+      )}
 
       {noteFiles.length > 0 && (
         <ul className="space-y-4 mb-20">
@@ -39,11 +36,14 @@ export const NumberNoteMainUI = ({
               <span className="font-semibold">File Name</span>:{' '}
               {fileDoc.file_name} &nbsp; | &nbsp;{' '}
               <span className="font-semibold">File Type</span>:{' '}
-              {fileDoc.file_type}
+              {fileDoc.file_type} &nbsp; | &nbsp; 🗑️
             </li>
           ))}
         </ul>
       )}
+
+
+      <h2 className="text-3xl lg:text-4xl mb-2">Upload More Files to Your Note</h2>
     </main>
   );
 };

@@ -1,11 +1,11 @@
 'use server';
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { NumberNoteMainUI } from '@/components/[noteID]';
+import { EditNoteMainUI } from '@/components/[noteID]';
 import { getNoteByID } from '@/actions/schemamodels/notes';
 import { getFilesByFields } from '@/actions/schemamodels/files';
 
-export default async function NotePage({
+export default async function NoteEditPage({
   params
 }: {
   params: { noteID: string };
@@ -31,7 +31,7 @@ export default async function NotePage({
 
   if (currentUser && currentNote && files) {
     return (
-      <NumberNoteMainUI
+      <EditNoteMainUI
         currentUser={currentUser}
         currentNote={currentNote}
         noteFiles={files}
