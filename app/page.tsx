@@ -1,7 +1,6 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Navbar } from '@heroui/react';
 import {
   SignedOut,
   SignedIn,
@@ -27,15 +26,24 @@ export default function LandingPage() {
 
   return (
     <div className="max-w-[90%] mx-auto p-28">
-      <Navbar className="mb-36 flex justify-end">
+      <nav className="max-w-[90%] m-auto mb-36 flex justify-end">
         <SignedIn>
-          <SignOutButton />
+          <SignOutButton>
+            <button className="border-2 py-3 px-6 rounded-sm">
+              Sign Out
+            </button>
+          </SignOutButton>
         </SignedIn>
 
         <SignedOut>
-          <SignUpButton />
+          <SignUpButton>
+            <button className="border-2 py-3 px-6 rounded-sm">
+              Sign Up
+            </button>
+          </SignUpButton>
+          
         </SignedOut>
-      </Navbar>
+      </nav>
       <section className="mb-16">
         <h1 className="text-4xl font-medium mb-10">
           🧠 AlwaysSaved - Your Private, Searchable Knowledge Base for Your Info
