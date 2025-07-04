@@ -18,6 +18,8 @@ export default function OnboardPage(): ReactNode {
     async function getNewUser() {
         const newUser = await registerNewUser()
 
+        console.log("newUser in /onboard page ", newUser);
+
         if(newUser) {
             setOnboardedUser(newUser);
             toast.success(successMessage, duration);

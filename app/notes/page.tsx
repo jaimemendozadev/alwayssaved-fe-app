@@ -54,7 +54,7 @@ export default function NotesPage(): ReactNode {
   }
 
   return (
-    <main className="p-6 w-[85%]">
+    <div>
       <h1 className="text-3xl lg:text-6xl mb-16">
         📝 {currentUser?.first_name}&#39;s Notes
       </h1>
@@ -90,7 +90,7 @@ export default function NotesPage(): ReactNode {
           })}
         </ul>
       )}
-    </main>
+    </div>
   );
 }
 

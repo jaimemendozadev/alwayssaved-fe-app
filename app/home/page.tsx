@@ -29,7 +29,7 @@ export default function HomePage() {
   if (currentUser === null) return currentUser;
 
   return (
-    <main className="p-6 w-[85%]">
+    <div>
       <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home Page</h1>
 
       <article className="mb-16">
@@ -58,6 +58,6 @@ export default function HomePage() {
       </article>
 
       <FileUpload currentUser={currentUser} />
-    </main>
+    </div>
   );
 }
