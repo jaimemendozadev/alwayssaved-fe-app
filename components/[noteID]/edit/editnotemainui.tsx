@@ -82,7 +82,7 @@ export const EditNoteMainUI = ({
         </p>
       </article>
 
-      {/* <FileUpload currentUser={currentUser} /> */}
+      <FileUpload currentUser={currentUser} currentNote={currentNote} />
     </main>
   );
 };

@@ -5,9 +5,16 @@ import dayjs from 'dayjs';
 import { Progress } from '@heroui/react';
 import Dropzone from 'react-dropzone';
 import { InputEvent } from '@/utils/ts';
-import { LeanUser } from '@/utils/mongodb';
-import { filterCurrentFiles, createNoteDocument, createFileDocuments, handleNoteDeletion, handleFileDeletion, handlePresignedUrls, processFile } from '@/components/fileupload/utils';
-
+import { LeanNote, LeanUser } from '@/utils/mongodb';
+import {
+  filterCurrentFiles,
+  createNoteDocument,
+  createFileDocuments,
+  handleNoteDeletion,
+  handleFileDeletion,
+  handlePresignedUrls,
+  processFile
+} from '@/components/fileupload/utils';
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 const basicErrorMsg =
@@ -16,9 +23,13 @@ const feedbackDuration = { duration: 3000 };
 
 interface FileUploadProps {
   currentUser: null | LeanUser;
+  currentNote: null | LeanNote;
 }
 
-export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
+export const FileUpload = ({
+  currentUser,
+  currentNote
+}: FileUploadProps): ReactNode => {
   const [inFlight, setFlightStatus] = useState(false);
   const [noteTitle, setNoteTitle] = useState(
     `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
@@ -51,7 +62,7 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
     }
   };
 
-  const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
+  const handleNormalUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser) return;
 
     setFlightStatus(true);
@@ -177,7 +188,6 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
     updateProgress(100);
 
-
     // 5) Trigger user feedback toast message and reset local state.
     switch (successfulResults.length) {
       case 0: {
@@ -248,7 +258,12 @@ export const FileUpload = ({ currentUser }: FileUploadProps): ReactNode => {
 
       <Dropzone
         disabled={inFlight}
-        onDrop={(acceptedFiles) => handleUpload(acceptedFiles)}
+        onDrop={(acceptedFiles) => {
+          if (currentNote === null) {
+            handleNormalUpload(acceptedFiles);
+            return;
+          }
+        }}
       >
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
