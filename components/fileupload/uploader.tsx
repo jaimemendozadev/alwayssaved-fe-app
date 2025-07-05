@@ -39,12 +39,6 @@ export const Uploader = ({
 }: UploaderProps): ReactNode => {
   const [progressValue, updateProgress] = useState(0);
 
-  console.log('inFlight status in Upload ', inFlight);
-
-  console.log('progressValue in Uploader ', progressValue);
-
-  console.log('localNote in Uploader ', localNote);
-
   const handleUploadFlow = async <T extends File>({
     acceptedFiles,
     userId,
@@ -216,6 +210,9 @@ export const Uploader = ({
 
   const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser || !localNote) return;
+
+    setFlightStatus(true);
+    updateProgress(7);
 
     /*
       1) There is the possibility a Note was created in the sibling NoteForm.
