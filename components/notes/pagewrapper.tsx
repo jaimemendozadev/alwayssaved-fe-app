@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
-import { Button } from '@heroui/react';
+import { Button, Tooltip } from '@heroui/react';
 import { LeanUser, LeanNote } from '@/utils/mongodb';
 import { deleteNoteByID } from '@/actions/schemamodels/notes';
 
@@ -62,15 +62,17 @@ export const PageWrapper = ({
                   {dayjs(noteDoc.date_created).format('dddd, MMMM D, YYYY')}
                 </Link>
                 &nbsp; | &nbsp;{' '}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  isIconOnly={true}
-                  aria-label="Delete"
-                  onPress={() => handleNoteDeletion(noteDoc._id.toString())}
-                >
-                  🗑️
-                </Button>
+                <Tooltip content="Delete Note">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    isIconOnly={true}
+                    aria-label="Delete"
+                    onPress={() => handleNoteDeletion(noteDoc._id.toString())}
+                  >
+                    🗑️
+                  </Button>
+                </Tooltip>
               </li>
             );
           })}
