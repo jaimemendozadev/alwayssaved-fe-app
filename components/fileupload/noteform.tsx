@@ -1,5 +1,11 @@
 'use client';
-import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState
+} from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { InputEvent } from '@/utils/ts';
@@ -9,7 +15,10 @@ import { SubmitEvent } from '@/utils/ts';
 import { updateNoteByID } from '@/actions/schemamodels/notes';
 import { createNoteDocument } from './utils';
 
-const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
+const getDefaultNoteTitle = () =>
+  `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+
+let defaultNoteTitle = '';
 
 const feedbackDuration = { duration: 3000 };
 
@@ -26,13 +35,7 @@ export const NoteForm = ({
   inFlight,
   setLocalNote
 }: NoteFormProps): ReactNode => {
-  const [noteTitle, setNoteTitle] = useState(() =>
-    localNote
-      ? localNote.title
-      : `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
-  );
-
-  console.log('localNote in NoteForm ', localNote);
+  const [noteTitle, setNoteTitle] = useState('');
 
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
@@ -77,6 +80,15 @@ export const NoteForm = ({
       toast.success('Your Note title has been updated. 👏🏼', feedbackDuration);
     }
   };
+
+  useEffect(() => {
+    if (localNote) {
+      setNoteTitle(localNote.title);
+    } else {
+      defaultNoteTitle = getDefaultNoteTitle();
+      setNoteTitle(defaultNoteTitle);
+    }
+  }, []);
 
   if (!currentUser) return null;
 
