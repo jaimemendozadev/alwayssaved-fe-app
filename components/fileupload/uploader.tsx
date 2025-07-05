@@ -17,10 +17,12 @@ import {
 
 const basicErrorMsg =
   'There was an error uploading your files, try again later.';
+
 const feedbackDuration = { duration: 3000 };
 
 interface UploaderProps {
   currentUser: null | LeanUser;
+  currentNoteID: null | string;
   localNote: null | LeanNote;
   setLocalNote: Dispatch<SetStateAction<LeanNote | null>>;
   inFlight: boolean;
@@ -29,6 +31,7 @@ interface UploaderProps {
 
 export const Uploader = ({
   currentUser,
+  currentNoteID,
   localNote,
   setLocalNote,
   inFlight,
@@ -210,12 +213,18 @@ export const Uploader = ({
   const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser || !localNote) return;
 
-    // 1) Create a Note document.
+    /*
+      1) There is the possibility a Note was created in the sibling NoteForm.
+         currenteNoteID with a null value explicitly states that indeed
+         the localNote was just created in the sibling NoteForm and
+         should be deleted from the database on failure or deleted from
+         localNote state if the Files upload successfully.
+    */
     await handleUploadFlow({
       acceptedFiles,
       userId: currentUser._id,
       targetNote: localNote,
-      isNewNote: false
+      isNewNote: currentNoteID === null
     });
   };
 

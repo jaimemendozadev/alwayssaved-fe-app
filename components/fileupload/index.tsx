@@ -49,6 +49,7 @@ export const FileUpload = ({
 
       <Uploader
         currentUser={currentUser}
+        currentNoteID={currentNoteID}
         localNote={localNote}
         setLocalNote={setLocalNote}
         inFlight={inFlight}
