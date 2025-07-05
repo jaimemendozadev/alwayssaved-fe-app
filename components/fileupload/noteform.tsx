@@ -11,9 +11,6 @@ import { createNoteDocument } from './utils';
 
 const defaultNoteTitle = `Untitled Note - ${dayjs().format('MMMM D, YYYY')}`;
 
-const basicErrorMsg =
-  'There was an error uploading your files, try again later.';
-
 const feedbackDuration = { duration: 3000 };
 
 interface NoteFormProps {
@@ -70,15 +67,15 @@ export const NoteForm = ({
 
       if (newNote) {
         setLocalNote(newNote);
+        toast.success('A new Note has been created. 🎉', feedbackDuration);
         return;
       }
     }
 
     if (localNote) {
       await updateNoteByID(localNote?._id, { title: noteTitle });
+      toast.success('Your Note title has been updated. 👏🏼', feedbackDuration);
     }
-
-    // toast.success('Your Note title has been update.', feedbackDuration);
   };
 
   if (!currentUser) return null;
