@@ -96,7 +96,7 @@ export const FileUpload = ({
     targetNote: LeanNote;
     isNewNote: boolean;
   }) => {
-    // 2) Create all the File documents associated with that Note.
+    // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
     const fileInfoArray = currentFiles.map((file) => ({
@@ -123,7 +123,7 @@ export const FileUpload = ({
       return;
     }
 
-    // 2a) If some of the File documents failed to be created, filter the acceptedFiles.
+    // 1a) If some of the File documents failed to be created, filter the acceptedFiles.
     if (createdFiles.length !== currentFiles.length) {
       currentFiles = filterCurrentFiles(currentFiles, createdFiles);
       toast.error(
@@ -134,12 +134,12 @@ export const FileUpload = ({
 
     updateProgress(32);
 
-    // 3) Create the presignUrls for each File document.
+    // 2) Create the presignUrls for each File document.
     const presignPayloads = await handlePresignedUrls(createdFiles);
 
     updateProgress(35);
 
-    // 3a) If some or all of the presignURLs failed to be created, take the appropriate steps.
+    // 2a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if (presignPayloads.length === 0) {
       if (isNewNote) {
         await handleNoteDeletion(targetNote);
@@ -168,7 +168,7 @@ export const FileUpload = ({
     updateProgress(38);
 
     /*
-      4) Upload each media file to s3, update the File document with the
+      3) Upload each media file to s3, update the File document with the
          s3_key in the database, send SQS message to the Extractor Queue. 
     */
 
@@ -195,7 +195,7 @@ export const FileUpload = ({
     );
     updateProgress(100);
 
-    // 5) Trigger user feedback toast message and reset local state.
+    // 4) Trigger user feedback toast message and reset local state.
     switch (successfulResults.length) {
       // TODO: Trigger Note and File deletions if there were no successful results.
       case 0:
@@ -225,48 +225,12 @@ export const FileUpload = ({
     updateProgress(0);
   };
 
-  const handleNormalUpload = async <T extends File>(acceptedFiles: T[]) => {
-    if (!currentUser) return;
-
-    setFlightStatus(true);
-    updateProgress(3);
-
-    // 1) Create a Note document.
-    const newNoteTitle = `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
-    const newNote = await createNoteDocument(currentUser._id, newNoteTitle);
-
-    if (!newNote) {
-      setFlightStatus(false);
-      updateProgress(0);
-      toast.error(basicErrorMsg, feedbackDuration);
-      return;
-    }
-
-    setLocalNote(newNote);
-
-    updateProgress(13);
-
-    await handleUploadFlow({
-      acceptedFiles,
-      userId: currentUser._id,
-      targetNote: newNote,
-      isNewNote: true
-    });
-  };
-
   const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser || !localNote) return;
 
     setFlightStatus(true);
     updateProgress(7);
 
-    /*
-      1) There is the possibility a Note was created in the sibling NoteForm.
-         currenteNoteID with a null value explicitly states that indeed
-         the localNote was just created in the sibling NoteForm and
-         should be deleted from the database on failure or deleted from
-         localNote state if the Files upload successfully.
-    */
     await handleUploadFlow({
       acceptedFiles,
       userId: currentUser._id,
@@ -353,11 +317,7 @@ export const FileUpload = ({
 
       <Dropzone
         disabled={inFlight}
-        onDrop={(acceptedFiles) =>
-          localNote
-            ? handleUpdateUpload(acceptedFiles)
-            : handleNormalUpload(acceptedFiles)
-        }
+        onDrop={(acceptedFiles) => handleUpdateUpload(acceptedFiles)}
       >
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
