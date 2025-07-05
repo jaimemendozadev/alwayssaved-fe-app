@@ -85,17 +85,12 @@ export const FileUpload = ({
     }
   };
 
-  const handleUploadFlow = async <T extends File>({
-    acceptedFiles,
-    userId,
-    targetNote,
-    isNewNote
-  }: {
-    acceptedFiles: T[];
-    userId: string;
-    targetNote: LeanNote;
-    isNewNote: boolean;
-  }) => {
+  const handleUploadFlow = async <T extends File>(
+    acceptedFiles: T[],
+    isNewNote: boolean
+  ) => {
+    if (!currentUser || !localNote) return;
+
     // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
@@ -106,14 +101,16 @@ export const FileUpload = ({
 
     const createdFiles = await createFileDocuments(
       fileInfoArray,
-      userId,
-      targetNote._id
+      currentUser._id,
+      localNote._id
     );
     updateProgress(20);
 
+    // TODO: Should we still delete the localNote if it's a new note?
+
     if (createdFiles.length === 0) {
       if (isNewNote) {
-        await handleNoteDeletion(targetNote);
+        await handleNoteDeletion(localNote);
         setLocalNote(null);
       }
 
@@ -139,10 +136,12 @@ export const FileUpload = ({
 
     updateProgress(35);
 
+    // TODO: Should we still delete the localNote if it's a new note?
+
     // 2a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if (presignPayloads.length === 0) {
       if (isNewNote) {
-        await handleNoteDeletion(targetNote);
+        await handleNoteDeletion(localNote);
         setLocalNote(null);
       }
 
@@ -218,6 +217,8 @@ export const FileUpload = ({
         break;
     }
 
+    // TODO: Possibly reset defaultTitle & setLocalNote to null or keep as is.
+
     setFlightStatus(false);
 
     setLocalNote(null);
@@ -231,12 +232,9 @@ export const FileUpload = ({
     setFlightStatus(true);
     updateProgress(7);
 
-    await handleUploadFlow({
-      acceptedFiles,
-      userId: currentUser._id,
-      targetNote: localNote,
-      isNewNote: currentNoteID === null
-    });
+    const isNewNote = currentNoteID === null;
+
+    await handleUploadFlow(acceptedFiles, isNewNote);
   };
 
   useEffect(() => {
