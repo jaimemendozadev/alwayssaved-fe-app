@@ -301,12 +301,14 @@ export const FileUpload = ({
         setLocalNote(newNote);
       }
     }
-    if (currentNoteID) {
-      getTargetNote(currentNoteID);
-    } else {
-      if (currentUser) {
-        createNewLocalNote(currentUser);
+
+    if (currentUser) {
+      if (currentNoteID) {
+        getTargetNote(currentNoteID);
+        return;
       }
+
+      createNewLocalNote(currentUser);
     }
   }, [currentNoteID, currentUser]);
 
