@@ -39,6 +39,10 @@ export const Uploader = ({
 }: UploaderProps): ReactNode => {
   const [progressValue, updateProgress] = useState(0);
 
+  console.log('inFlight status in Upload ', inFlight);
+
+  console.log('progressValue in Uploader ', progressValue);
+
   console.log('localNote in Uploader ', localNote);
 
   const handleUploadFlow = async <T extends File>({

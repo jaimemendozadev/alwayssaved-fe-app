@@ -1,3 +1,5 @@
+'use server';
+import mongoose from 'mongoose';
 import {
   deepLean,
   FileModel,
@@ -29,12 +31,22 @@ interface SpecifiedFileFields {
   date_uploaded?: number;
 }
 
-export const getFilesByFields = async (
-  userID: string,
+interface FileMatch {
+  _id?: mongoose.Types.ObjectId;
+  user_id?: mongoose.Types.ObjectId;
+  note_id?: mongoose.Types.ObjectId;
+  s3_key?: string;
+  file_name?: string;
+  file_type?: string;
+  date_uploaded?: Date;
+}
+
+export const matchProjectFiles = async (
+  match: FileMatch,
   docFields: SpecifiedFileFields
 ): Promise<LeanFile[]> => {
   const foundNotes = await FileModel.aggregate([
-    { $match: { user_id: getObjectIDFromString(userID) } },
+    { $match: match },
     { $project: docFields }
   ]);
 
