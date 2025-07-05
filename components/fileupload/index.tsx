@@ -31,7 +31,7 @@ const basicErrorMsg =
 const getDefaultNoteTitle = () =>
   `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
 
-let defaultNoteTitle = '';
+let defaultNoteTitle = ''; // TODO: set this in local state instead.
 
 export const FileUpload = ({
   currentUser,
@@ -290,13 +290,24 @@ export const FileUpload = ({
         `Could not find the Note with noteID ${targetNoteID} to perform FileUpload update.`
       );
     }
+
+    async function createNewLocalNote(targetUser: LeanUser) {
+      const newNoteTitle = getDefaultNoteTitle();
+      const newNote = await createNoteDocument(targetUser._id, newNoteTitle);
+
+      if (newNote) {
+        setNoteTitle(newNoteTitle);
+        setLocalNote(newNote);
+      }
+    }
     if (currentNoteID) {
       getTargetNote(currentNoteID);
     } else {
-      defaultNoteTitle = getDefaultNoteTitle();
-      setNoteTitle(defaultNoteTitle);
+      if (currentUser) {
+        createNewLocalNote(currentUser);
+      }
     }
-  }, [currentNoteID]);
+  }, [currentNoteID, currentUser]);
 
   if (!currentUser) return null;
 
