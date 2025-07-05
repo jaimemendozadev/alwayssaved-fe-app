@@ -8,6 +8,7 @@ import {
 } from 'react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import {Button} from "@heroui/react";
 import { InputEvent } from '@/utils/ts';
 import { LeanNote, LeanUser } from '@/utils/mongodb';
 
@@ -94,10 +95,11 @@ export const NoteForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="mb-8 border-2 p-4">
-      <label htmlFor="noteTitle" className="text-lg">
+      <div className='flex items-end'>
+        <label htmlFor="noteTitle" className="text-lg min-w-[400px]">
         <span className="font-bold">Note Name</span>:<br />
         <input
-          className="w-[100%] p-3"
+          className="w-[100%] p-1"
           onBlur={handleChange}
           onFocus={handleChange}
           onChange={handleChange}
@@ -106,6 +108,9 @@ export const NoteForm = ({
           disabled={inFlight}
         />
       </label>
+
+      <Button className='ml-4' onPress={() => console.log("BUTTON PRESS")}>Submit</Button>
+      </div>
     </form>
   );
 };
