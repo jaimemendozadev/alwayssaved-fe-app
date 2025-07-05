@@ -58,7 +58,7 @@ export const updateNoteByID = async (
   );
 };
 
-export const handleNoteDeletion = async (noteID: string): Promise<void> => {
+export const deleteNoteByID = async (noteID: string): Promise<void> => {
   try {
     const _id = getObjectIDFromString(noteID);
 
@@ -66,7 +66,7 @@ export const handleNoteDeletion = async (noteID: string): Promise<void> => {
   } catch (error) {
     // TODO: Handle in telemetry.
     console.log(
-      `Error in handleNoteDeletion for Note with ID of ${noteID}:`,
+      `Error in deleteNoteByID for Note with ID of ${noteID}:`,
       error
     );
   }
