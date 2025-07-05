@@ -1,6 +1,5 @@
 import {
   handleFileDeletion,
-  handleNoteDeletion,
   handlePresignedUrls,
   createNoteDocument,
   createFileDocuments
@@ -11,7 +10,6 @@ import { processFile } from './processFile';
 
 export {
   handleFileDeletion,
-  handleNoteDeletion,
   handlePresignedUrls,
   createNoteDocument,
   createFileDocuments,

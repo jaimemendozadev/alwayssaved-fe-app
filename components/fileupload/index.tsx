@@ -12,7 +12,6 @@ import {
   filterCurrentFiles,
   createNoteDocument,
   createFileDocuments,
-  handleNoteDeletion,
   handleFileDeletion,
   handlePresignedUrls,
   processFile

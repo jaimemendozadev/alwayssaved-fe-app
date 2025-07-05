@@ -49,3 +49,17 @@ export const updateNoteByID = async (
     options
   );
 };
+
+export const handleNoteDeletion = async (noteID: string): Promise<void> => {
+  try {
+    const _id = getObjectIDFromString(noteID);
+
+    await NoteModel.findOneAndDelete({ _id }).exec();
+  } catch (error) {
+    // TODO: Handle in telemetry.
+    console.log(
+      `Error in handleNoteDeletion for Note with ID of ${noteID}:`,
+      error
+    );
+  }
+};
