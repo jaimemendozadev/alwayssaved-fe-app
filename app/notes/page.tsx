@@ -22,11 +22,15 @@ export default function NotesPage(): ReactNode {
       if (currentUser) {
         setCurrentUser(currentUser);
 
-        const userNotes = await getNotesByFields(currentUser._id, {
-          _id: 1,
-          title: 1,
-          date_created: 1
-        });
+        const userNotes = await getNotesByFields(
+          currentUser._id,
+          {
+            _id: 1,
+            title: 1,
+            date_created: 1
+          },
+          true
+        );
 
         console.log(
           'typeof foundNotes in getNotesByFields ',

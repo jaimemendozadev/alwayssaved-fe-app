@@ -5,6 +5,7 @@ import {
   LeanNote,
   NoteModel
 } from '@/utils/mongodb';
+import { PipelineStage } from 'mongoose';
 
 export const getNoteByID = async (noteID: string): Promise<LeanNote | void> => {
   const mongoID = getObjectIDFromString(noteID);
@@ -28,12 +29,19 @@ interface SpecifiedNoteFields {
 
 export const getNotesByFields = async (
   userID: string,
-  docFields: SpecifiedNoteFields
+  docFields: SpecifiedNoteFields,
+  sortByDate: boolean = false
 ): Promise<LeanNote[]> => {
-  const foundNotes = await NoteModel.aggregate([
+  const pipeline: PipelineStage[] = [
     { $match: { user_id: getObjectIDFromString(userID) } },
     { $project: docFields }
-  ]);
+  ];
+
+  if (sortByDate) {
+    pipeline.push({ $sort: { date: -1 } });
+  }
+
+  const foundNotes = await NoteModel.aggregate(pipeline);
 
   return deepLean(foundNotes);
 };
