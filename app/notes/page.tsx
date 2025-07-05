@@ -72,7 +72,7 @@ export default function NotesPage(): ReactNode {
         </p>
       )}
       {appNotes.length > 0 && (
-        <ul>
+        <ul className="space-y-7">
           {appNotes.map((noteDoc) => {
             return (
               <li className="border p-5" key={noteDoc._id}>
