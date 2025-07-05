@@ -1,5 +1,6 @@
 'use client';
 import { ReactNode, useState, useEffect } from 'react';
+import dayjs from 'dayjs';
 import { LeanNote, LeanUser } from '@/utils/mongodb';
 
 import { Uploader } from './uploader';
@@ -13,10 +14,14 @@ interface FileUploadProps {
 
 // TODO: Fix resetting NoteForm when successful file upload occurs.
 
+const getDefaultNoteTitle = () =>
+  `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+
 export const FileUpload = ({
   currentUser,
   currentNoteID
 }: FileUploadProps): ReactNode => {
+  const [defaultTitle, setDefaultTitle] = useState('');
   const [localNote, setLocalNote] = useState<LeanNote | null>(null);
   const [inFlight, setFlightStatus] = useState(false);
 
@@ -26,6 +31,7 @@ export const FileUpload = ({
 
       if (foundNote) {
         setLocalNote(foundNote);
+        setDefaultTitle(foundNote.title);
         return;
       }
 
@@ -35,7 +41,11 @@ export const FileUpload = ({
     }
     if (currentNoteID) {
       getTargetNote(currentNoteID);
+      return;
     }
+
+    const newTitle = getDefaultNoteTitle();
+    setDefaultTitle(newTitle);
   }, [currentNoteID]);
 
   if (!currentUser) return null;
@@ -46,6 +56,7 @@ export const FileUpload = ({
         currentUser={currentUser}
         localNote={localNote}
         setLocalNote={setLocalNote}
+        defaultTitle={defaultTitle}
         inFlight={inFlight}
       />
 
