@@ -1,5 +1,6 @@
 'use client';
 import { ReactNode, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { Progress } from '@heroui/react';
@@ -17,6 +18,7 @@ import {
   processFile
 } from '@/components/fileupload/utils';
 
+// TODO: Add an optional prop where we can specify a redirect route
 interface FileUploadProps {
   currentUser: null | LeanUser;
   currentNoteID: null | string;
@@ -36,6 +38,8 @@ export const FileUpload = ({
   const [localNote, setLocalNote] = useState<LeanNote | null>(null);
   const [inFlight, setFlightStatus] = useState(false);
   const [progressValue, updateProgress] = useState(0);
+
+  const router = useRouter();
 
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
@@ -95,6 +99,7 @@ export const FileUpload = ({
     setFlightStatus(true);
     updateProgress(7);
 
+    // TODO: Should we use this or delete it?
     const isNewNote = currentNoteID === null;
 
     // 1) Create all the File documents associated with that Note.
@@ -120,8 +125,7 @@ export const FileUpload = ({
         toastOptions
       );
 
-      // TODO: Redirect to a note edit page?
-      return;
+      router.push('/notes');
     }
 
     // 1a) If some of the File documents failed to be created, filter the acceptedFiles.
@@ -147,15 +151,13 @@ export const FileUpload = ({
         await handleFileDeletion(fileIDs);
       }
 
-      // TODO: Redirect to a note edit page?
-
       setFlightStatus(false);
       updateProgress(0);
       toast.error(
         'There was a problem trying to prep your files for uploading to the cloud. You can try uploading the files for your Note again later.',
         toastOptions
       );
-      return;
+      router.push('/notes');
     }
 
     if (presignPayloads.length !== currentFiles.length) {
@@ -220,13 +222,13 @@ export const FileUpload = ({
         break;
     }
 
-    // TODO: Possibly reset defaultTitle & setLocalNote to null or keep as is.
-
     setFlightStatus(false);
 
     setLocalNote(null);
 
     updateProgress(0);
+
+    router.push('/notes');
   };
 
   useEffect(() => {
@@ -327,6 +329,5 @@ export const FileUpload = ({
   - If you have multiple long format videos (> 15 minutes), it will take a long time to
     upload all the files to s3. Need feedback to tell user to wait.
 
-  - Should we delete the Note if all the processFile operations failed? 🤔
 
 */
