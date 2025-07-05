@@ -8,12 +8,14 @@ interface NumberNoteMainUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
+  currentNoteID: string;
 }
 
 export const EditNoteMainUI = ({
   currentUser,
   currentNote,
-  noteFiles
+  noteFiles,
+  currentNoteID
 }: NumberNoteMainUIProps): ReactNode => {
   console.log('currentUser in NumberNoteMainUI ', currentUser);
 
@@ -82,7 +84,7 @@ export const EditNoteMainUI = ({
         </p>
       </article>
 
-      <FileUpload currentUser={currentUser} currentNote={currentNote} />
+      <FileUpload currentUser={currentUser} currentNoteID={currentNoteID} />
     </main>
   );
 };

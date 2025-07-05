@@ -13,8 +13,6 @@ export default async function NoteEditPage({
 }): Promise<ReactNode> {
   const { noteID } = await params;
 
-  console.log('noteID in [noteID]/edit ', noteID);
-
   const currentNote = await getNoteByID(noteID);
 
   const currentUser = await getUserFromDB();
@@ -36,12 +34,13 @@ export default async function NoteEditPage({
     );
   }
 
-  if (currentUser && currentNote && files) {
+  if (currentUser && currentNote && files && noteID) {
     return (
       <EditNoteMainUI
         currentUser={currentUser}
         currentNote={currentNote}
         noteFiles={files}
+        currentNoteID={noteID}
       />
     );
   }

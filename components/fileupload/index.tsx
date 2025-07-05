@@ -11,6 +11,8 @@ interface FileUploadProps {
   currentNoteID: null | string;
 }
 
+// TODO: Fix resetting NoteForm when successful file upload occurs.
+
 export const FileUpload = ({
   currentUser,
   currentNoteID
