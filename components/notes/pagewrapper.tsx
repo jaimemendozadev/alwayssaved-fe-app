@@ -66,6 +66,7 @@ export const PageWrapper = ({
                   size="sm"
                   variant="ghost"
                   isIconOnly={true}
+                  aria-label="Delete"
                   onPress={() => handleNoteDeletion(noteDoc._id.toString())}
                 >
                   🗑️
