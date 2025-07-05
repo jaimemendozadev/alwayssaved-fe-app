@@ -6,6 +6,7 @@ import {
   useEffect,
   useState
 } from 'react';
+import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import { InputEvent } from '@/utils/ts';
 import { LeanNote, LeanUser } from '@/utils/mongodb';
@@ -16,11 +17,15 @@ import { createNoteDocument } from './utils';
 
 const feedbackDuration = { duration: 3000 };
 
+const getDefaultNoteTitle = () =>
+  `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+
+let defaultNoteTitle = '';
+
 interface NoteFormProps {
   currentUser: null | LeanUser;
   localNote: null | LeanNote;
   inFlight: boolean;
-  defaultTitle: string;
   setLocalNote: Dispatch<SetStateAction<LeanNote | null>>;
 }
 
@@ -28,8 +33,7 @@ export const NoteForm = ({
   currentUser,
   localNote,
   inFlight,
-  setLocalNote,
-  defaultTitle
+  setLocalNote
 }: NoteFormProps): ReactNode => {
   const [noteTitle, setNoteTitle] = useState('');
 
@@ -37,7 +41,7 @@ export const NoteForm = ({
     if (!setNoteTitle) return;
 
     if (evt?.type === 'focus') {
-      if (noteTitle === defaultTitle) {
+      if (noteTitle === defaultNoteTitle) {
         setNoteTitle('');
         return;
       }
@@ -45,7 +49,7 @@ export const NoteForm = ({
 
     if (evt?.type === 'blur') {
       if (noteTitle.length === 0) {
-        setNoteTitle(defaultTitle);
+        setNoteTitle(defaultNoteTitle);
         return;
       }
     }
@@ -81,7 +85,8 @@ export const NoteForm = ({
     if (localNote) {
       setNoteTitle(localNote.title);
     } else {
-      setNoteTitle(defaultTitle);
+      defaultNoteTitle = getDefaultNoteTitle();
+      setNoteTitle(defaultNoteTitle);
     }
   }, []);
 
