@@ -23,10 +23,7 @@ interface FileUploadProps {
   currentNoteID: null | string;
 }
 
-const feedbackDuration = { duration: 3000 };
-
-const basicErrorMsg =
-  'There was an error uploading your files, try again later.';
+const toastOptions = { duration: 3000 };
 
 const getDefaultNoteTitle = () =>
   `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
@@ -74,19 +71,27 @@ export const FileUpload = ({
 
       if (newNote) {
         setLocalNote(newNote);
-        toast.success('A new Note has been created. 🎉', feedbackDuration);
+        toast.success('A new Note has been created. 🎉', toastOptions);
         return;
       }
     }
 
     if (localNote) {
       await updateNoteByID(localNote?._id, { title: noteTitle });
-      toast.success('Your Note title has been updated. 👏🏼', feedbackDuration);
+      toast.success('Your Note title has been updated. 👏🏼', toastOptions);
     }
   };
 
   const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
-    if (!currentUser || !localNote) return;
+    if (!currentUser) return;
+
+    if (!localNote) {
+      toast.error(
+        'You must first create a Note before uploading files. Fill out and submit the form please. 🥺',
+        toastOptions
+      );
+      return;
+    }
 
     setFlightStatus(true);
     updateProgress(7);
@@ -108,17 +113,15 @@ export const FileUpload = ({
     );
     updateProgress(20);
 
-    // TODO: Should we still delete the localNote if it's a new note?
-
     if (createdFiles.length === 0) {
-      if (isNewNote) {
-        await handleNoteDeletion(localNote);
-        setLocalNote(null);
-      }
-
       setFlightStatus(false);
       updateProgress(0);
-      toast.error(basicErrorMsg, feedbackDuration);
+      toast.error(
+        'There was a problem uplading files for your Note. You can try uploading the files again later.',
+        toastOptions
+      );
+
+      // TODO: Redirect to a note edit page?
       return;
     }
 
@@ -126,8 +129,8 @@ export const FileUpload = ({
     if (createdFiles.length !== currentFiles.length) {
       currentFiles = filterCurrentFiles(currentFiles, createdFiles);
       toast.error(
-        'There was a problem uploading some of your files, try saving those files again later.',
-        feedbackDuration
+        'There was a problem uploading some of your files. Continuing with File upload process',
+        toastOptions
       );
     }
 
@@ -138,31 +141,29 @@ export const FileUpload = ({
 
     updateProgress(35);
 
-    // TODO: Should we still delete the localNote if it's a new note?
-
     // 2a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if (presignPayloads.length === 0) {
-      if (isNewNote) {
-        await handleNoteDeletion(localNote);
-        setLocalNote(null);
-      }
-
       if (createdFiles.length > 0) {
         const fileIDs = createdFiles.map((file) => file._id);
         await handleFileDeletion(fileIDs);
       }
 
+      // TODO: Redirect to a note edit page?
+
       setFlightStatus(false);
       updateProgress(0);
-      toast.error(basicErrorMsg, feedbackDuration);
+      toast.error(
+        'There was a problem trying to prep your files for uploading to the cloud. You can try uploading the files for your Note again later.',
+        toastOptions
+      );
       return;
     }
 
     if (presignPayloads.length !== currentFiles.length) {
       currentFiles = filterCurrentFiles(currentFiles, presignPayloads);
       toast.error(
-        'There was a problem uploading some of your files, try again later.',
-        feedbackDuration
+        'Not all of your files were prepped for uploading. Proceeding to upload remaining files.',
+        toastOptions
       );
     }
 
@@ -201,20 +202,21 @@ export const FileUpload = ({
       // TODO: Trigger Note and File deletions if there were no successful results.
       case 0:
         toast.error(
-          'There was a problem saving your files. Try again later.',
-          feedbackDuration
+          'There was a problem completing your File uploads to the cloud. You can try again later.',
+          toastOptions
         );
+        // TODO: Redirect to a note edit page?
         break;
       case currentFiles.length:
         toast.success(
-          'Your files were successfully uploaded.',
-          feedbackDuration
+          'Your files were successfully uploaded! 🥳',
+          toastOptions
         );
         break;
       default:
         toast.success(
-          'Some but not all your files were saved. Try saving those files again later.',
-          feedbackDuration
+          'There was a slight problem uploading some of your files to the cloud. 😬 Try uploading those files again later.',
+          toastOptions
         );
         break;
     }
