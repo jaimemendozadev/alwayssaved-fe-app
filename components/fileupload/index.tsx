@@ -37,8 +37,8 @@ export const FileUpload = ({
     <div className="w-[900px]">
       <NoteForm
         currentUser={currentUser}
-        currentNote={localNote}
-        setNoteState={setLocalNote}
+        localNote={localNote}
+        setLocalNote={setLocalNote}
         inFlight={inFlight}
       />
 

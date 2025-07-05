@@ -18,24 +18,24 @@ const feedbackDuration = { duration: 3000 };
 
 interface NoteFormProps {
   currentUser: null | LeanUser;
-  currentNote: null | LeanNote;
+  localNote: null | LeanNote;
   inFlight: boolean;
-  setNoteState: Dispatch<SetStateAction<LeanNote | null>>;
+  setLocalNote: Dispatch<SetStateAction<LeanNote | null>>;
 }
 
 export const NoteForm = ({
   currentUser,
-  currentNote,
+  localNote,
   inFlight,
-  setNoteState
+  setLocalNote
 }: NoteFormProps): ReactNode => {
   const [noteTitle, setNoteTitle] = useState(() =>
-    currentNote
-      ? currentNote.title
+    localNote
+      ? localNote.title
       : `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
   );
 
-  console.log('currentNote in NoteForm ', currentNote);
+  console.log('localNote in NoteForm ', localNote);
 
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
@@ -65,17 +65,17 @@ export const NoteForm = ({
 
     if (!currentUser) return;
 
-    if (!currentNote) {
+    if (!localNote) {
       const newNote = await createNoteDocument(currentUser._id, noteTitle);
 
       if (newNote) {
-        setNoteState(newNote);
+        setLocalNote(newNote);
         return;
       }
     }
 
-    if (currentNote) {
-      await updateNoteByID(currentNote?._id, { title: noteTitle });
+    if (localNote) {
+      await updateNoteByID(localNote?._id, { title: noteTitle });
     }
 
     // toast.success('Your Note title has been update.', feedbackDuration);
