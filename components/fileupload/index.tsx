@@ -85,11 +85,13 @@ export const FileUpload = ({
     }
   };
 
-  const handleUploadFlow = async <T extends File>(
-    acceptedFiles: T[],
-    isNewNote: boolean
-  ) => {
+  const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser || !localNote) return;
+
+    setFlightStatus(true);
+    updateProgress(7);
+
+    const isNewNote = currentNoteID === null;
 
     // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
@@ -226,17 +228,6 @@ export const FileUpload = ({
     updateProgress(0);
   };
 
-  const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
-    if (!currentUser || !localNote) return;
-
-    setFlightStatus(true);
-    updateProgress(7);
-
-    const isNewNote = currentNoteID === null;
-
-    await handleUploadFlow(acceptedFiles, isNewNote);
-  };
-
   useEffect(() => {
     async function getTargetNote(targetNoteID: string): Promise<void> {
       const foundNote = await getNoteByID(targetNoteID);
@@ -313,10 +304,7 @@ export const FileUpload = ({
         )}
       </div>
 
-      <Dropzone
-        disabled={inFlight}
-        onDrop={(acceptedFiles) => handleUpdateUpload(acceptedFiles)}
-      >
+      <Dropzone disabled={inFlight} onDrop={handleUpload}>
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
             <div {...getRootProps()}>
