@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { Progress } from '@heroui/react';
@@ -22,14 +22,16 @@ const feedbackDuration = { duration: 3000 };
 interface UploaderProps {
   currentUser: null | LeanUser;
   currentNote: null | LeanNote;
+  inFlight: boolean;
+  setFlightStatus: Dispatch<SetStateAction<boolean>>;
 }
 
 export const Uploader = ({
   currentUser,
-  currentNote
+  currentNote,
+  inFlight,
+  setFlightStatus
 }: UploaderProps): ReactNode => {
-  const [inFlight, setFlightStatus] = useState(false);
-
   const [progressValue, updateProgress] = useState(0);
 
   console.log('currentNote in Uploader ', currentNote);

@@ -42,7 +42,12 @@ export const FileUpload = ({
         inFlight={inFlight}
       />
 
-      <Uploader currentUser={currentUser} currentNote={localNote} />
+      <Uploader
+        currentUser={currentUser}
+        currentNote={localNote}
+        inFlight={inFlight}
+        setFlightStatus={setFlightStatus}
+      />
     </div>
   );
 };
