@@ -21,20 +21,22 @@ const feedbackDuration = { duration: 3000 };
 
 interface UploaderProps {
   currentUser: null | LeanUser;
-  currentNote: null | LeanNote;
+  localNote: null | LeanNote;
+  setLocalNote: Dispatch<SetStateAction<LeanNote | null>>;
   inFlight: boolean;
   setFlightStatus: Dispatch<SetStateAction<boolean>>;
 }
 
 export const Uploader = ({
   currentUser,
-  currentNote,
+  localNote,
+  setLocalNote,
   inFlight,
   setFlightStatus
 }: UploaderProps): ReactNode => {
   const [progressValue, updateProgress] = useState(0);
 
-  console.log('currentNote in Uploader ', currentNote);
+  console.log('localNote in Uploader ', localNote);
 
   const handleUploadFlow = async <T extends File>({
     acceptedFiles,
@@ -63,7 +65,10 @@ export const Uploader = ({
     updateProgress(20);
 
     if (createdFiles.length === 0) {
-      if (isNewNote) await handleNoteDeletion(targetNote);
+      if (isNewNote) {
+        await handleNoteDeletion(targetNote);
+        setLocalNote(null);
+      }
 
       setFlightStatus(false);
       updateProgress(0);
@@ -89,7 +94,10 @@ export const Uploader = ({
 
     // 3a) If some or all of the presignURLs failed to be created, take the appropriate steps.
     if (presignPayloads.length === 0) {
-      if (isNewNote) await handleNoteDeletion(targetNote);
+      if (isNewNote) {
+        await handleNoteDeletion(targetNote);
+        setLocalNote(null);
+      }
 
       if (createdFiles.length > 0) {
         const fileIDs = createdFiles.map((file) => file._id);
@@ -142,6 +150,7 @@ export const Uploader = ({
 
     // 5) Trigger user feedback toast message and reset local state.
     switch (successfulResults.length) {
+      // TODO: Trigger Note and File deletions if there were no successful results.
       case 0:
         toast.error(
           'There was a problem saving your files. Try again later.',
@@ -164,6 +173,8 @@ export const Uploader = ({
 
     setFlightStatus(false);
 
+    setLocalNote(null);
+
     updateProgress(0);
   };
 
@@ -184,6 +195,8 @@ export const Uploader = ({
       return;
     }
 
+    setLocalNote(newNote);
+
     updateProgress(13);
 
     await handleUploadFlow({
@@ -195,13 +208,13 @@ export const Uploader = ({
   };
 
   const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
-    if (!currentUser || !currentNote) return;
+    if (!currentUser || !localNote) return;
 
     // 1) Create a Note document.
     await handleUploadFlow({
       acceptedFiles,
       userId: currentUser._id,
-      targetNote: currentNote,
+      targetNote: localNote,
       isNewNote: false
     });
   };
@@ -227,7 +240,7 @@ export const Uploader = ({
       <Dropzone
         disabled={inFlight}
         onDrop={(acceptedFiles) =>
-          currentNote
+          localNote
             ? handleUpdateUpload(acceptedFiles)
             : handleNormalUpload(acceptedFiles)
         }

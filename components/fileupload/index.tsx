@@ -24,7 +24,12 @@ export const FileUpload = ({
 
       if (foundNote) {
         setLocalNote(foundNote);
+        return;
       }
+
+      throw new Error(
+        `Could not find the Note with noteID ${targetNoteID} to perform FileUpload update.`
+      );
     }
     if (currentNoteID) {
       getTargetNote(currentNoteID);
@@ -44,7 +49,8 @@ export const FileUpload = ({
 
       <Uploader
         currentUser={currentUser}
-        currentNote={localNote}
+        localNote={localNote}
+        setLocalNote={setLocalNote}
         inFlight={inFlight}
         setFlightStatus={setFlightStatus}
       />
