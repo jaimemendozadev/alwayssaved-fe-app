@@ -31,13 +31,12 @@ const basicErrorMsg =
 const getDefaultNoteTitle = () =>
   `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
 
-let defaultNoteTitle = ''; // TODO: set this in local state instead.
-
 export const FileUpload = ({
   currentUser,
   currentNoteID
 }: FileUploadProps): ReactNode => {
   const [noteTitle, setNoteTitle] = useState('');
+  const [defaultTitle, setDefaultTitle] = useState('');
   const [localNote, setLocalNote] = useState<LeanNote | null>(null);
   const [inFlight, setFlightStatus] = useState(false);
   const [progressValue, updateProgress] = useState(0);
@@ -46,7 +45,7 @@ export const FileUpload = ({
     if (!setNoteTitle) return;
 
     if (evt?.type === 'focus') {
-      if (noteTitle === defaultNoteTitle) {
+      if (noteTitle === defaultTitle) {
         setNoteTitle('');
         return;
       }
@@ -54,7 +53,7 @@ export const FileUpload = ({
 
     if (evt?.type === 'blur') {
       if (noteTitle.length === 0) {
-        setNoteTitle(defaultNoteTitle);
+        setNoteTitle(defaultTitle);
         return;
       }
     }
@@ -282,6 +281,7 @@ export const FileUpload = ({
 
       if (foundNote) {
         setNoteTitle(foundNote.title);
+        setDefaultTitle(foundNote.title);
         setLocalNote(foundNote);
         return;
       }
@@ -297,6 +297,7 @@ export const FileUpload = ({
 
       if (newNote) {
         setNoteTitle(newNoteTitle);
+        setDefaultTitle(newNoteTitle);
         setLocalNote(newNote);
       }
     }
