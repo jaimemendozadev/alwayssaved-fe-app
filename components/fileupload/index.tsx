@@ -1,30 +1,287 @@
 'use client';
 import { ReactNode, useState, useEffect } from 'react';
+import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
+import { Progress } from '@heroui/react';
+import Dropzone from 'react-dropzone';
+import { Button } from '@heroui/react';
 import { LeanNote, LeanUser } from '@/utils/mongodb';
-
-import { Uploader } from './uploader';
-import { NoteForm } from './noteform';
-import { getNoteByID } from '@/actions/schemamodels/notes';
+import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { getNoteByID, updateNoteByID } from '@/actions/schemamodels/notes';
+import {
+  filterCurrentFiles,
+  createNoteDocument,
+  createFileDocuments,
+  handleNoteDeletion,
+  handleFileDeletion,
+  handlePresignedUrls,
+  processFile
+} from '@/components/fileupload/utils';
 
 interface FileUploadProps {
   currentUser: null | LeanUser;
   currentNoteID: null | string;
 }
 
-// TODO: Fix resetting NoteForm when successful file upload occurs.
+const feedbackDuration = { duration: 3000 };
+
+const basicErrorMsg =
+  'There was an error uploading your files, try again later.';
+
+const getDefaultNoteTitle = () =>
+  `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+
+let defaultNoteTitle = '';
 
 export const FileUpload = ({
   currentUser,
   currentNoteID
 }: FileUploadProps): ReactNode => {
+  const [noteTitle, setNoteTitle] = useState('');
   const [localNote, setLocalNote] = useState<LeanNote | null>(null);
   const [inFlight, setFlightStatus] = useState(false);
+  const [progressValue, updateProgress] = useState(0);
+
+  const handleChange = (evt: InputEvent) => {
+    if (!setNoteTitle) return;
+
+    if (evt?.type === 'focus') {
+      if (noteTitle === defaultNoteTitle) {
+        setNoteTitle('');
+        return;
+      }
+    }
+
+    if (evt?.type === 'blur') {
+      if (noteTitle.length === 0) {
+        setNoteTitle(defaultNoteTitle);
+        return;
+      }
+    }
+
+    if (evt?.type === 'change') {
+      setNoteTitle(evt.target.value);
+      return;
+    }
+  };
+
+  const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
+    evt.preventDefault();
+
+    if (!currentUser) return;
+
+    if (!localNote) {
+      const newNote = await createNoteDocument(currentUser._id, noteTitle);
+
+      if (newNote) {
+        setLocalNote(newNote);
+        toast.success('A new Note has been created. 🎉', feedbackDuration);
+        return;
+      }
+    }
+
+    if (localNote) {
+      await updateNoteByID(localNote?._id, { title: noteTitle });
+      toast.success('Your Note title has been updated. 👏🏼', feedbackDuration);
+    }
+  };
+
+  const handleUploadFlow = async <T extends File>({
+    acceptedFiles,
+    userId,
+    targetNote,
+    isNewNote
+  }: {
+    acceptedFiles: T[];
+    userId: string;
+    targetNote: LeanNote;
+    isNewNote: boolean;
+  }) => {
+    // 2) Create all the File documents associated with that Note.
+    let currentFiles = [...acceptedFiles];
+
+    const fileInfoArray = currentFiles.map((file) => ({
+      name: file.name,
+      type: file.type
+    }));
+
+    const createdFiles = await createFileDocuments(
+      fileInfoArray,
+      userId,
+      targetNote._id
+    );
+    updateProgress(20);
+
+    if (createdFiles.length === 0) {
+      if (isNewNote) {
+        await handleNoteDeletion(targetNote);
+        setLocalNote(null);
+      }
+
+      setFlightStatus(false);
+      updateProgress(0);
+      toast.error(basicErrorMsg, feedbackDuration);
+      return;
+    }
+
+    // 2a) If some of the File documents failed to be created, filter the acceptedFiles.
+    if (createdFiles.length !== currentFiles.length) {
+      currentFiles = filterCurrentFiles(currentFiles, createdFiles);
+      toast.error(
+        'There was a problem uploading some of your files, try saving those files again later.',
+        feedbackDuration
+      );
+    }
+
+    updateProgress(32);
+
+    // 3) Create the presignUrls for each File document.
+    const presignPayloads = await handlePresignedUrls(createdFiles);
+
+    updateProgress(35);
+
+    // 3a) If some or all of the presignURLs failed to be created, take the appropriate steps.
+    if (presignPayloads.length === 0) {
+      if (isNewNote) {
+        await handleNoteDeletion(targetNote);
+        setLocalNote(null);
+      }
+
+      if (createdFiles.length > 0) {
+        const fileIDs = createdFiles.map((file) => file._id);
+        await handleFileDeletion(fileIDs);
+      }
+
+      setFlightStatus(false);
+      updateProgress(0);
+      toast.error(basicErrorMsg, feedbackDuration);
+      return;
+    }
+
+    if (presignPayloads.length !== currentFiles.length) {
+      currentFiles = filterCurrentFiles(currentFiles, presignPayloads);
+      toast.error(
+        'There was a problem uploading some of your files, try again later.',
+        feedbackDuration
+      );
+    }
+
+    updateProgress(38);
+
+    /*
+      4) Upload each media file to s3, update the File document with the
+         s3_key in the database, send SQS message to the Extractor Queue. 
+    */
+
+    const uploadResults = await Promise.allSettled(
+      currentFiles.map(async (file) => {
+        const [targetPayload] = presignPayloads.filter(
+          (s3Payload) => s3Payload.file_name === file.name
+        );
+        return await processFile(file, targetPayload);
+      })
+    );
+
+    updateProgress(75);
+
+    uploadResults.forEach((result) => {
+      if (result.status === 'rejected') {
+        // TODO: Handle in telemetry.
+        console.error('Uploading file to s3 failed: ', result.reason);
+      }
+    });
+
+    const successfulResults = uploadResults.filter(
+      (r) => r.status === 'fulfilled'
+    );
+    updateProgress(100);
+
+    // 5) Trigger user feedback toast message and reset local state.
+    switch (successfulResults.length) {
+      // TODO: Trigger Note and File deletions if there were no successful results.
+      case 0:
+        toast.error(
+          'There was a problem saving your files. Try again later.',
+          feedbackDuration
+        );
+        break;
+      case currentFiles.length:
+        toast.success(
+          'Your files were successfully uploaded.',
+          feedbackDuration
+        );
+        break;
+      default:
+        toast.success(
+          'Some but not all your files were saved. Try saving those files again later.',
+          feedbackDuration
+        );
+        break;
+    }
+
+    setFlightStatus(false);
+
+    setLocalNote(null);
+
+    updateProgress(0);
+  };
+
+  const handleNormalUpload = async <T extends File>(acceptedFiles: T[]) => {
+    if (!currentUser) return;
+
+    setFlightStatus(true);
+    updateProgress(3);
+
+    // 1) Create a Note document.
+    const newNoteTitle = `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+    const newNote = await createNoteDocument(currentUser._id, newNoteTitle);
+
+    if (!newNote) {
+      setFlightStatus(false);
+      updateProgress(0);
+      toast.error(basicErrorMsg, feedbackDuration);
+      return;
+    }
+
+    setLocalNote(newNote);
+
+    updateProgress(13);
+
+    await handleUploadFlow({
+      acceptedFiles,
+      userId: currentUser._id,
+      targetNote: newNote,
+      isNewNote: true
+    });
+  };
+
+  const handleUpdateUpload = async <T extends File>(acceptedFiles: T[]) => {
+    if (!currentUser || !localNote) return;
+
+    setFlightStatus(true);
+    updateProgress(7);
+
+    /*
+      1) There is the possibility a Note was created in the sibling NoteForm.
+         currenteNoteID with a null value explicitly states that indeed
+         the localNote was just created in the sibling NoteForm and
+         should be deleted from the database on failure or deleted from
+         localNote state if the Files upload successfully.
+    */
+    await handleUploadFlow({
+      acceptedFiles,
+      userId: currentUser._id,
+      targetNote: localNote,
+      isNewNote: currentNoteID === null
+    });
+  };
 
   useEffect(() => {
     async function getTargetNote(targetNoteID: string): Promise<void> {
       const foundNote = await getNoteByID(targetNoteID);
 
       if (foundNote) {
+        setNoteTitle(foundNote.title);
         setLocalNote(foundNote);
         return;
       }
@@ -35,6 +292,9 @@ export const FileUpload = ({
     }
     if (currentNoteID) {
       getTargetNote(currentNoteID);
+    } else {
+      defaultNoteTitle = getDefaultNoteTitle();
+      setNoteTitle(defaultNoteTitle);
     }
   }, [currentNoteID]);
 
@@ -42,21 +302,58 @@ export const FileUpload = ({
 
   return (
     <div className="w-[900px]">
-      <NoteForm
-        currentUser={currentUser}
-        localNote={localNote}
-        setLocalNote={setLocalNote}
-        inFlight={inFlight}
-      />
+      <form onSubmit={handleSubmit} className="mb-8 border-2 p-4">
+        <div className="flex items-end">
+          <label htmlFor="noteTitle" className="text-lg min-w-[400px]">
+            <span className="font-bold">Note Name</span>:<br />
+            <input
+              className="w-[100%] p-1"
+              onBlur={handleChange}
+              onFocus={handleChange}
+              onChange={handleChange}
+              id="noteTitle"
+              value={noteTitle}
+              disabled={inFlight}
+            />
+          </label>
 
-      <Uploader
-        currentUser={currentUser}
-        currentNoteID={currentNoteID}
-        localNote={localNote}
-        setLocalNote={setLocalNote}
-        inFlight={inFlight}
-        setFlightStatus={setFlightStatus}
-      />
+          <Button className="ml-4" onPress={() => console.log('BUTTON PRESS')}>
+            Submit
+          </Button>
+        </div>
+      </form>
+
+      <div className="flex min-h-24 justify-center">
+        {inFlight && (
+          <Progress
+            aria-label="Uploading..."
+            label="Uploading..."
+            className="max-w-md"
+            color="success"
+            showValueLabel={true}
+            size="md"
+            value={progressValue}
+          />
+        )}
+      </div>
+
+      <Dropzone
+        disabled={inFlight}
+        onDrop={(acceptedFiles) =>
+          localNote
+            ? handleUpdateUpload(acceptedFiles)
+            : handleNormalUpload(acceptedFiles)
+        }
+      >
+        {({ getRootProps, getInputProps }) => (
+          <section className="border-4 border-dashed p-10">
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <p>Drag and drop some files here, or click to select files</p>
+            </div>
+          </section>
+        )}
+      </Dropzone>
     </div>
   );
 };
