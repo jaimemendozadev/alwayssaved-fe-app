@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { Button, Tooltip, useDisclosure } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
-import { purgeFileByID } from '@/actions/notes';
+import { purgeFileByID } from '@/actions/schemamodels/files';
 import { DeleteNoteModal } from '@/components/deletenotemodal';
 
 interface NumberNoteMainUIProps {
