@@ -128,6 +128,7 @@ export const FileUpload = ({
 
       if (routerCallback) {
         routerCallback();
+        return;
       }
 
       router.push('/notes');
@@ -165,6 +166,7 @@ export const FileUpload = ({
 
       if (routerCallback) {
         routerCallback();
+        return;
       }
 
       router.push('/notes');
@@ -240,6 +242,7 @@ export const FileUpload = ({
 
     if (routerCallback) {
       routerCallback();
+      return;
     }
 
     router.push('/notes');
