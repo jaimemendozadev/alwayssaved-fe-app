@@ -29,11 +29,12 @@ interface SpecifiedNoteFields {
 }
 
 interface SearchNoteFields {
-  _id?: mongoose.Types.ObjectId;
-  user_id?: mongoose.Types.ObjectId;
-  title?: string;
+  _id?: unknown;
+  user_id?: unknown;
+  title?: unknown;
   date_created?: unknown;
   date_deleted?: unknown;
+  files?: unknown;
 }
 
 export const getNotesByFields = async (

@@ -2,9 +2,9 @@
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { EditNoteMainUI } from '@/components/[noteID]';
-import { getNoteByID } from '@/actions/schemamodels/notes';
+import { getNotesByFields } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
-import { getObjectIDFromString } from '@/utils/mongodb';
+import { getObjectIDFromString, LeanNote } from '@/utils/mongodb';
 
 export default async function NoteEditPage({
   params
@@ -13,9 +13,26 @@ export default async function NoteEditPage({
 }): Promise<ReactNode> {
   const { noteID } = await params;
 
-  const currentNote = await getNoteByID(noteID);
-
   const currentUser = await getUserFromDB();
+
+  let currentNote: LeanNote | undefined = undefined;
+
+  if (currentUser) {
+    [currentNote] = await getNotesByFields(
+      {
+        user_id: getObjectIDFromString(currentUser._id),
+        date_deleted: { $eq: null }
+      },
+      {
+        _id: 1,
+        title: 1
+      }
+    );
+  }
+
+  if (!currentNote) {
+    throw new Error("You're trying to edit a Note that has been deleted.");
+  }
 
   let files = null;
 
