@@ -31,17 +31,7 @@ export const EditNoteMainUI = ({
   };
 
   const handleFileDeletion = async (fileID: string): Promise<void> => {
-    await purgeFileByID(fileID);
-    /*
-    - TODO:
-      - First delete file in s3
-      - Second, delete document in DB.    
- 
-    toast.success('Your file has been successfully deleted. 👌🏽', toastOptions);
-    router.refresh();
-
-
-    */
+    await purgeFileByID(fileID, currentNoteID);
   };
 
   const noteID = currentNote._id.toString();

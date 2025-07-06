@@ -93,9 +93,10 @@ export const deleteNoteByID = async (noteID: string): Promise<LeanNote> => {
     the date_deleted property. In a separate async job,
     a proper Note deletion will involve:
 
-    - Deleting all Note's Files from s3.
-    - Deleting all the Vector points in Vector DB.
-    - Deleting all the attached Note's File DB documents.
+    - Getting all the Note's File DB references in NoteModel.files[].
+      - Deleting all Note's Files from s3.
+      - Deleting all the Vector points in Vector DB.
+      - Deleting File DB document.
     - Deleting the Note DB document.
 
 

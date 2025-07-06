@@ -5,7 +5,8 @@ import {
   deepLean,
   FileModel,
   getObjectIDFromString,
-  LeanFile
+  LeanFile,
+  NoteModel
 } from '@/utils/mongodb';
 
 export const getFilesByNoteID = async (
@@ -54,27 +55,41 @@ export const matchProjectFiles = async (
   return deepLean(foundNotes);
 };
 
-export const purgeFileByID = async (fileID: string): Promise<void> => {
-  const convertedID = getObjectIDFromString(fileID);
+export const purgeFileByID = async (
+  fileID: string,
+  noteID: string
+): Promise<void> => {
+  const convertedFileID = getObjectIDFromString(fileID);
+  const convertedNoteID = getObjectIDFromString(noteID);
 
-  const foundFile = await FileModel.findById(convertedID).exec();
+  const foundNote = await NoteModel.findById(convertedNoteID).exec();
+
+  const foundFile = await FileModel.findById(convertedFileID).exec();
+
+  if (!foundNote || !foundFile) {
+    throw new Error(`Can Perform File deletion for File `);
+  }
+
+  // 1) Deleting all the File's Vector points in Vector DB.
 
   console.log('foundFile in purgeFileByID ', foundFile);
 
-  if (foundFile) {
-    const { s3_key } = foundFile;
+  // 2) Deletes the File in s3.
+  const { s3_key } = foundFile;
 
-    const s3Result = await deleteFileFromS3(s3_key);
+  const s3Result = await deleteFileFromS3(s3_key);
 
-    console.log('s3Result in purgeFileByID ', s3Result);
-    console.log('\n');
+  console.log('s3Result in purgeFileByID ', s3Result);
+  console.log('\n');
 
-    if (s3Result && s3Result.$metadata) {
-      const statusCode = s3Result.$metadata.httpStatusCode;
+  if (s3Result && s3Result.$metadata) {
+    const statusCode = s3Result.$metadata.httpStatusCode;
 
-      if (statusCode === 204) {
-        await FileModel.findByIdAndDelete(convertedID).exec();
-      }
+    // 3) Updates target Note by deleting File.id references from NoteModel.files[].
+
+    // 4) Delete the File DB document.
+    if (statusCode === 204) {
+      await FileModel.findByIdAndDelete(convertedFileID).exec();
     }
   }
 };
