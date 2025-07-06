@@ -1,7 +1,7 @@
 export * from './schemamodels/users';
 export * from './schemamodels/files';
 export * from './schemamodels/notes';
-export * from './utils'
+export * from './utils';
 
 import mongoose from 'mongoose';
 
@@ -32,6 +32,7 @@ export async function dbConnect() {
         bufferCommands: false
       };
 
+      // TODO: May have to refactor and fetch env variables with get ssm getSecret()
       const {
         MONGO_DB_USER,
         MONGO_DB_PASSWORD,
@@ -66,15 +67,14 @@ export async function dbConnect() {
     cached.conn = await cached.promise;
   } catch (e) {
     // TODO: Handle in telemetry. Also handle error thrown in catch block in Next.js error page.
-    console.log("Error creating/getting DB connection: ", e);
-    console.log("\n");
+    console.log('Error creating/getting DB connection: ', e);
+    console.log('\n');
     cached.promise = null;
     throw new Error('There was a problem with the database. Try again later.');
   }
 
   return cached.conn;
 }
-
 
 /***************************
   Notes

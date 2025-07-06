@@ -17,6 +17,7 @@
     "@aws-sdk/s3-request-presigner": "^3.817.0",
     "@clerk/nextjs": "^6.20.0",
     "@heroui/react": "^2.7.9",
+    "@qdrant/js-client-rest": "^1.14.1",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.16.0",
     "mongoose": "^8.15.0",
