@@ -1,5 +1,7 @@
 'use client';
 import { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 interface NumberNoteMainUIProps {
@@ -15,6 +17,9 @@ export const NumberNoteMainUI = ({
 }: NumberNoteMainUIProps): ReactNode => {
   console.log('currentUser in NumberNoteMainUI ', currentUser);
 
+  const router = useRouter();
+  const editURL = `${currentNote._id.toString()}/edit`;
+
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
@@ -22,12 +27,9 @@ export const NumberNoteMainUI = ({
       </h1>
 
       <p className="mb-14">
-        <Link
-          className="hover:underline underline-offset-4 text-xl"
-          href={`${currentNote._id.toString()}/edit`}
-        >
+        <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
           ✍🏼 Edit Note
-        </Link>
+        </Button>
       </p>
 
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
