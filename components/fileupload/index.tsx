@@ -71,6 +71,8 @@ export const FileUpload = ({
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
+    console.log('INSIIIIIDE handleSubmit');
+
     if (!currentUser) return;
 
     if (!localNote) {
@@ -79,15 +81,25 @@ export const FileUpload = ({
       if (newNote) {
         setLocalNote(newNote);
         toast.success('A new Note has been created. 🎉', toastOptions);
-        router.refresh(); // TODO: Verify how this works in a /notes/[noteID]/edit page & on /home page
+
+        // TODO: Maybe we shouldn't refresh if the currentNoteID is null
+        router.refresh();
         return;
       }
+
+      // TODO: Should we throw an error here if we fail to create a new note?
     }
 
     if (localNote) {
       await updateNoteByID(localNote?._id, { title: noteTitle });
       toast.success('Your Note title has been updated. 👏🏼', toastOptions);
-      router.refresh(); // TODO: Verify how this works in a /notes/[noteID]/edit page & on /home page
+
+      /*
+        TODO: 
+          - Verify how this works in a /notes/[noteID]/edit page & on /home page
+          - Maybe we shouldn't refresh if the currentNoteID is null
+      */
+      router.refresh();
       return;
     }
   };
@@ -300,7 +312,7 @@ export const FileUpload = ({
             />
           </label>
 
-          <Button className="ml-4" onPress={() => console.log('BUTTON PRESS')}>
+          <Button size="md" variant="ghost" type="submit" className="ml-4">
             Submit
           </Button>
         </div>
