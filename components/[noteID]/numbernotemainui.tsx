@@ -32,7 +32,7 @@ export const NumberNoteMainUI = ({
 
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
 
-      {noteFiles.length > 0 && (
+      {noteFiles.length > 0 ? (
         <ul className="space-y-4 mb-20">
           {noteFiles.map((fileDoc) => (
             <li key={fileDoc._id} className="border p-5">
@@ -43,9 +43,21 @@ export const NumberNoteMainUI = ({
             </li>
           ))}
         </ul>
+      ) : (
+        <div>
+          <p className="text-xl mb-1">
+            You have no files attached to this Note. 😔
+          </p>
+          <p className="text-xl mb-20">
+            You can add files to the note by clicking on the 👆🏽 above
+            &ldquo;Edit Your Note&rdquo; link.
+          </p>
+        </div>
       )}
 
-      <h3 className="text-2xl lg:text-3xl">LLM Chat Placeholder</h3>
+      {noteFiles.length > 0 && (
+        <h3 className="text-2xl lg:text-3xl">LLM Chat Placeholder</h3>
+      )}
     </main>
   );
 };
