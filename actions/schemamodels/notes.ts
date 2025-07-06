@@ -58,16 +58,35 @@ export const updateNoteByID = async (
   );
 };
 
-export const deleteNoteByID = async (noteID: string): Promise<void> => {
-  try {
-    const _id = getObjectIDFromString(noteID);
+// See Dev Notes below.
+export const deleteNoteByID = async (noteID: string): Promise<LeanNote> => {
+  const _id = getObjectIDFromString(noteID);
 
-    await NoteModel.findOneAndDelete({ _id }).exec();
-  } catch (error) {
-    // TODO: Handle in telemetry.
-    console.log(
-      `Error in deleteNoteByID for Note with ID of ${noteID}:`,
-      error
-    );
-  }
+  const deleteDate = new Date();
+
+  const deleteUpdate = await NoteModel.findOneAndUpdate(
+    _id,
+    { date_deleted: deleteDate },
+    { returnDocument: 'after' }
+  ).exec();
+
+  console.log('deleteUpdate in deleteNoteByID ', deleteUpdate);
+
+  return deepLean(deleteUpdate);
 };
+
+/********************************************
+ * Notes
+ ********************************************
+
+ 1) For MVP v1, deleteNoteByID "deletes" a Note by updating
+    the date_deleted property. In a separate async job,
+    a proper Note deletion will involve:
+
+    - Deleting all Note's Files from s3.
+    - Deleting all the Vector points in Vector DB.
+    - Deleting all the attached Note's File DB documents.
+    - Deleting the Note DB document.
+
+
+ */
