@@ -23,8 +23,6 @@ export const EditNoteMainUI = ({
   noteFiles,
   currentNoteID
 }: NumberNoteMainUIProps): ReactNode => {
-  console.log('currentUser in NumberNoteMainUI ', currentUser);
-
   const router = useRouter();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 

@@ -14,8 +14,6 @@ export const NumberNoteMainUI = ({
   currentNote,
   noteFiles
 }: NumberNoteMainUIProps): ReactNode => {
-  console.log('currentUser in NumberNoteMainUI ', currentUser);
-
   const router = useRouter();
   const editURL = `${currentNote._id.toString()}/edit`;
 
