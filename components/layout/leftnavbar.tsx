@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
+import { SignOutButton } from '@clerk/nextjs';
 
 export const LeftNavbar = (): ReactNode => {
   return (
@@ -14,6 +15,12 @@ export const LeftNavbar = (): ReactNode => {
         <p className="text-[#919191] font-semibold mb-2">
           <Link href="/notes">📝 Notes</Link>
         </p>
+      </div>
+
+      <div className="min-w-28 p-5">
+        <div className="text-[#919191] font-semibold mb-2">
+          <SignOutButton />
+        </div>
       </div>
     </div>
   );
