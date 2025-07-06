@@ -24,10 +24,10 @@ interface FileUploadProps {
   routerCallback?: () => void;
 }
 
-const toastOptions = { duration: 3000 };
+const toastOptions = { duration: 6000 };
 
 const getDefaultNoteTitle = () =>
-  `Untitled Note - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+  `Enter a New Note Title - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
 
 export const FileUpload = ({
   currentUser,
@@ -41,6 +41,9 @@ export const FileUpload = ({
   const [progressValue, updateProgress] = useState(0);
 
   const router = useRouter();
+
+  console.log('localNote in FileUpload ', localNote);
+  console.log('\n');
 
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
@@ -76,6 +79,7 @@ export const FileUpload = ({
       if (newNote) {
         setLocalNote(newNote);
         toast.success('A new Note has been created. 🎉', toastOptions);
+        router.refresh(); // TODO: Verify how this works in a /notes/[noteID]/edit page & on /home page
         return;
       }
     }
@@ -83,6 +87,8 @@ export const FileUpload = ({
     if (localNote) {
       await updateNoteByID(localNote?._id, { title: noteTitle });
       toast.success('Your Note title has been updated. 👏🏼', toastOptions);
+      router.refresh(); // TODO: Verify how this works in a /notes/[noteID]/edit page & on /home page
+      return;
     }
   };
 
@@ -264,24 +270,14 @@ export const FileUpload = ({
       );
     }
 
-    async function createNewLocalNote(targetUser: LeanUser) {
-      const newNoteTitle = getDefaultNoteTitle();
-      const newNote = await createNoteDocument(targetUser._id, newNoteTitle);
-
-      if (newNote) {
-        setNoteTitle(newNoteTitle);
-        setDefaultTitle(newNoteTitle);
-        setLocalNote(newNote);
-      }
-    }
-
     if (currentUser) {
       if (currentNoteID) {
         getTargetNote(currentNoteID);
         return;
       }
-
-      createNewLocalNote(currentUser);
+      const defaultTitle = getDefaultNoteTitle();
+      setNoteTitle(defaultTitle);
+      setDefaultTitle(defaultTitle);
     }
   }, [currentNoteID, currentUser]);
 
@@ -292,7 +288,7 @@ export const FileUpload = ({
       <form onSubmit={handleSubmit} className="mb-8 border-2 p-4">
         <div className="flex items-end">
           <label htmlFor="noteTitle" className="text-lg min-w-[400px]">
-            <span className="font-bold">Note Name</span>:<br />
+            <span className="font-bold">Note Title</span>:<br />
             <input
               className="w-[100%] p-1"
               onBlur={handleChange}
