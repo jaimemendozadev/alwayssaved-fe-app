@@ -13,7 +13,7 @@ interface PageWrapperProps {
   currentUser: LeanUser;
 }
 
-const toastOptions = { duration: 3000 };
+const toastOptions = { duration: 6000 };
 
 export const PageWrapper = ({
   userNotes,
@@ -22,9 +22,20 @@ export const PageWrapper = ({
   const router = useRouter();
 
   const handleNoteDeletion = async (noteID: string): Promise<void> => {
-    await deleteNoteByID(noteID);
-    toast.success('Your note has been successfully deleted. 👌🏽', toastOptions);
-    router.refresh();
+    const delRes = await deleteNoteByID(noteID);
+    if (delRes) {
+      toast.success(
+        'Your note has been successfully deleted. 👌🏽',
+        toastOptions
+      );
+      router.refresh();
+      return;
+    }
+
+    toast.error(
+      'There was a problem deleting your Note. Try again later. 😬',
+      toastOptions
+    );
   };
 
   if (!currentUser) return null;
@@ -73,7 +84,9 @@ export const PageWrapper = ({
                     variant="ghost"
                     isIconOnly={true}
                     aria-label="Delete"
-                    onPress={() => handleNoteDeletion(noteDoc._id.toString())}
+                    onPress={async () =>
+                      await handleNoteDeletion(noteDoc._id.toString())
+                    }
                   >
                     🗑️
                   </Button>

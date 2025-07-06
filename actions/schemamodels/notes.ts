@@ -1,4 +1,5 @@
 'use server';
+import mongoose from 'mongoose';
 import {
   deepLean,
   getObjectIDFromString,
@@ -27,13 +28,21 @@ interface SpecifiedNoteFields {
   files?: number;
 }
 
+interface SearchNoteFields {
+  _id?: mongoose.Types.ObjectId;
+  user_id?: mongoose.Types.ObjectId;
+  title?: string;
+  date_created?: Date;
+  date_deleted?: Date | null;
+}
+
 export const getNotesByFields = async (
-  userID: string,
+  searchParams: SearchNoteFields,
   docFields: SpecifiedNoteFields,
   sortByDate: boolean = false
 ): Promise<LeanNote[]> => {
   const pipeline: PipelineStage[] = [
-    { $match: { user_id: getObjectIDFromString(userID) } },
+    { $match: searchParams },
     { $project: docFields }
   ];
 
