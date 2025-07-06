@@ -20,16 +20,7 @@ export const DeleteNoteModal = ({
   isOpen,
   onOpenChange
 }: DeleteNoteModalProps): ReactNode => {
-  const handleNoteDeletion = async (noteID: string): Promise<void> => {
-    /*
-    - TODO:
-      - First collect all the Note Files.
-      - Second, delete all the Files in s3.
-      - Third, delete all the File documents in DB.
-      - Finally, delete the Note document in DB.    
- 
-    */
-  };
+  const handleNoteDeletion = async (targetID: string): Promise<void> => {};
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -37,11 +28,10 @@ export const DeleteNoteModal = ({
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Modal Title
+              WARNING: You&#39;re about to delete your Note. 😱
             </ModalHeader>
             <ModalBody>
-              <p>You&#39;re about to delete your Note. 😱</p>
-              <p>Are you sure you want to delete it? 🤔</p>
+              <p>Are you sure you want to delete your Note? 🤔</p>
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>
