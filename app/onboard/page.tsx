@@ -7,7 +7,7 @@ import { LeanUser } from '@/utils/mongodb';
 import { registerNewUser } from '@/actions/onboard';
 const successMessage = "Yay! 🥳 You've been registered to AlwaysSaved. Welcome aboard! 👋🏼";
 const errorMessage = "Whoops! 😱 Looks like there was a problem registering you to AlwaysSaved. 🤦🏽 Try again later.";
-const duration = { duration: 5000 };
+const duration = { duration: 6000 };
 
 export default function OnboardPage(): ReactNode {
 

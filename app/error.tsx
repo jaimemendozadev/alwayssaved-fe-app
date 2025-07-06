@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 import toast from 'react-hot-toast';
 
 
-const duration = { duration: 5000 };
+const duration = { duration: 6000 };
 const toastMessage = "Something went wrong. 🥺 You'll be redirected to the landing page in a few seconds."
 export default function LandingErrorPage({
   error,
