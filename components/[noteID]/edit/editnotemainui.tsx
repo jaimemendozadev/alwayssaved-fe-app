@@ -6,6 +6,8 @@ import { Button, Tooltip } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
 
+import { purgeFileByID } from '@/actions/notes';
+
 interface NumberNoteMainUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
@@ -30,6 +32,7 @@ export const EditNoteMainUI = ({
   };
 
   const handleFileDeletion = async (fileID: string): Promise<void> => {
+    await purgeFileByID(fileID);
     /*
     - TODO:
       - First delete file in s3
