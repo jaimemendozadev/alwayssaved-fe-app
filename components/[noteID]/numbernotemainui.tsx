@@ -44,6 +44,8 @@ export const NumberNoteMainUI = ({
           ))}
         </ul>
       )}
+
+      <h3 className="text-2xl lg:text-3xl">LLM Chat Placeholder</h3>
     </main>
   );
 };

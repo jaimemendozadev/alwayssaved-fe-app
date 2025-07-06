@@ -35,7 +35,7 @@ export const PageWrapper = ({
         📝 {currentUser?.first_name}&#39;s Notes
       </h1>
 
-      {userNotes.length === 0 && (
+      {userNotes.length === 0 ? (
         <p className="text-2xl">
           You have no notes saved in the app. Go upload some files and{' '}
           <Link
@@ -45,6 +45,11 @@ export const PageWrapper = ({
             create a new note
           </Link>
           .
+        </p>
+      ) : (
+        <p className="text-2xl mb-16">
+          Click on a Note link to view the Files attached to the Note and to
+          chat with the LLM about your note files. 🤖
         </p>
       )}
       {userNotes.length > 0 && (
