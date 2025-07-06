@@ -18,10 +18,10 @@ import {
   processFile
 } from '@/components/fileupload/utils';
 
-// TODO: Add an optional prop where we can specify a redirect route
 interface FileUploadProps {
   currentUser: null | LeanUser;
   currentNoteID: null | string;
+  routerCallback?: () => void;
 }
 
 const toastOptions = { duration: 3000 };
@@ -31,7 +31,8 @@ const getDefaultNoteTitle = () =>
 
 export const FileUpload = ({
   currentUser,
-  currentNoteID
+  currentNoteID,
+  routerCallback
 }: FileUploadProps): ReactNode => {
   const [noteTitle, setNoteTitle] = useState('');
   const [defaultTitle, setDefaultTitle] = useState('');
@@ -125,6 +126,10 @@ export const FileUpload = ({
         toastOptions
       );
 
+      if (routerCallback) {
+        routerCallback();
+      }
+
       router.push('/notes');
     }
 
@@ -157,6 +162,11 @@ export const FileUpload = ({
         'There was a problem trying to prep your files for uploading to the cloud. You can try uploading the files for your Note again later.',
         toastOptions
       );
+
+      if (routerCallback) {
+        routerCallback();
+      }
+
       router.push('/notes');
     }
 
@@ -227,6 +237,10 @@ export const FileUpload = ({
     setLocalNote(null);
 
     updateProgress(0);
+
+    if (routerCallback) {
+      routerCallback();
+    }
 
     router.push('/notes');
   };

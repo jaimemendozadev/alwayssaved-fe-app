@@ -1,5 +1,6 @@
 'use client';
 import { ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
@@ -19,8 +20,14 @@ export const EditNoteMainUI = ({
 }: NumberNoteMainUIProps): ReactNode => {
   console.log('currentUser in NumberNoteMainUI ', currentUser);
 
+  const router = useRouter();
+
+  const handleRedirect = () => {
+    router.refresh();
+  };
+
   return (
-    <main className="p-6 w-[85%]">
+    <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
         Note Page for: {currentNote?.title}
       </h1>
@@ -28,7 +35,7 @@ export const EditNoteMainUI = ({
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
 
       {noteFiles.length === 0 && (
-        <p className="text-xl">
+        <p className="text-xl mb-16">
           You have no files attached to this Note. You can add files to the note
           in the dropdown below.
         </p>
@@ -84,7 +91,11 @@ export const EditNoteMainUI = ({
         </p>
       </article>
 
-      <FileUpload currentUser={currentUser} currentNoteID={currentNoteID} />
-    </main>
+      <FileUpload
+        currentUser={currentUser}
+        currentNoteID={currentNoteID}
+        routerCallback={handleRedirect}
+      />
+    </div>
   );
 };
