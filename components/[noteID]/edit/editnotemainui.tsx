@@ -2,11 +2,11 @@
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Button, Tooltip } from '@heroui/react';
+import { Button, Tooltip, useDisclosure } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
-
 import { purgeFileByID } from '@/actions/notes';
+import { DeleteNoteModal } from '@/components/deletenotemodal';
 
 interface NumberNoteMainUIProps {
   currentUser: LeanUser;
@@ -26,6 +26,7 @@ export const EditNoteMainUI = ({
   console.log('currentUser in NumberNoteMainUI ', currentUser);
 
   const router = useRouter();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const handleRedirect = () => {
     router.refresh();
@@ -45,11 +46,25 @@ export const EditNoteMainUI = ({
     */
   };
 
+  const noteID = currentNote._id.toString();
+
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
         Note Page for: {currentNote?.title}
       </h1>
+
+      <div className="mb-14">
+        <Button onPress={onOpen} color="danger" size="md" variant="ghost">
+          Delete Note
+        </Button>
+      </div>
+
+      <DeleteNoteModal
+        noteID={noteID}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      />
 
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
 
