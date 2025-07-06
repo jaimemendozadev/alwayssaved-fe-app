@@ -1,7 +1,8 @@
 'use client';
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@heroui/react';
+import toast from 'react-hot-toast';
+import { Button, Tooltip } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
 
@@ -11,6 +12,8 @@ interface NumberNoteMainUIProps {
   noteFiles: LeanFile[];
   currentNoteID: string;
 }
+
+const toastOptions = { duration: 6000 };
 
 export const EditNoteMainUI = ({
   currentUser,
@@ -24,6 +27,19 @@ export const EditNoteMainUI = ({
 
   const handleRedirect = () => {
     router.refresh();
+  };
+
+  const handleFileDeletion = async (fileID: string): Promise<void> => {
+    /*
+    - TODO:
+      - First delete file in s3
+      - Second, delete document in DB.    
+ 
+    toast.success('Your file has been successfully deleted. 👌🏽', toastOptions);
+    router.refresh();
+
+
+    */
   };
 
   return (
@@ -42,23 +58,24 @@ export const EditNoteMainUI = ({
       )}
 
       {noteFiles.length > 0 && (
-        <ul className="space-y-4 mb-32">
+        <ul className="space-y-4 mb-44">
           {noteFiles.map((fileDoc) => (
             <li key={fileDoc._id} className="border p-5">
               <span className="font-semibold">File Name</span>:{' '}
               {fileDoc.file_name} &nbsp; | &nbsp;{' '}
               <span className="font-semibold">File Type</span>:{' '}
               {fileDoc.file_type} &nbsp; | &nbsp;{' '}
-              <Button
-                size="sm"
-                variant="ghost"
-                isIconOnly={true}
-                onPress={() => {
-                  console.log('CLICKING BUTTON');
-                }}
-              >
-                🗑️
-              </Button>
+              <Tooltip content="Delete File">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  isIconOnly={true}
+                  aria-label="Delete"
+                  onPress={() => handleFileDeletion(fileDoc._id.toString())}
+                >
+                  🗑️
+                </Button>
+              </Tooltip>
             </li>
           ))}
         </ul>
@@ -68,7 +85,7 @@ export const EditNoteMainUI = ({
         Upload More Files to Your Note
       </h2>
 
-      <article className="mb-16">
+      <article className="mb-24">
         <p className="text-xl mb-2">
           <span className="font-bold">Media Upload Instructions</span>:
         </p>
