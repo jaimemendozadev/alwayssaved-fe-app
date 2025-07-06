@@ -16,17 +16,17 @@ export const NumberNoteMainUI = ({
   console.log('currentUser in NumberNoteMainUI ', currentUser);
 
   return (
-    <main className="p-6 w-[85%]">
+    <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
         Note Page for: {currentNote?.title}
       </h1>
 
       <p className="mb-14">
         <Link
-          className="hover:underline underline-offset-4"
+          className="hover:underline underline-offset-4 text-xl"
           href={`${currentNote._id.toString()}/edit`}
         >
-          ✍🏼 Edit Your Note
+          ✍🏼 Edit Note
         </Link>
       </p>
 
@@ -58,6 +58,6 @@ export const NumberNoteMainUI = ({
       {noteFiles.length > 0 && (
         <h3 className="text-2xl lg:text-3xl">LLM Chat Placeholder</h3>
       )}
-    </main>
+    </div>
   );
 };
