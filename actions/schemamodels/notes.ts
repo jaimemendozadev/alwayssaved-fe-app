@@ -32,8 +32,8 @@ interface SearchNoteFields {
   _id?: mongoose.Types.ObjectId;
   user_id?: mongoose.Types.ObjectId;
   title?: string;
-  date_created?: Date;
-  date_deleted?: Date | null;
+  date_created?: unknown;
+  date_deleted?: unknown;
 }
 
 export const getNotesByFields = async (
@@ -57,8 +57,8 @@ export const getNotesByFields = async (
 
 export const updateNoteByID = async (
   noteID: string,
-  update: { [key: string]: any },
-  options: { [key: string]: any } = {}
+  update: { [key: string]: unknown },
+  options: { [key: string]: unknown } = {}
 ): Promise<void> => {
   await NoteModel.findByIdAndUpdate(
     getObjectIDFromString(noteID),
