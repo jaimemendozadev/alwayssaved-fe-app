@@ -12,7 +12,7 @@ export const getQdrantDB = async () => {
   }
 
   const qdrantClient = new QdrantClient({
-    host: hostURL,
+    url: hostURL,
     apiKey: apiKey
   });
 
