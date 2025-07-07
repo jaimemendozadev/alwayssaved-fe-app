@@ -128,8 +128,7 @@ export const FileUpload = ({
     let currentFiles = [...acceptedFiles];
 
     const fileInfoArray = currentFiles.map((file) => ({
-      name: file.name,
-      type: file.type
+      name: file.name
     }));
 
     const createdFiles = await createFileDocuments(

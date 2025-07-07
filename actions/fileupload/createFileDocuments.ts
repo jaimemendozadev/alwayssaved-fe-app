@@ -1,4 +1,5 @@
 'use server';
+import { getFileExtension } from '@/components/fileupload/utils';
 import {
   dbConnect,
   getObjectIDFromString,
@@ -9,7 +10,6 @@ import {
 
 export interface fileInfo {
   name: string;
-  type: string;
 }
 
 export const createFileDocuments = async (
@@ -33,14 +33,14 @@ export const createFileDocuments = async (
     const fileDBResults = await Promise.allSettled(
       fileInfoArray.map(async (file) => {
         const file_name = file.name;
-        const file_type = file.type;
+        const fileExtension = getFileExtension(file_name);
 
         try {
           const filePayload = {
             user_id: userMongoID,
             note_id: noteMongoID,
             file_name,
-            file_type
+            file_type: fileExtension
           };
 
           const [createdFile] = await FileModel.create([filePayload], {
