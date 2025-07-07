@@ -80,7 +80,10 @@ export const FileUpload = ({
 
       if (newNote) {
         setLocalNote(newNote);
-        toast.success('A new Note has been created. 🎉', toastOptions);
+        toast.success(
+          'A new Note has been created. 🎉 You may now add video files to your new Note.',
+          toastOptions
+        );
 
         // TODO: Maybe we shouldn't refresh if the currentNoteID is null
         router.refresh();
