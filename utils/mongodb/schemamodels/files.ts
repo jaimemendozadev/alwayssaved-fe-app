@@ -14,6 +14,7 @@ export interface IFile {
   file_name: string;
   file_type: string;
   date_uploaded: Date;
+  date_deleted: Date | null;
 }
 
 export type LeanFile = Omit<IFile, '_id' | 'user_id' | 'note_id'> & {
@@ -24,7 +25,6 @@ export type LeanFile = Omit<IFile, '_id' | 'user_id' | 'note_id'> & {
 
 const { Schema, model } = mongoose;
 
-// TODO: Need to fix FileSchema to maybe throw error if created File doc has no file_type or file_name
 const FileSchema = new Schema<IFile>({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   note_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Note' },
@@ -35,7 +35,13 @@ const FileSchema = new Schema<IFile>({
     default: `Untitled File - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`
   },
   file_type: { type: String, required: true, default: 'Unknown Type' },
-  date_uploaded: { type: Date, default: Date.now }
+  date_uploaded: { type: Date, default: Date.now },
+  date_deleted: { type: Date, default: null }
+});
+
+FileSchema.pre('save', function (next) {
+  if (this.file_type === '') this.file_type = 'Unknown Type';
+  next();
 });
 
 export const FileModel =
