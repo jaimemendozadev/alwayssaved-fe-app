@@ -25,7 +25,7 @@ export const handlePresignedUrls = async (
       const s3_key = `${userID}/${noteID}/${_id}/${file_name}`;
 
       try {
-        const presignedURL = await handlePresignedUrlsWithClient(s3_key);
+        const presigned_url = await handlePresignedUrlsWithClient(s3_key);
 
         return {
           s3_key,
@@ -33,7 +33,7 @@ export const handlePresignedUrls = async (
           user_id: userID,
           file_id: _id,
           file_name,
-          presigned_url: presignedURL
+          presigned_url
         };
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
