@@ -30,8 +30,14 @@ export const EditNoteMainUI = ({
     router.refresh();
   };
 
-  const handleFileDeletion = async (fileID: string): Promise<void> => {
-    await purgeFileByID(fileID, currentNoteID);
+  const handleFileDeletion = async (
+    fileID: string,
+    fileType: string
+  ): Promise<void> => {
+    console.log('fileID inside handleFileDeletion ', fileID);
+    console.log('fileType inside handleFileDeletion ', fileType);
+
+    await purgeFileByID(currentNoteID, fileID, fileType);
   };
 
   const noteID = currentNote._id.toString();
@@ -39,7 +45,7 @@ export const EditNoteMainUI = ({
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
-        Note Page for: {currentNote?.title}
+        Edit Page for Note: {currentNote?.title}
       </h1>
 
       <div className="mb-14">
@@ -77,7 +83,9 @@ export const EditNoteMainUI = ({
                   variant="ghost"
                   isIconOnly={true}
                   aria-label="Delete"
-                  onPress={() => handleFileDeletion(fileDoc._id.toString())}
+                  onPress={() =>
+                    handleFileDeletion(fileDoc._id, fileDoc.file_type)
+                  }
                 >
                   🗑️
                 </Button>

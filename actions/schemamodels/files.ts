@@ -9,6 +9,8 @@ import {
   NoteModel
 } from '@/utils/mongodb';
 
+import { getQdrantDB } from '@/utils/qdrant';
+
 export const getFilesByNoteID = async (
   noteID: string
 ): Promise<LeanFile[] | void> => {
@@ -56,8 +58,9 @@ export const matchProjectFiles = async (
 };
 
 export const purgeFileByID = async (
+  noteID: string,
   fileID: string,
-  noteID: string
+  fileType: string
 ): Promise<void> => {
   const convertedFileID = getObjectIDFromString(fileID);
   const convertedNoteID = getObjectIDFromString(noteID);
@@ -66,30 +69,27 @@ export const purgeFileByID = async (
 
   const foundFile = await FileModel.findById(convertedFileID).exec();
 
-  if (!foundNote || !foundFile) {
+  console.log('foundNote in purgeFileByID ', foundNote);
+  console.log('\n');
+
+  console.log('foundFile in purgeFileByID ', foundFile);
+  console.log('\n');
+
+  if (fileType !== '.txt') {
+    // TODO: Handle '.mp3' and '.mp4' deletion
+  }
+
+  const { QDRANT_COLLECTION_NAME } = process.env;
+
+  if (!foundNote || !foundFile || !QDRANT_COLLECTION_NAME) {
     throw new Error(`Can Perform File deletion for File `);
   }
 
-  // 1) Deleting all the File's Vector points in Vector DB.
+  const qdrantClient = await getQdrantDB();
 
-  console.log('foundFile in purgeFileByID ', foundFile);
-
-  // 2) Deletes the File in s3.
-  const { s3_key } = foundFile;
-
-  const s3Result = await deleteFileFromS3(s3_key);
-
-  console.log('s3Result in purgeFileByID ', s3Result);
-  console.log('\n');
-
-  if (s3Result && s3Result.$metadata) {
-    const statusCode = s3Result.$metadata.httpStatusCode;
-
-    // 3) Updates target Note by deleting File.id references from NoteModel.files[].
-
-    // 4) Delete the File DB document.
-    if (statusCode === 204) {
-      await FileModel.findByIdAndDelete(convertedFileID).exec();
-    }
+  if (!qdrantClient) {
+    throw new Error(
+      `Can't purgeFileByID for File ${fileID} Note ${noteID}due to missing Qdrant Client.`
+    );
   }
 };
