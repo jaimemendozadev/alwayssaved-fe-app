@@ -9,8 +9,6 @@ import {
   NoteModel
 } from '@/utils/mongodb';
 
-import { getQdrantDB } from '@/utils/qdrant';
-
 export const getFilesByNoteID = async (
   noteID: string
 ): Promise<LeanFile[] | void> => {
@@ -33,16 +31,18 @@ interface SpecifiedFileFields {
   file_name?: number;
   file_type?: number;
   date_uploaded?: number;
+  date_deleted?: number;
 }
 
 interface FileMatch {
-  _id?: mongoose.Types.ObjectId;
-  user_id?: mongoose.Types.ObjectId;
-  note_id?: mongoose.Types.ObjectId;
-  s3_key?: string;
-  file_name?: string;
-  file_type?: string;
-  date_uploaded?: Date;
+  _id?: unknown;
+  user_id?: unknown;
+  note_id?: unknown;
+  s3_key?: unknown;
+  file_name?: unknown;
+  file_type?: unknown;
+  date_uploaded?: unknown;
+  date_deleted?: unknown;
 }
 
 export const matchProjectFiles = async (
@@ -75,21 +75,11 @@ export const purgeFileByID = async (
   console.log('foundFile in purgeFileByID ', foundFile);
   console.log('\n');
 
+  if (!foundNote || !foundFile) {
+    throw new Error(`Can Perform File deletion for File ${fileID}.`);
+  }
+
   if (fileType !== '.txt') {
     // TODO: Handle '.mp3' and '.mp4' deletion
-  }
-
-  const { QDRANT_COLLECTION_NAME } = process.env;
-
-  if (!foundNote || !foundFile || !QDRANT_COLLECTION_NAME) {
-    throw new Error(`Can Perform File deletion for File `);
-  }
-
-  const qdrantClient = await getQdrantDB();
-
-  if (!qdrantClient) {
-    throw new Error(
-      `Can't purgeFileByID for File ${fileID} Note ${noteID}due to missing Qdrant Client.`
-    );
   }
 };
