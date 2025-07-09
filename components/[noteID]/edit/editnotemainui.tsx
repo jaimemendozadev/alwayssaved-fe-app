@@ -8,7 +8,7 @@ import { FileUpload } from '@/components/fileupload';
 import { purgeFileByID } from '@/actions/schemamodels/files';
 import { DeleteNoteModal } from '@/components/deletenotemodal';
 
-interface NumberNoteMainUIProps {
+interface EditNoteMainUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
@@ -22,7 +22,7 @@ export const EditNoteMainUI = ({
   currentNote,
   noteFiles,
   currentNoteID
-}: NumberNoteMainUIProps): ReactNode => {
+}: EditNoteMainUIProps): ReactNode => {
   const router = useRouter();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 

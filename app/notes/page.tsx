@@ -16,7 +16,7 @@ export default async function NotesPage(): Promise<ReactNode> {
         user_id: getObjectIDFromString(currentUser._id),
         date_deleted: { $eq: null }
       },
-      { _id: 1, title: 1, date_created: 1, date_deleted: 1 },
+      { _id: 1, title: 1, date_created: 1 },
       true
     );
 

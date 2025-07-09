@@ -33,14 +33,8 @@ export default async function NoteIDPage({
     );
   }
 
-  if (currentUser && currentNote && noteFiles) {
-    return (
-      <NumberNoteMainUI
-        currentUser={currentUser}
-        currentNote={currentNote}
-        noteFiles={noteFiles}
-      />
-    );
+  if (currentNote && noteFiles) {
+    return <NumberNoteMainUI currentNote={currentNote} noteFiles={noteFiles} />;
   }
   throw new Error(`There was an error displaying the Note Page for ${noteID}`);
 }

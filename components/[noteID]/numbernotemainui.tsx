@@ -2,15 +2,13 @@
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
-import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
+import { LeanNote, LeanFile } from '@/utils/mongodb';
 interface NumberNoteMainUIProps {
-  currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
 }
 
 export const NumberNoteMainUI = ({
-  currentUser,
   currentNote,
   noteFiles
 }: NumberNoteMainUIProps): ReactNode => {
