@@ -80,7 +80,11 @@ export const deleteNoteByID = async (noteID: string): Promise<LeanNote> => {
     { returnDocument: 'after' }
   ).exec();
 
-  console.log('deleteUpdate in deleteNoteByID ', deleteUpdate);
+  if (!deleteUpdate || deleteUpdate.date_deleted === null) {
+    throw new Error(
+      `There was a problem deleting the Note ${noteID}. Try again later`
+    );
+  }
 
   return deepLean(deleteUpdate);
 };

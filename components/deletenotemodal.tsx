@@ -47,7 +47,7 @@ export const DeleteNoteModal = ({
                 onPress={async () => {
                   const deleteRes = await deleteNoteByID(noteID);
 
-                  if (deleteRes) {
+                  if (deleteRes.date_deleted) {
                     toast.success(
                       'Your Note has been delete. 👍🏽',
                       toastOptions

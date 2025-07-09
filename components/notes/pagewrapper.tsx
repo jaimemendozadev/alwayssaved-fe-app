@@ -23,7 +23,7 @@ export const PageWrapper = ({
 
   const handleNoteDeletion = async (noteID: string): Promise<void> => {
     const delRes = await deleteNoteByID(noteID);
-    if (delRes) {
+    if (delRes.date_deleted) {
       toast.success(
         'Your note has been successfully deleted. 👌🏽',
         toastOptions
