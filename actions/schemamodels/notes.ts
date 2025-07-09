@@ -37,18 +37,19 @@ interface SearchNoteFields {
   files?: unknown;
 }
 
+// TODO: May need to refactor sortBy argument for better sorting options.
 export const getNotesByFields = async (
   searchParams: SearchNoteFields,
   docFields: SpecifiedNoteFields,
-  sortByDate: boolean = false
+  sortByDateCreated: boolean = false
 ): Promise<LeanNote[]> => {
   const pipeline: PipelineStage[] = [
     { $match: searchParams },
     { $project: docFields }
   ];
 
-  if (sortByDate) {
-    pipeline.push({ $sort: { date: -1 } });
+  if (sortByDateCreated) {
+    pipeline.push({ $sort: { date_created: -1 } });
   }
 
   const foundNotes = await NoteModel.aggregate(pipeline);
