@@ -12,8 +12,8 @@ export default async function ConvoIDPage({
 }): Promise<ReactNode> {
   const { noteID, convoID } = await params;
 
-  console.log("noteID in ConvoIDPage ", noteID);
-  console.log("convoID in ConvoIDPage ", convoID);
+  console.log('noteID in ConvoIDPage ', noteID);
+  console.log('convoID in ConvoIDPage ', convoID);
 
-  return <h1>ConvoIDPage</h1>
+  return <h1>ConvoIDPage</h1>;
 }
