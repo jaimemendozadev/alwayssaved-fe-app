@@ -1,18 +1,18 @@
 'use client';
 import { ReactNode, useState, ChangeEvent, FocusEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 
 interface ChatBoxProps {
-  handleSubmit: () => void;
+  chatSubmit: () => void;
   inFlight: boolean;
 }
 
 const defaultInput = 'Ask something';
-export const ChatBox = ({
-  handleSubmit,
-  inFlight
-}: ChatBoxProps): ReactNode => {
+export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
+  const [localConvo, setLocalConvo] = useState(null);
   const [userInput, setUserInput] = useState(defaultInput);
+  const router = useRouter();
 
   const handleChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
@@ -39,7 +39,7 @@ export const ChatBox = ({
 
   return (
     <div className="max-w-[700px] mx-auto">
-      <form onSubmit={handleSubmit} className="mb-8 border-2 p-4 rounded-md">
+      <form onSubmit={chatSubmit} className="mb-8 border-2 p-4 rounded-md">
         <div className="flex items-start">
           <textarea
             aria-label="Ask the LLM a Question"
