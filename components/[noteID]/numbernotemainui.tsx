@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 import { LeanNote, LeanFile } from '@/utils/mongodb';
+import { ChatBox } from '../chatbox';
 interface NumberNoteMainUIProps {
   currentNote: LeanNote;
   noteFiles: LeanFile[];
@@ -53,7 +54,7 @@ export const NumberNoteMainUI = ({
       )}
 
       {noteFiles.length > 0 && (
-        <h3 className="text-2xl lg:text-3xl">LLM Chat Placeholder</h3>
+       <ChatBox handleSubmit={() => console.log('HANDLE CHATBOX SUBMIT')} />
       )}
     </div>
   );
