@@ -31,4 +31,4 @@ const ConvoMessageSchema = new Schema<IConvoMessage>({
 
 
 export const ConvoMessageModel =
-  mongoose.models?.File || model<IConvoMessage>('ConvoMessage', ConvoMessageSchema);
+  mongoose.models?.ConvoMessage || model<IConvoMessage>('ConvoMessage', ConvoMessageSchema);

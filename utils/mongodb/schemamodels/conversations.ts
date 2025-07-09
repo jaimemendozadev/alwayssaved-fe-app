@@ -32,5 +32,5 @@ const ConversationSchema = new Schema<IConversation>({
 });
 
 export const ConversationModel =
-  mongoose.models?.File ||
+  mongoose.models?.Conversation ||
   model<IConversation>('Conversation', ConversationSchema);
