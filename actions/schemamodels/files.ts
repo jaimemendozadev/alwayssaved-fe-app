@@ -57,29 +57,62 @@ export const matchProjectFiles = async (
   return deepLean(foundNotes);
 };
 
+// See Dev Notes below.
 export const purgeFileByID = async (
-  noteID: string,
   fileID: string,
   fileType: string
-): Promise<void> => {
+): Promise<LeanFile> => {
   const convertedFileID = getObjectIDFromString(fileID);
-  const convertedNoteID = getObjectIDFromString(noteID);
-
-  const foundNote = await NoteModel.findById(convertedNoteID).exec();
 
   const foundFile = await FileModel.findById(convertedFileID).exec();
 
-  console.log('foundNote in purgeFileByID ', foundNote);
-  console.log('\n');
-
-  console.log('foundFile in purgeFileByID ', foundFile);
-  console.log('\n');
-
-  if (!foundNote || !foundFile) {
-    throw new Error(`Can Perform File deletion for File ${fileID}.`);
+  if (!foundFile) {
+    throw new Error(
+      `Can Perform File deletion for File ${fileID} of type ${fileType}.`
+    );
   }
 
-  if (fileType !== '.txt') {
-    // TODO: Handle '.mp3' and '.mp4' deletion
+  const s3Response = await deleteFileFromS3(foundFile.s3_key);
+
+  if (s3Response.$metadata.httpStatusCode !== 204) {
+    throw new Error(
+      `There was a problem deleting your File ${fileID} of type ${fileType} from s3. Try again later.`
+    );
   }
+
+  const updatedFile = await FileModel.findByIdAndUpdate(
+    convertedFileID,
+    { date_deleted: new Date() },
+    {
+      new: true
+    }
+  ).exec();
+
+  if (!updatedFile || updatedFile.date_deleted === null) {
+    throw new Error(
+      `There was a problem deleting your File ${fileID} of type ${fileType}. Try again later`
+    );
+  }
+
+  return deepLean(updatedFile);
 };
+
+/********************************************
+ * Notes
+ ********************************************
+
+ 1) For MVP v1, purgeFileByID "deletes" by 
+    - Deleting the File from s3.
+    - Updating the File.date_deleted property to today's date.
+
+    If the file is .txt file, deleting al the Qdrant
+    Vector DB points will have to be done in a 
+    separate async job. For MVP, it's enough just to
+    delete the files from s3 and update the File
+    date_deleted property. A separate Async job will
+    remove the deleted MongoDB documents and any
+    Qdrant Vector DB points if any.
+    
+
+
+ */

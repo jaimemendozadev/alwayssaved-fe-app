@@ -73,13 +73,11 @@ export const EditNoteMainUI = ({
                   variant="ghost"
                   isIconOnly={true}
                   aria-label="Delete"
-                  onPress={async () =>
-                    await purgeFileByID(
-                      currentNoteID,
-                      fileDoc._id,
-                      fileDoc.file_type
-                    )
-                  }
+                  onPress={async () => {
+                    await purgeFileByID(fileDoc._id, fileDoc.file_type);
+
+                    router.refresh();
+                  }}
                 >
                   🗑️
                 </Button>
