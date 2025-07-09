@@ -74,9 +74,18 @@ export const EditNoteMainUI = ({
                   isIconOnly={true}
                   aria-label="Delete"
                   onPress={async () => {
-                    await purgeFileByID(fileDoc._id, fileDoc.file_type);
+                    const purgedResult = await purgeFileByID(
+                      fileDoc._id,
+                      fileDoc.file_type
+                    );
 
-                    router.refresh();
+                    if (purgedResult.date_deleted) {
+                      toast.success(
+                        'Your File has been deleted. 👍🏽',
+                        toastOptions
+                      );
+                      router.refresh();
+                    }
                   }}
                 >
                   🗑️
