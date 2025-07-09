@@ -14,6 +14,7 @@ export const NumberNoteMainUI = ({
 }: NumberNoteMainUIProps): ReactNode => {
   const router = useRouter();
   const editURL = `${currentNote._id.toString()}/edit`;
+  const convoURL = `${currentNote._id.toString()}/convo`;
 
   return (
     <div className="p-6 w-[85%]">
@@ -52,9 +53,16 @@ export const NumberNoteMainUI = ({
         </div>
       )}
 
-      <h3 className="text-3xl lg:text-4xl mb-6">
-        Placeholder for Link to ConvoID Page
-      </h3>
+      <p className="text-2xl mb-16">
+        Click on the Link below to go to the Note&#39;s Conversations Page to
+        start a Chat with the LLM about your Note files. 🤖
+      </p>
+
+      <div className="mb-14">
+        <Button size="md" variant="ghost" onPress={() => router.push(convoURL)}>
+          💬 Note Convos
+        </Button>
+      </div>
     </div>
   );
 };
