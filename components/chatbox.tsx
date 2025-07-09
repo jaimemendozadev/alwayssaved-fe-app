@@ -38,21 +38,19 @@ export const ChatBox = ({
   };
 
   return (
-    <div className="w-[900px]">
-      <form onSubmit={handleSubmit} className="mb-8 border-2 p-4">
-        <div className="flex items-end">
-          <label htmlFor="noteTitle" className="text-lg min-w-[400px]">
-            <span className="font-bold">Note Title</span>:<br />
-            <textarea
-              className="w-[100%] p-1"
-              onBlur={handleChange}
-              onFocus={handleChange}
-              onChange={handleChange}
-              id="noteTitle"
-              value={userInput}
-              disabled={inFlight}
-            />
-          </label>
+    <div className="max-w-[700px] mx-auto">
+      <form onSubmit={handleSubmit} className="mb-8 border-2 p-4 rounded-md">
+        <div className="flex items-start">
+          <textarea
+            aria-label="Ask the LLM a Question"
+            className="w-[100%] p-3 border rounded-md"
+            onBlur={handleChange}
+            onFocus={handleChange}
+            onChange={handleChange}
+            id="noteTitle"
+            value={userInput}
+            disabled={inFlight}
+          />
 
           <Button size="md" variant="ghost" type="submit" className="ml-4">
             Submit

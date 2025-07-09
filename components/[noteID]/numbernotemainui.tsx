@@ -31,7 +31,7 @@ export const NumberNoteMainUI = ({
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
 
       {noteFiles.length > 0 ? (
-        <ul className="space-y-4 mb-20">
+        <ul className="space-y-4 mb-32">
           {noteFiles.map((fileDoc) => (
             <li key={fileDoc._id} className="border p-5">
               <span className="font-semibold">File Name</span>:{' '}
@@ -54,7 +54,10 @@ export const NumberNoteMainUI = ({
       )}
 
       {noteFiles.length > 0 && (
-       <ChatBox handleSubmit={() => console.log('HANDLE CHATBOX SUBMIT')} />
+        <ChatBox
+          inFlight={false}
+          handleSubmit={() => console.log('HANDLE CHATBOX SUBMIT')}
+        />
       )}
     </div>
   );
