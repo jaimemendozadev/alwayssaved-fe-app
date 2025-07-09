@@ -1,12 +1,10 @@
 'use server';
-import mongoose from 'mongoose';
 import { deleteFileFromS3 } from '@/utils/aws';
 import {
   deepLean,
   FileModel,
   getObjectIDFromString,
   LeanFile,
-  NoteModel
 } from '@/utils/mongodb';
 
 export const getFilesByNoteID = async (
@@ -16,6 +14,7 @@ export const getFilesByNoteID = async (
 
   const noteFiles = await FileModel.find({ note_id: mongoID }).exec();
 
+  // TODO: Need to delete possibly fix return value.
   console.log('noteFiles in getFilesByNoteID ', noteFiles);
 
   if (noteFiles.length === 0) return;
