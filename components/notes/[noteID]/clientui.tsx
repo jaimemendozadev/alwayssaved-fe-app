@@ -1,5 +1,6 @@
 'use client';
 import { ReactNode } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 import { LeanNote, LeanFile } from '@/utils/mongodb';
@@ -14,7 +15,7 @@ export const ClientUI = ({
 }: ClientUIProps): ReactNode => {
   const router = useRouter();
   const editURL = `${currentNote._id.toString()}/edit`;
-  const convoURL = `${currentNote._id.toString()}/convo`;
+  const convoURL = `${currentNote._id.toString()}/convos`;
 
   return (
     <div className="p-6 w-[85%]">
@@ -42,20 +43,11 @@ export const ClientUI = ({
               </li>
             ))}
           </ul>
-          <p className="text-2xl mb-16">
-            Click on the Link below to go to the Note&#39;s Conversations Page
-            to start a Chat with the LLM about your Note files. 🤖
+          <p className="text-2xl mb-4">
+            Click on the <Link className="hover:underline underline-offset-4 text-blue-700" href={convoURL}>Link to your Note&#39;s Conversations Page</Link> to view all all your conversations with the LLM about your Note Files.
           </p>
 
-          <div className="mb-14">
-            <Button
-              size="md"
-              variant="ghost"
-              onPress={() => router.push(convoURL)}
-            >
-              💬 Note Convos
-            </Button>
-          </div>
+          <p className="text-2xl">Or you could start a new Chat. 🤖</p>
         </>
       ) : (
         <div>
