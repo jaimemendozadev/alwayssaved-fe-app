@@ -2,7 +2,7 @@
 import { getUserFromDB } from '@/actions';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
-import { ConvoMainUI } from '@/components/notes/[noteID]/convo/convomainui';
+import { ClientUI } from '@/components/notes/[noteID]/convo';
 import { getObjectIDFromString } from '@/utils/mongodb';
 import { ReactNode } from 'react';
 export default async function ConvoPage({
@@ -48,5 +48,5 @@ export default async function ConvoPage({
     { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 }
   );
 
-  return <ConvoMainUI currentNote={currentNote} convos={activeConvos} />;
+  return <ClientUI currentNote={currentNote} convos={activeConvos} />;
 }

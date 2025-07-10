@@ -5,15 +5,15 @@ import { Button, Tooltip } from '@heroui/react';
 import dayjs from 'dayjs';
 import { LeanConversation, LeanNote } from '@/utils/mongodb';
 
-interface ConvoMainUIProps {
+interface ClientUIProps {
   currentNote: LeanNote;
   convos: LeanConversation[];
 }
 
-export const ConvoMainUI = ({
+export const ClientUI = ({
   convos,
   currentNote
-}: ConvoMainUIProps): ReactNode => {
+}: ClientUIProps): ReactNode => {
   const handleConvoDeletion = async (convoID: string): Promise<void> => {
     /*
       TODO: On Conversation Deletion:
