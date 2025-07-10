@@ -8,17 +8,17 @@ import { Button, Tooltip } from '@heroui/react';
 import { LeanUser, LeanNote } from '@/utils/mongodb';
 import { deleteNoteByID } from '@/actions/schemamodels/notes';
 
-interface PageWrapperProps {
+interface ClientUIProps {
   userNotes: LeanNote[];
   currentUser: LeanUser;
 }
 
 const toastOptions = { duration: 6000 };
 
-export const PageWrapper = ({
+export const ClientUI = ({
   userNotes,
   currentUser
-}: PageWrapperProps): ReactNode => {
+}: ClientUIProps): ReactNode => {
   const router = useRouter();
 
   const handleNoteDeletion = async (noteID: string): Promise<void> => {

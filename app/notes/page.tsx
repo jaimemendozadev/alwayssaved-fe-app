@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { Spinner } from '@heroui/react';
 import { getUserFromDB } from '@/actions';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
-import { PageWrapper as NotesPageWrapper } from '@/components/notes';
+import { ClientUI } from '@/components/notes';
 import { getObjectIDFromString, LeanNote } from '@/utils/mongodb';
 
 export default async function NotesPage(): Promise<ReactNode> {
@@ -35,5 +35,5 @@ export default async function NotesPage(): Promise<ReactNode> {
     );
   }
 
-  return <NotesPageWrapper userNotes={userNotes} currentUser={currentUser} />;
+  return <ClientUI userNotes={userNotes} currentUser={currentUser} />;
 }

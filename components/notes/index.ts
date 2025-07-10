@@ -1,3 +1,3 @@
-import { PageWrapper } from './pagewrapper';
+import { ClientUI } from './clientui';
 
-export { PageWrapper };
+export { ClientUI };
