@@ -1,6 +1,9 @@
 'use server';
 import { getUserFromDB } from '@/actions';
-import { getActiveUserConvos } from '@/actions/schemamodels/conversations';
+import { matchProjectConversations } from '@/actions/schemamodels/conversations';
+import { getNotesByFields } from '@/actions/schemamodels/notes';
+import { ConvoMainUI } from '@/components/[noteID]/convo/convomainui';
+import { getObjectIDFromString } from '@/utils/mongodb';
 import { ReactNode } from 'react';
 export default async function ConvoPage({
   params
@@ -9,26 +12,41 @@ export default async function ConvoPage({
 }): Promise<ReactNode> {
   const currentUser = await getUserFromDB();
 
-
   const { noteID } = await params;
 
-
-
-
-  if(!noteID || !currentUser) {
-    throw new Error(`There was a problem getting the Convos for Note ${noteID}. Try again later.`);
+  if (!noteID || !currentUser) {
+    throw new Error(
+      `There was a problem getting the Convos for Note ${noteID}. Try again later.`
+    );
   }
 
-  console.log("noteID in ConvoIDPage ", noteID);
+  const [currentNote] = await getNotesByFields(
+    {
+      _id: getObjectIDFromString(noteID),
+      user_id: getObjectIDFromString(currentUser._id),
+      date_deleted: { $eq: null }
+    },
+    {
+      _id: 1,
+      title: 1
+    }
+  );
 
-  console.log("currentUser in ConvoIDPage ", currentUser);
+  if (!currentNote) {
+    throw new Error(
+      `There was a problem getting the Convos for Note ${noteID}. Try again later.`
+    );
+  }
 
-  await getActiveUserConvos(currentUser._id, noteID)
+  const activeConvos = await matchProjectConversations(
+    {
+      user_id: getObjectIDFromString(currentUser._id),
+      note_id: getObjectIDFromString(currentNote._id),
+      date_deleted: { $eq: null },
+      date_archived: { $eq: null }
+    },
+    { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 }
+  );
 
-
-  
-
-  
-
-  return <h1>ConvoPage</h1>
+  return <ConvoMainUI convos={activeConvos} />;
 }

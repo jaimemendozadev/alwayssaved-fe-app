@@ -4,7 +4,7 @@ import {
   deepLean,
   FileModel,
   getObjectIDFromString,
-  LeanFile,
+  LeanFile
 } from '@/utils/mongodb';
 
 export const getFilesByNoteID = async (
@@ -44,6 +44,7 @@ interface FileMatch {
   date_deleted?: unknown;
 }
 
+// TODO: Rename this function.
 export const matchProjectFiles = async (
   match: FileMatch,
   docFields: SpecifiedFileFields
