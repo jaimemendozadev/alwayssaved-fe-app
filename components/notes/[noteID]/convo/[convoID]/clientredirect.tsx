@@ -3,13 +3,13 @@ import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
-interface NoFilesRedirectProps {
+interface ClientRedirectProps {
   noteID: string;
 }
 
-export const NoFilesRedirect = ({
+export const ClientRedirect = ({
   noteID
-}: NoFilesRedirectProps): ReactNode => {
+}: ClientRedirectProps): ReactNode => {
   const router = useRouter();
 
   useEffect(() => {
