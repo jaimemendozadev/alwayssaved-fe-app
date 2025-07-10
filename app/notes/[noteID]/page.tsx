@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { getNoteByID } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
-import { NumberNoteMainUI } from '@/components/notes/[noteID]';
+import { ClientUI } from '@/components/notes/[noteID]';
 import { getObjectIDFromString } from '@/utils/mongodb';
 export default async function NoteIDPage({
   params
@@ -34,7 +34,7 @@ export default async function NoteIDPage({
   }
 
   if (currentNote && noteFiles) {
-    return <NumberNoteMainUI currentNote={currentNote} noteFiles={noteFiles} />;
+    return <ClientUI currentNote={currentNote} noteFiles={noteFiles} />;
   }
   throw new Error(`There was an error displaying the Note Page for ${noteID}`);
 }

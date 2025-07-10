@@ -3,15 +3,15 @@ import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 import { LeanNote, LeanFile } from '@/utils/mongodb';
-interface NumberNoteMainUIProps {
+interface ClientUIProps {
   currentNote: LeanNote;
   noteFiles: LeanFile[];
 }
 
-export const NumberNoteMainUI = ({
+export const ClientUI = ({
   currentNote,
   noteFiles
-}: NumberNoteMainUIProps): ReactNode => {
+}: ClientUIProps): ReactNode => {
   const router = useRouter();
   const editURL = `${currentNote._id.toString()}/edit`;
   const convoURL = `${currentNote._id.toString()}/convo`;

@@ -1,6 +1,6 @@
 import { EditNoteMainUI } from "./edit/editnotemainui";
-import { NumberNoteMainUI } from "./numbernotemainui";
+import { ClientUI } from "./clientui";
 export {
-    NumberNoteMainUI,
+    ClientUI,
     EditNoteMainUI
 }
