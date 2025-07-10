@@ -54,40 +54,24 @@ export const ClientUI = ({
           </p>
         </div>
       ) : (
-        <div className="mb-40">
-          <ul className="space-y-4 mb-32">
-            {noteFiles.map((fileDoc) => (
-              <li key={fileDoc._id} className="border p-5">
-                <span className="font-semibold">File Name</span>:{' '}
-                {fileDoc.file_name} &nbsp; | &nbsp;{' '}
-                <span className="font-semibold">File Type</span>:{' '}
-                {fileDoc.file_type}
-              </li>
-            ))}
-          </ul>
-
-          <p className="text-2xl mb-4">
-            Click on the link to the{' '}
-            <Link
-              className="hover:underline underline-offset-4 text-blue-700"
-              href={convoURL}
-            >
-              {' '}
-              Note Conversations Page
-            </Link>{' '}
-            to view all your convos with the LLM.
-          </p>
-
-          <p className="text-2xl">Or you could start a new Chat. 🤖</p>
-        </div>
+        <ul className="space-y-4 mb-40">
+          {noteFiles.map((fileDoc) => (
+            <li key={fileDoc._id} className="border p-5">
+              <span className="font-semibold">File Name</span>:{' '}
+              {fileDoc.file_name} &nbsp; | &nbsp;{' '}
+              <span className="font-semibold">File Type</span>:{' '}
+              {fileDoc.file_type}
+            </li>
+          ))}
+        </ul>
       )}
 
-      <h2 className="text-3xl lg:text-4xl mb-6">
+      <h2 className="text-3xl lg:text-4xl mb-10">
         💬 Conversations for {currentNote.title} Note
       </h2>
 
       {convos.length === 0 ? (
-        <>
+        <div>
           <p className="text-2xl mb-4">
             You have no Conversations for this Note.
           </p>
@@ -100,9 +84,9 @@ export const ClientUI = ({
             </Link>{' '}
             to start chatting with the LLM. 🤖
           </p>
-        </>
+        </div>
       ) : (
-        <>
+        <div>
           <p className="text-2xl mb-16">
             Click on the Conversation link to view the Convo Chat thread and
             continue chatting with the LLM about your Note. 🦾
@@ -136,7 +120,7 @@ export const ClientUI = ({
               );
             })}
           </ul>
-        </>
+        </div>
       )}
     </div>
   );
