@@ -14,8 +14,8 @@ export const ClientUI = ({
   noteFiles
 }: ClientUIProps): ReactNode => {
   const router = useRouter();
-  const editURL = `${currentNote._id.toString()}/edit`;
-  const convoURL = `${currentNote._id.toString()}/convos`;
+  const editURL = `/notes/${currentNote._id.toString()}/edit`;
+  const convoURL = `/notes/${currentNote._id.toString()}/convos`;
 
   return (
     <div className="p-6 w-[85%]">
@@ -44,7 +44,15 @@ export const ClientUI = ({
             ))}
           </ul>
           <p className="text-2xl mb-4">
-            Click on the link to the <Link className="hover:underline underline-offset-4 text-blue-700" href={convoURL}> Note Conversations Page</Link> to view all your convos with the LLM.
+            Click on the link to the{' '}
+            <Link
+              className="hover:underline underline-offset-4 text-blue-700"
+              href={convoURL}
+            >
+              {' '}
+              Note Conversations Page
+            </Link>{' '}
+            to view all your convos with the LLM.
           </p>
 
           <p className="text-2xl">Or you could start a new Chat. 🤖</p>
@@ -60,6 +68,8 @@ export const ClientUI = ({
           </p>
         </div>
       )}
+
+      {/* TODO: Should we delete http://localhost:3000/notes/[noteID]/convos page and display all the convos on this page? 🤔 */}
     </div>
   );
 };
