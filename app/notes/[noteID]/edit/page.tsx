@@ -2,7 +2,7 @@
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { EditNoteMainUI } from '@/components/[noteID]';
-import { getNotesByFields } from '@/actions/schemamodels/notes';
+import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
 import { getObjectIDFromString } from '@/utils/mongodb';
 
@@ -21,7 +21,7 @@ export default async function NoteEditPage({
     );
   }
 
-  const [currentNote] = await getNotesByFields(
+  const [currentNote] = await matchProjectNotes(
     {
       _id: getObjectIDFromString(noteID),
       user_id: getObjectIDFromString(currentUser._id),

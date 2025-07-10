@@ -44,7 +44,6 @@ interface FileMatch {
   date_deleted?: unknown;
 }
 
-// TODO: Rename this function.
 export const matchProjectFiles = async (
   match: FileMatch,
   docFields: SpecifiedFileFields

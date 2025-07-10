@@ -2,7 +2,7 @@
 import { ReactNode } from 'react';
 import { Spinner } from '@heroui/react';
 import { getUserFromDB } from '@/actions';
-import { getNotesByFields } from '@/actions/schemamodels/notes';
+import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { PageWrapper as NotesPageWrapper } from '@/components/notes';
 import { getObjectIDFromString, LeanNote } from '@/utils/mongodb';
 
@@ -11,7 +11,7 @@ export default async function NotesPage(): Promise<ReactNode> {
   let userNotes: LeanNote[] = [];
 
   if (currentUser) {
-    const dbResult = await getNotesByFields(
+    const dbResult = await matchProjectNotes(
       {
         user_id: getObjectIDFromString(currentUser._id),
         date_deleted: { $eq: null }

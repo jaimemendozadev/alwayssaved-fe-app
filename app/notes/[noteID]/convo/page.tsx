@@ -1,7 +1,7 @@
 'use server';
 import { getUserFromDB } from '@/actions';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
-import { getNotesByFields } from '@/actions/schemamodels/notes';
+import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { ConvoMainUI } from '@/components/[noteID]/convo/convomainui';
 import { getObjectIDFromString } from '@/utils/mongodb';
 import { ReactNode } from 'react';
@@ -20,7 +20,7 @@ export default async function ConvoPage({
     );
   }
 
-  const [currentNote] = await getNotesByFields(
+  const [currentNote] = await matchProjectNotes(
     {
       _id: getObjectIDFromString(noteID),
       user_id: getObjectIDFromString(currentUser._id),

@@ -1,5 +1,4 @@
 'use server';
-import mongoose from 'mongoose';
 import {
   deepLean,
   getObjectIDFromString,
@@ -38,14 +37,14 @@ interface SearchNoteFields {
 }
 
 // TODO: May need to refactor sortBy argument for better sorting options.
-export const getNotesByFields = async (
-  searchParams: SearchNoteFields,
-  docFields: SpecifiedNoteFields,
+export const matchProjectNotes = async (
+  match: SearchNoteFields,
+  projectFields: SpecifiedNoteFields,
   sortByDateCreated: boolean = false
 ): Promise<LeanNote[]> => {
   const pipeline: PipelineStage[] = [
-    { $match: searchParams },
-    { $project: docFields }
+    { $match: match },
+    { $project: projectFields }
   ];
 
   if (sortByDateCreated) {
