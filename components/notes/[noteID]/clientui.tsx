@@ -35,7 +35,7 @@ export const ClientUI = ({
         Note Page for: {currentNote?.title}
       </h1>
 
-      <div className="mb-20">
+      <div className="mb-24">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
           ✍🏼 Edit Note
         </Button>
@@ -54,7 +54,7 @@ export const ClientUI = ({
           </p>
         </div>
       ) : (
-        <div className="mb-36">
+        <div className="mb-40">
           <ul className="space-y-4 mb-32">
             {noteFiles.map((fileDoc) => (
               <li key={fileDoc._id} className="border p-5">
