@@ -23,7 +23,7 @@ export const LeftNavbar = (): ReactNode => {
 
       <div className="min-w-28 p-5">
         <p className="text-[#919191] font-semibold mb-2">
-          <Link href="/convo">💬 Convos</Link>
+          <Link href="/convos">💬 Convos</Link>
         </p>
       </div>
 

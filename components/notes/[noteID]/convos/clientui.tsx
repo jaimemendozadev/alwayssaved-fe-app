@@ -37,7 +37,7 @@ export const ClientUI = ({
           <p className="text-2xl">
             <Link
               className="hover:underline underline-offset-4 text-blue-700"
-              href={`/notes/${currentNote._id}/convo/new`}
+              href={`/notes/${currentNote._id}/convos/new`}
             >
               Create a Conversation for this Note
             </Link>{' '}
@@ -58,7 +58,7 @@ export const ClientUI = ({
               <li className="border p-5" key={convo._id}>
                 <Link
                   className="hover:underline underline-offset-4"
-                  href={`/notes/${convo.note_id}/convo/${convo._id}`}
+                  href={`/notes/${convo.note_id}/convos/${convo._id}`}
                 >
                   <span className="font-semibold">Convo Name</span>:{' '}
                   {convo.title} &nbsp; | &nbsp;{' '}
