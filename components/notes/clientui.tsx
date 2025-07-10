@@ -59,15 +59,18 @@ export const ClientUI = ({
         </p>
       ) : (
         <div className="mb-16">
-        <p className="text-2xl mb-4">
-          Click on a Note link to view all the Files and Conversations attached to the Note.
-        </p>
-          
-        <p className="text-2xl">
-          You can also go to the Note Page to start a new chat with the LLM about your note files. 🤖</p>
+          <p className="text-2xl mb-4">
+            Click on any Note Page link to view all the Files and Conversations
+            attached to that Note.
+          </p>
+
+          <p className="text-2xl">
+            From the selected Note Page, you can also start a new chat with the
+            LLM about your Note Files. 🤖
+          </p>
         </div>
       )}
-      
+
       {userNotes.length > 0 && (
         <ul className="space-y-7">
           {userNotes.map((noteDoc) => {
