@@ -1,7 +1,7 @@
 'use server';
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { EditNoteMainUI } from '@/components/[noteID]';
+import { EditNoteMainUI } from '@/components/notes/[noteID]';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
 import { getObjectIDFromString } from '@/utils/mongodb';

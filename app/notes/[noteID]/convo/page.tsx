@@ -2,7 +2,7 @@
 import { getUserFromDB } from '@/actions';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
-import { ConvoMainUI } from '@/components/[noteID]/convo/convomainui';
+import { ConvoMainUI } from '@/components/notes/[noteID]/convo/convomainui';
 import { getObjectIDFromString } from '@/utils/mongodb';
 import { ReactNode } from 'react';
 export default async function ConvoPage({
