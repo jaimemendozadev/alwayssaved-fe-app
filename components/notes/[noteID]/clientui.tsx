@@ -44,7 +44,7 @@ export const ClientUI = ({
             ))}
           </ul>
           <p className="text-2xl mb-4">
-            Click on the <Link className="hover:underline underline-offset-4 text-blue-700" href={convoURL}>Link to your Note&#39;s Conversations Page</Link> to view all all your conversations with the LLM about your Note Files.
+            Click on the link to the <Link className="hover:underline underline-offset-4 text-blue-700" href={convoURL}> Note Conversations Page</Link> to view all your convos with the LLM.
           </p>
 
           <p className="text-2xl">Or you could start a new Chat. 🤖</p>
