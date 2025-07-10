@@ -9,11 +9,14 @@ export interface IConvoMessage {
   conversation_id: mongoose.Types.ObjectId | IConversation;
   user_id?: mongoose.Types.ObjectId | IUser;
   date_sent: Date;
-  sender_type: string;
+  sender_type: string; // "user" | "llm" | "system"
   message: string;
 }
 
-export type LeanConvoMessage = Omit<IConvoMessage, '_id' | 'conversation_id' | 'user_id'> & {
+export type LeanConvoMessage = Omit<
+  IConvoMessage,
+  '_id' | 'conversation_id' | 'user_id'
+> & {
   _id: string;
   conversation_id: string | LeanConversation;
   user_id: string | LeanUser;
@@ -22,13 +25,16 @@ export type LeanConvoMessage = Omit<IConvoMessage, '_id' | 'conversation_id' | '
 const { Schema, model } = mongoose;
 
 const ConvoMessageSchema = new Schema<IConvoMessage>({
-  conversation_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Conversation' },  
+  conversation_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Conversation'
+  },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  date_sent: {type: Date, default: Date.now},
-  sender_type: {type: String, required: true},
-  message: {type: String, required: true},
+  date_sent: { type: Date, default: Date.now },
+  sender_type: { type: String, required: true },
+  message: { type: String, required: true }
 });
 
-
 export const ConvoMessageModel =
-  mongoose.models?.ConvoMessage || model<IConvoMessage>('ConvoMessage', ConvoMessageSchema);
+  mongoose.models?.ConvoMessage ||
+  model<IConvoMessage>('ConvoMessage', ConvoMessageSchema);
