@@ -8,7 +8,7 @@ import { FileUpload } from '@/components/fileupload';
 import { purgeFileByID } from '@/actions/schemamodels/files';
 import { DeleteNoteModal } from '@/components/deletenotemodal';
 
-interface EditNoteMainUIProps {
+interface ClientUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
@@ -17,12 +17,12 @@ interface EditNoteMainUIProps {
 
 const toastOptions = { duration: 6000 };
 
-export const EditNoteMainUI = ({
+export const ClientUI = ({
   currentUser,
   currentNote,
   noteFiles,
   currentNoteID
-}: EditNoteMainUIProps): ReactNode => {
+}: ClientUIProps): ReactNode => {
   const router = useRouter();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 

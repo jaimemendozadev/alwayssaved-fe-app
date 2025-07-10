@@ -1,7 +1,7 @@
 'use server';
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { EditNoteMainUI } from '@/components/notes/[noteID]';
+import { ClientUI } from '@/components/notes/[noteID]/edit';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
 import { getObjectIDFromString } from '@/utils/mongodb';
@@ -55,7 +55,7 @@ export default async function NoteEditPage({
   );
 
   return (
-    <EditNoteMainUI
+    <ClientUI
       currentUser={currentUser}
       currentNote={currentNote}
       noteFiles={files}
