@@ -3,13 +3,17 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { Button, Tooltip } from '@heroui/react';
 import dayjs from 'dayjs';
-import { LeanConversation } from '@/utils/mongodb';
+import { LeanConversation, LeanNote } from '@/utils/mongodb';
 
 interface ConvoMainUIProps {
+  currentNote: LeanNote;
   convos: LeanConversation[];
 }
 
-export const ConvoMainUI = ({ convos }: ConvoMainUIProps): ReactNode => {
+export const ConvoMainUI = ({
+  convos,
+  currentNote
+}: ConvoMainUIProps): ReactNode => {
   const handleConvoDeletion = async (convoID: string): Promise<void> => {
     /*
       TODO: On Conversation Deletion:
@@ -21,20 +25,25 @@ export const ConvoMainUI = ({ convos }: ConvoMainUIProps): ReactNode => {
 
   return (
     <div>
-      <h1>ConvoMainUI Page</h1>
+      <h1 className="text-3xl lg:text-6xl mb-16">
+        💬 Conversations for {currentNote.title} Note
+      </h1>
 
       {convos.length === 0 ? (
-        <p className="text-2xl">
-          You have no Conversations for this note. Create a Conversation for
-          this Note
-          <Link
-            className="hover:underline underline-offset-4 text-blue-700"
-            href="/"
-          >
-            to start chatting with the LLM
-          </Link>
-          🤖.
-        </p>
+        <>
+          <p className="text-2xl mb-4">
+            You have no Conversations for this Note.
+          </p>
+          <p className="text-2xl">
+            <Link
+              className="hover:underline underline-offset-4 text-blue-700"
+              href={`/notes/${currentNote._id}/convo/new`}
+            >
+              Create a Conversation for this Note
+            </Link>{' '}
+            to start chatting with the LLM. 🤖
+          </p>
+        </>
       ) : (
         <p className="text-2xl mb-16">
           Click on the Conversation link to view the Convo Chat thread and
@@ -57,7 +66,7 @@ export const ConvoMainUI = ({ convos }: ConvoMainUIProps): ReactNode => {
                   {dayjs(convo.date_started).format('dddd, MMMM D, YYYY')}
                 </Link>
                 &nbsp; | &nbsp;{' '}
-                <Tooltip content="Delete Note">
+                <Tooltip content="Delete Convo">
                   <Button
                     size="sm"
                     variant="ghost"

@@ -48,5 +48,5 @@ export default async function ConvoPage({
     { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 }
   );
 
-  return <ConvoMainUI convos={activeConvos} />;
+  return <ConvoMainUI currentNote={currentNote} convos={activeConvos} />;
 }
