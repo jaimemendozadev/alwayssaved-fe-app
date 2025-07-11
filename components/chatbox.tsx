@@ -2,19 +2,20 @@
 import { ReactNode, useState, ChangeEvent, FocusEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
+import { LeanConversation } from '@/utils/mongodb';
 
 interface ChatBoxProps {
   chatSubmit: () => void;
   inFlight: boolean;
+  convo: null | LeanConversation;
 }
 
 const defaultInput = 'Ask something';
 export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
-  const [localConvo, setLocalConvo] = useState(null);
   const [userInput, setUserInput] = useState(defaultInput);
   const router = useRouter();
 
-  const handleChange = (
+  const handleChatBox = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
   ) => {
     if (evt?.type === 'focus') {
@@ -44,9 +45,9 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
           <textarea
             aria-label="Ask the LLM a Question"
             className="w-[100%] p-3 border rounded-md"
-            onBlur={handleChange}
-            onFocus={handleChange}
-            onChange={handleChange}
+            onBlur={handleChatBox}
+            onFocus={handleChatBox}
+            onChange={handleChatBox}
             id="noteTitle"
             value={userInput}
             disabled={inFlight}
