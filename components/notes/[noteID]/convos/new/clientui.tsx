@@ -39,7 +39,7 @@ export const ClientUI = ({
   }, [convo]);
 
   return (
-    <div className="p-6 w-[85%]">
+    <div className="min-h-screen border p-6 flex flex-col justify-between">
       <ChatBox inFlight={inFlight} convo={localConvo} chatSubmit={chatSubmit} />
     </div>
   );
