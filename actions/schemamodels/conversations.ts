@@ -60,10 +60,18 @@ export const updateConversationByID = async (
   convoID: string,
   update: { [key: string]: unknown },
   options: { [key: string]: unknown } = {}
-): Promise<void> => {
-  await ConversationModel.findByIdAndUpdate(
+): Promise<LeanConversation> => {
+  const updatedConvo = await ConversationModel.findByIdAndUpdate(
     getObjectIDFromString(convoID),
     update,
     options
   );
+
+  if (!updatedConvo) {
+    throw new Error(
+      `There was a problem updating the Conversation ${convoID}. Try again later.`
+    );
+  }
+
+  return deepLean(updatedConvo);
 };

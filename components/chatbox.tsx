@@ -1,6 +1,7 @@
 'use client';
 import { ReactNode, useState, ChangeEvent, FocusEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
 import { LeanConversation } from '@/utils/mongodb';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
@@ -11,10 +12,15 @@ interface ChatBoxProps {
 }
 
 const defaultInput = 'Ask something';
-const defaultTitle = 'Untitled';
+const DEFAULT_TITLE = 'Untitled';
+const toastOptions = { duration: 6000 };
+
 export const ChatBox = ({ convo }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
-  const [convoTitle, setConvoTitle] = useState(defaultTitle);
+  const [convoTitle, setConvoTitle] = useState(convo?.title || DEFAULT_TITLE);
+  const [defaultTitle, setDefaultTitle] = useState(
+    convo?.title || DEFAULT_TITLE
+  );
   const [inFlight, setFlightStatus] = useState(false); // May only need this for LLM submission.
   const router = useRouter();
 
@@ -44,20 +50,24 @@ export const ChatBox = ({ convo }: ChatBoxProps): ReactNode => {
     }
   };
 
+  const submitChat = async (evt: SubmitEvent): Promise<void> => {
+    evt.preventDefault();
+  };
+
   const titleChange = (evt: InputEvent) => {
     console.log('evt in titleChange ', evt);
     console.log('\n');
 
     if (evt?.type === 'focus') {
-      if (userInput === defaultTitle) {
+      if (convoTitle === defaultTitle) {
         setConvoTitle('');
         return;
       }
     }
 
     if (evt?.type === 'blur') {
-      if (userInput.length === 0) {
-        setConvoTitle(defaultInput);
+      if (convoTitle.length === 0) {
+        setConvoTitle(defaultTitle);
         return;
       }
     }
@@ -71,16 +81,28 @@ export const ChatBox = ({ convo }: ChatBoxProps): ReactNode => {
   const updateTitle = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
+    if (!convo) return;
+
     setFlightStatus(true);
 
-    await updateConversationByID(convo._id, { title: convoTitle });
+    const updatedConvo = await updateConversationByID(
+      convo._id,
+      { title: convoTitle },
+      { returnDocument: 'after' }
+    );
 
-    setFlightStatus(false);
+    if (updatedConvo) {
+      setFlightStatus(false);
+      setDefaultTitle(updatedConvo.title);
+      toast.success('Your Conversation title has been updated.', toastOptions);
+    }
   };
+
+  if (!convo) return;
 
   return (
     <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-[11%] right-0 bg-white">
-      <form onSubmit={chatSubmit} className="mb-3 border-2 p-4 rounded-md">
+      <form onSubmit={submitChat} className="mb-3 border-2 p-4 rounded-md">
         <div className="flex items-center">
           <textarea
             aria-label="Ask the LLM a Question"
