@@ -5,7 +5,7 @@ import { ChatBox } from '@/components/chatbox';
 import { LeanConversation, LeanUser, LeanNote } from '@/utils/mongodb';
 import { createConversation } from '@/actions/schemamodels/conversations';
 import { SubmitEvent } from '@/utils/ts';
-
+import { ChatThread } from '@/components/chatthread';
 interface ClientUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
@@ -40,6 +40,7 @@ export const ClientUI = ({
 
   return (
     <div className="min-h-screen border p-6 flex flex-col justify-between">
+      <ChatThread />
       <ChatBox inFlight={inFlight} convo={localConvo} chatSubmit={chatSubmit} />
     </div>
   );
