@@ -23,6 +23,8 @@ export const processFile = async <T extends File>(
   const s3DeleteURL = `/api/s3/${s3_key}`;
   const fileDeleteURL = `/api/files/${file_id}`;
 
+  // TODO: Refactor and use makeBackEndRequest
+
   try {
     // 1) Upload file to s3.
     const s3UploadRes = await fetch(presigned_url, {
