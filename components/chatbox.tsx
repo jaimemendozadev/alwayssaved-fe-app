@@ -68,7 +68,7 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
           <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
             <span className="font-bold">Conversation Title</span>:<br />
             <input
-              className="w-[100%] p-1"
+              className="w-[100%] p-2 border ounded-md rounded-md"
               onBlur={chatBoxOnChange}
               onFocus={chatBoxOnChange}
               onChange={chatBoxOnChange}
