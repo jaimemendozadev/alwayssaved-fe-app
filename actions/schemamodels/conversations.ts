@@ -55,3 +55,15 @@ export const createConversation = async (
 
   return deepLean(newConvo);
 };
+
+export const updateConversationByID = async (
+  convoID: string,
+  update: { [key: string]: unknown },
+  options: { [key: string]: unknown } = {}
+): Promise<void> => {
+  await ConversationModel.findByIdAndUpdate(
+    getObjectIDFromString(convoID),
+    update,
+    options
+  );
+};
