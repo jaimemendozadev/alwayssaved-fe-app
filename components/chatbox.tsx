@@ -3,7 +3,7 @@ import { ReactNode, useState, ChangeEvent, FocusEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 import { LeanConversation } from '@/utils/mongodb';
-import { SubmitEvent } from '@/utils/ts';
+import { InputEvent, SubmitEvent } from '@/utils/ts';
 
 interface ChatBoxProps {
   inFlight: boolean;
@@ -12,11 +12,13 @@ interface ChatBoxProps {
 }
 
 const defaultInput = 'Ask something';
+const defaultTitle = 'Untitled';
 export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
+  const [convoTitle, setConvoTitle] = useState(defaultTitle)
   const router = useRouter();
 
-  const chatBoxOnChange = (
+  const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
   ) => {
     console.log('evt in chatBoxOnChange ', evt);
@@ -42,6 +44,32 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
     }
   };
 
+  const titleChange = (
+    evt: InputEvent
+  ) => {
+    console.log('evt in titleChange ', evt);
+    console.log('\n');
+
+    if (evt?.type === 'focus') {
+      if (userInput === defaultTitle) {
+        setConvoTitle('');
+        return;
+      }
+    }
+
+    if (evt?.type === 'blur') {
+      if (userInput.length === 0) {
+        setConvoTitle(defaultInput);
+        return;
+      }
+    }
+
+    if (evt?.type === 'change') {
+      setConvoTitle(evt.target.value);
+      return;
+    }
+  };
+
   return (
     <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-[11%] right-0 bg-white">
       <form onSubmit={chatSubmit} className="mb-3 border-2 p-4 rounded-md">
@@ -49,9 +77,9 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
           <textarea
             aria-label="Ask the LLM a Question"
             className="w-[100%] p-3 border rounded-md"
-            onBlur={chatBoxOnChange}
-            onFocus={chatBoxOnChange}
-            onChange={chatBoxOnChange}
+            onBlur={chatBoxChange}
+            onFocus={chatBoxChange}
+            onChange={chatBoxChange}
             id="conversation"
             name="conversation"
             value={userInput}
@@ -69,12 +97,12 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
             <span className="font-bold">Conversation Title</span>:<br />
             <input
               className="w-[100%] p-2 border ounded-md rounded-md"
-              onBlur={chatBoxOnChange}
-              onFocus={chatBoxOnChange}
-              onChange={chatBoxOnChange}
+              onBlur={titleChange}
+              onFocus={titleChange}
+              onChange={titleChange}
               id="convoTitle"
               name="convoTitle"
-              value={userInput}
+              value={convoTitle}
               disabled={inFlight}
             />
           </label>
