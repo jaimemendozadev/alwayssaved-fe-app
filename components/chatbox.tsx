@@ -4,18 +4,18 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/react';
 import { LeanConversation } from '@/utils/mongodb';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { updateConversationByID } from '@/actions/schemamodels/conversations';
 
 interface ChatBoxProps {
-  inFlight: boolean;
   convo: null | LeanConversation;
-  chatSubmit: (evt: SubmitEvent) => Promise<void>;
 }
 
 const defaultInput = 'Ask something';
 const defaultTitle = 'Untitled';
-export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
+export const ChatBox = ({ convo }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
-  const [convoTitle, setConvoTitle] = useState(defaultTitle)
+  const [convoTitle, setConvoTitle] = useState(defaultTitle);
+  const [inFlight, setFlightStatus] = useState(false); // May only need this for LLM submission.
   const router = useRouter();
 
   const chatBoxChange = (
@@ -44,9 +44,7 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
     }
   };
 
-  const titleChange = (
-    evt: InputEvent
-  ) => {
+  const titleChange = (evt: InputEvent) => {
     console.log('evt in titleChange ', evt);
     console.log('\n');
 
@@ -70,6 +68,16 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
     }
   };
 
+  const updateTitle = async (evt: SubmitEvent): Promise<void> => {
+    evt.preventDefault();
+
+    setFlightStatus(true);
+
+    await updateConversationByID(convo._id, { title: convoTitle });
+
+    setFlightStatus(false);
+  };
+
   return (
     <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-[11%] right-0 bg-white">
       <form onSubmit={chatSubmit} className="mb-3 border-2 p-4 rounded-md">
@@ -91,7 +99,7 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
           </Button>
         </div>
       </form>
-      <form onSubmit={chatSubmit} className="border-2 p-4 rounded-md">
+      <form onSubmit={updateTitle} className="border-2 p-4 rounded-md">
         <div className="flex items-end">
           <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
             <span className="font-bold">Conversation Title</span>:<br />

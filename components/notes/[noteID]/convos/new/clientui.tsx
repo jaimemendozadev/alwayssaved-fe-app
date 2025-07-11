@@ -21,16 +21,7 @@ export const ClientUI = ({
   currentNote,
   convo
 }: ClientUIProps): ReactNode => {
-  const [inFlight, setFlightStatus] = useState(false);
   const [localConvo, setLocalConvo] = useState<LeanConversation | null>(null);
-
-  const chatSubmit = (evt: SubmitEvent): Promise<void> => {
-    evt.preventDefault();
-
-    console.log('evt in chatSubmit ', evt);
-
-    return;
-  };
 
   useEffect(() => {
     if (convo) {
@@ -42,7 +33,7 @@ export const ClientUI = ({
   return (
     <div className="min-h-screen border p-6 flex flex-col justify-between relative">
       <ChatThread />
-      <ChatBox inFlight={inFlight} convo={localConvo} chatSubmit={chatSubmit} />
+      <ChatBox convo={localConvo} />
     </div>
   );
 };
