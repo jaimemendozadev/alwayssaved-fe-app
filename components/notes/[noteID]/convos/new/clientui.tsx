@@ -38,8 +38,9 @@ export const ClientUI = ({
     }
   }, [convo]);
 
+  //   TODO: Delete border in parent container.
   return (
-    <div className="min-h-screen border p-6 flex flex-col justify-between">
+    <div className="min-h-screen border p-6 flex flex-col justify-between relative">
       <ChatThread />
       <ChatBox inFlight={inFlight} convo={localConvo} chatSubmit={chatSubmit} />
     </div>

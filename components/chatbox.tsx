@@ -20,7 +20,7 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
   ) => {
     console.log('evt in chatBoxOnChange ', evt);
-    console.log("\n");
+    console.log('\n');
 
     if (evt?.type === 'focus') {
       if (userInput === defaultInput) {
@@ -43,7 +43,7 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
   };
 
   return (
-    <div className="max-w-[700px] mx-auto mb-8">
+    <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-0 right-0 bg-white">
       <form onSubmit={chatSubmit} className="mb-3 border-2 p-4 rounded-md">
         <div className="flex items-start">
           <textarea
