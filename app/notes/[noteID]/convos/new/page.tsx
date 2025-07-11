@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { ClientUI } from '@/components/notes/[noteID]/convos/new';
 import { getNoteByID } from '@/actions/schemamodels/notes';
-
+import { createConversation } from '@/actions/schemamodels/conversations';
 export default async function NewConvoPage({
   params
 }: {
@@ -12,15 +12,13 @@ export default async function NewConvoPage({
   const currentUser = await getUserFromDB();
   const { noteID } = await params;
 
-  console.log('noteID in New Conversation Page ', noteID);
-
   if (!currentUser || !noteID) {
     throw new Error(
       `There was an error creating a new conversation for Note ${noteID}. Try again later.`
     );
   }
 
-  const currentNote = getNoteByID(noteID);
+  const currentNote = await getNoteByID(noteID);
 
   if (!currentNote) {
     throw new Error(
@@ -28,5 +26,19 @@ export default async function NewConvoPage({
     );
   }
 
-  return <ClientUI currentNote={currentNote} currentUser={currentUser} />;
+  const newConvo = await createConversation(currentUser._id, currentNote._id);
+
+  if (!newConvo) {
+    throw new Error(
+      `There was an error creating a new conversation for User ${currentUser._id} Note ${noteID}. Try again later.`
+    );
+  }
+
+  return (
+    <ClientUI
+      convo={newConvo}
+      currentNote={currentNote}
+      currentUser={currentUser}
+    />
+  );
 }

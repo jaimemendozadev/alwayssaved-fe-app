@@ -9,6 +9,7 @@ import { SubmitEvent } from '@/utils/ts';
 interface ClientUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
+  convo: LeanConversation;
 }
 
 const toastOptions = { duration: 6000 };
@@ -17,7 +18,8 @@ const toastOptions = { duration: 6000 };
 
 export const ClientUI = ({
   currentUser,
-  currentNote
+  currentNote,
+  convo
 }: ClientUIProps): ReactNode => {
   const [inFlight, setFlightStatus] = useState(false);
   const [localConvo, setLocalConvo] = useState<LeanConversation | null>(null);
@@ -25,33 +27,16 @@ export const ClientUI = ({
   const chatSubmit = (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
+    console.log('evt in chatSubmit ', evt);
+
     return;
   };
 
   useEffect(() => {
-    async function loadNewConversation() {
-      setFlightStatus(true);
-      const newConvo = await createConversation(
-        currentUser._id,
-        currentNote._id
-      );
-
-      if (newConvo) {
-        setLocalConvo(newConvo);
-
-        setFlightStatus(false);
-        return;
-      }
-
-      throw new Error(
-        `There was a problem creating a new Conversation for User ${currentUser._id} Note ${currentNote._id}`
-      );
+    if (convo) {
+      setLocalConvo(convo);
     }
-
-    if (!localConvo) {
-      loadNewConversation();
-    }
-  }, []);
+  }, [convo]);
 
   return (
     <div className="p-6 w-[85%]">
