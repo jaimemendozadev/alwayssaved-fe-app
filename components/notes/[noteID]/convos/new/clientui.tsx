@@ -33,7 +33,7 @@ export const ClientUI = ({
   return (
     <div className="min-h-screen border p-6 flex flex-col justify-between relative">
       <ChatThread />
-      <ChatBox convo={convo} />
+      <ChatBox currentUser={currentUser} convo={convo} />
     </div>
   );
 };

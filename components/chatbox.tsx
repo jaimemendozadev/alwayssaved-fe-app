@@ -3,19 +3,25 @@ import { ReactNode, useState, ChangeEvent, FocusEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
-import { LeanConversation } from '@/utils/mongodb';
+import {
+  getObjectIDFromString,
+  LeanConversation,
+  LeanNote,
+  LeanUser
+} from '@/utils/mongodb';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 import { updateConversationByID } from '@/actions/schemamodels/conversations';
 
 interface ChatBoxProps {
   convo: null | LeanConversation;
+  currentUser: LeanUser;
 }
 
 const defaultInput = 'Ask something';
 const DEFAULT_TITLE = 'Untitled';
 const toastOptions = { duration: 6000 };
 
-export const ChatBox = ({ convo }: ChatBoxProps): ReactNode => {
+export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
   const [convoTitle, setConvoTitle] = useState(convo?.title || DEFAULT_TITLE);
   const [defaultTitle, setDefaultTitle] = useState(
@@ -52,6 +58,17 @@ export const ChatBox = ({ convo }: ChatBoxProps): ReactNode => {
 
   const submitChat = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
+
+    if (!convo) return;
+
+    setFlightStatus(true);
+
+    const baseConvoPayload = {
+      conversation_id: getObjectIDFromString(convo._id),
+      user_id: getObjectIDFromString(currentUser._id),
+      sender_type: 'user',
+      message: userInput
+    };
   };
 
   const titleChange = (evt: InputEvent) => {
