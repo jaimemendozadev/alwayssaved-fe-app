@@ -45,7 +45,7 @@ export const ChatBox = ({ chatSubmit, inFlight }: ChatBoxProps): ReactNode => {
   return (
     <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-[11%] right-0 bg-white">
       <form onSubmit={chatSubmit} className="mb-3 border-2 p-4 rounded-md">
-        <div className="flex items-start">
+        <div className="flex items-center">
           <textarea
             aria-label="Ask the LLM a Question"
             className="w-[100%] p-3 border rounded-md"
