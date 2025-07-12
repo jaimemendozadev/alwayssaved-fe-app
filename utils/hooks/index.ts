@@ -1,5 +1,3 @@
-import { useLLM_Api } from "./useLLM_Api";
+import { useBackendRequest } from './useBackendRequest';
 
-export {
-    useLLM_Api
-}
+export { useBackendRequest };
