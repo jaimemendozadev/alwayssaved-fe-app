@@ -11,6 +11,8 @@ import {
 } from '@/utils/mongodb';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 import { updateConversationByID } from '@/actions/schemamodels/conversations';
+import { useBackendRequest } from '@/utils/hooks';
+import { HTTP_METHOD } from 'next/dist/server/web/http';
 
 interface ChatBoxProps {
   convo: null | LeanConversation;
@@ -28,6 +30,7 @@ export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
     convo?.title || DEFAULT_TITLE
   );
   const [inFlight, setFlightStatus] = useState(false); // May only need this for LLM submission.
+  const { makeRequest } = useBackendRequest();
   const router = useRouter();
 
   const chatBoxChange = (
@@ -61,14 +64,23 @@ export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
 
     if (!convo) return;
 
+    const method: HTTP_METHOD = 'POST';
+
     setFlightStatus(true);
 
-    const baseConvoPayload = {
-      conversation_id: getObjectIDFromString(convo._id),
-      user_id: getObjectIDFromString(currentUser._id),
-      sender_type: 'user',
-      message: userInput
+    const options = {
+      body: {
+        conversation_id: getObjectIDFromString(convo._id),
+        user_id: getObjectIDFromString(currentUser._id),
+        sender_type: 'user',
+        message: userInput
+      },
+      method
     };
+
+    const backendURL = `/convos/${convo._id}`;
+
+    await makeRequest(backendURL, options);
   };
 
   const titleChange = (evt: InputEvent) => {
