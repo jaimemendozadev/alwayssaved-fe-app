@@ -32,11 +32,11 @@ export const useBackendRequest = () => {
         ...(options.headers || {})
       },
       body: options.body ? JSON.stringify(options.body) : undefined
-    });
+    }).then((res) => res.json());
 
     console.log('res in useBackendRequest ', res);
 
-    return res.json();
+    return res;
   };
 
   return {
