@@ -10,6 +10,10 @@ export interface IConvoMessage {
   user_id?: mongoose.Types.ObjectId | IUser;
   date_sent: Date;
   sender_type: string; // "user" | "llm" | "system"
+  llm_info?: {
+    llm_company: string;  // e.g., "OpenAI", "MistralAI"
+    llm_model: string;    // e.g., "gpt-4-turbo", "mistral-7b"
+  };          
   message: string;
 }
 
@@ -32,6 +36,14 @@ const ConvoMessageSchema = new Schema<IConvoMessage>({
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   date_sent: { type: Date, default: Date.now },
   sender_type: { type: String, required: true },
+  llm_info: {
+    type: {
+      llm_company: { type: String },
+      llm_model: { type: String }
+    },
+    required: false,
+    default: undefined
+  },
   message: { type: String, required: true }
 });
 
