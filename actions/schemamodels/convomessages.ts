@@ -20,3 +20,13 @@ export const getConvoMessageByID = async (
 
   return deepLean(foundMsg);
 };
+
+export const getConversationMessages = async (convoID: string) => {
+  const convoMessages = await ConvoMessageModel.find({
+    conversation_id: getObjectIDFromString(convoID)
+  }).exec();
+
+  console.log('convoMessages in getConversationMessages ', convoMessages);
+
+  return deepLean(convoMessages);
+};
