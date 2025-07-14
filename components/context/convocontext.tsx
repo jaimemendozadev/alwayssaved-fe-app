@@ -2,18 +2,8 @@
 import { ReactNode, useState } from 'react';
 import { LeanConversation, LeanConvoMessage } from '@/utils/mongodb';
 import { createContext, Dispatch, SetStateAction } from 'react';
-import mongoose from 'mongoose';
 
 export interface TempConvoMessage {
-  conversation_id?: string | mongoose.Types.ObjectId;
-  user_id?: string | mongoose.Types.ObjectId;
-  date_sent?: Date;
-  sender_type?: string; // "user" | "llm" | "system"
-  llm_info?: {
-    llm_company: string; // e.g., "OpenAI", "MistralAI"
-    llm_model: string; // e.g., "gpt-4-turbo", "mistral-7b"
-  };
-  message?: string;
   is_pending?: boolean;
   is_thinking?: boolean;
   temp_id?: string;
