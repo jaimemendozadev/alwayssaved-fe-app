@@ -25,9 +25,9 @@ export const ClientUI = ({
   const { currentConvo, convoThread, setCurrentConvo } =
     useContext(ConvoContext);
 
-  console.log('currentConvo in ClientUI ', currentConvo);
-  console.log('convoThread in ClientUI ', convoThread);
-  console.log('\n');
+  // console.log('currentConvo in ClientUI ', currentConvo);
+  // console.log('convoThread in ClientUI ', convoThread);
+  // console.log('\n');
 
   useEffect(() => {
     if (convo && setCurrentConvo && currentConvo === null) {

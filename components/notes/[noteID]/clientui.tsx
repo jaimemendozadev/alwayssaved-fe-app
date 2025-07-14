@@ -44,6 +44,10 @@ export const ClientUI = ({
     if (newConvo) {
       router.push(`/notes/${currentNote._id}/convos/${newConvo._id}`);
     }
+
+    throw new Error(
+      `There was an error creating a new Conversation for Note ${currentNote._id}`
+    );
   };
 
   return (

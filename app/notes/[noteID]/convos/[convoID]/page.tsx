@@ -1,12 +1,12 @@
 'use server';
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { ClientUI } from '@/components/notes/[noteID]/convos/new'; // TODO: Copy the old ClientUI and add it for this page.
+import { ClientUI } from '@/components/notes/[noteID]/convos/[convoID]';
 import { getNoteByID } from '@/actions/schemamodels/notes';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 import { getObjectIDFromString } from '@/utils/mongodb';
 
-export default async function NewConvoPage({
+export default async function ConvoIDPage({
   params
 }: {
   params: { noteID: string; convoID: string };
