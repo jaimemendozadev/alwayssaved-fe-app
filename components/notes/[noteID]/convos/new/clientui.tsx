@@ -22,12 +22,12 @@ export const ClientUI = ({
   currentNote,
   convo
 }: ClientUIProps): ReactNode => {
-  const { currentConvo, convoThread, setCurrentConvo, } =
+  const { currentConvo, convoThread, setCurrentConvo } =
     useContext(ConvoContext);
 
   console.log('currentConvo in ClientUI ', currentConvo);
-  console.log("convoThread in ClientUI ", convoThread);
-  console.log("\n");
+  console.log('convoThread in ClientUI ', convoThread);
+  console.log('\n');
 
   useEffect(() => {
     if (convo && setCurrentConvo && currentConvo === null) {
@@ -37,8 +37,8 @@ export const ClientUI = ({
 
   //   TODO: Delete border in parent container.
   return (
-    <div className="min-h-screen border p-6 flex flex-col justify-between relative">
-      <ChatThread />
+    <div className="min-h-screen border p-6 flex flex-col justify-between">
+      <ChatThread convoThread={convoThread} />
       <ChatBox currentUser={currentUser} />
     </div>
   );

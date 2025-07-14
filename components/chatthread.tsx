@@ -1,6 +1,42 @@
 'use client';
+import { LeanConvoMessage } from '@/utils/mongodb';
 import { ReactNode } from 'react';
+import { FixedSizeList as List } from 'react-window';
+import { TempConvoMessage } from './context/convocontext';
 
-export const ChatThread = (): ReactNode => {
-  return <div className="min-h-[50vh]"></div>;
+interface ChatThreadProps {
+  convoThread: (LeanConvoMessage | TempConvoMessage)[];
+}
+
+interface RowProps {
+  index: number;
+}
+
+// TODO: Need to fix ChatThread dimensions for reponsive design. Tailwind width classes don't work on <List />
+export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
+  const Row = ({ index }: RowProps): ReactNode => {
+    const convoMsg = convoThread[index] as LeanConvoMessage;
+
+    console.log('convoMsg in Row ', convoMsg);
+
+    return (
+      <div className="border p-4 mb-4 rounded-md" key={convoMsg._id}>
+        {convoMsg.message}
+      </div>
+    );
+  };
+
+  if (!Array.isArray(convoThread)) return null;
+
+  return (
+    <List
+      className="mx-auto mb-4 border rounded-md"
+      height={500}
+      itemCount={convoThread.length}
+      itemSize={35}
+      width={900}
+    >
+      {Row}
+    </List>
+  );
 };

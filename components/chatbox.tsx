@@ -114,12 +114,13 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
         >(backendURL, options);
 
         updateThread((prevState) => {
-            const filtered = prevState.filter(
-              (leanMsg: TempConvoMessage | LeanConvoMessage) => 'temp_id' in leanMsg === false
-            );
+          const filtered = prevState.filter(
+            (leanMsg: TempConvoMessage | LeanConvoMessage) =>
+              'temp_id' in leanMsg === false
+          );
 
-            return filtered;
-          });
+          return filtered;
+        });
 
         setFlightStatus(false);
 
@@ -129,12 +130,16 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
 
           const savedUserMsg = await getConvoMessageByID(user_msg_id);
 
-          updateThread((prevState) => [...prevState, savedUserMsg, llm_response]);
+          updateThread((prevState) => [
+            ...prevState,
+            savedUserMsg,
+            llm_response
+          ]);
 
           setUserInput(defaultInput);
 
           return;
-        } 
+        }
 
         throw new Error('Never received a response from the LLM Service.');
       } catch (error) {
@@ -211,8 +216,9 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
 
   if (!currentConvo) return;
 
+  // TODO: Need to fix ChatBox dimensions to align perfectly with ChatThread dimensions for reponsive design.
   return (
-    <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-[11%] right-0 bg-white">
+    <div className="w-[700px] mx-auto mb-8 bg-white">
       <form onSubmit={submitChat} className="mb-3 border-2 p-4 rounded-md">
         <div className="flex items-center">
           <textarea
