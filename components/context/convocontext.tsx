@@ -4,6 +4,7 @@ import { LeanConversation, LeanConvoMessage } from '@/utils/mongodb';
 import { createContext, Dispatch, SetStateAction } from 'react';
 
 export interface TempConvoMessage {
+  message?: string;
   is_pending?: boolean;
   is_thinking?: boolean;
   temp_id?: string;
