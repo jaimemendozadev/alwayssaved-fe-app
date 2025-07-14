@@ -1,9 +1,12 @@
 'use server';
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { matchProjectFiles } from '@/actions/schemamodels/files';
+import { ClientUI } from '@/components/notes/[noteID]/convos/new'; // TODO: Copy the old ClientUI and add it for this page.
+import { getNoteByID } from '@/actions/schemamodels/notes';
+import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 import { getObjectIDFromString } from '@/utils/mongodb';
-export default async function ConvoIDPage({
+
+export default async function NewConvoPage({
   params
 }: {
   params: { noteID: string; convoID: string };
@@ -11,33 +14,41 @@ export default async function ConvoIDPage({
   const currentUser = await getUserFromDB();
   const { noteID, convoID } = await params;
 
-  console.log('noteID in ConvoIDPage ', noteID);
-  console.log('convoID in ConvoIDPage ', convoID);
-
   if (!currentUser || !noteID || !convoID) {
     throw new Error(
-      `There was an error getting the Convo Page for Note ${noteID} Convo ${convoID}. Try again later.`
+      `There was an error getting the Conversation ${convoID} for Note ${noteID}. Try again later.`
     );
   }
 
-  const files = await matchProjectFiles(
+  const currentNote = await getNoteByID(noteID);
+
+  if (!currentNote) {
+    throw new Error(
+      `There was an error getting the Conversation ${convoID} for User ${currentUser._id} Note ${noteID}. Try again later.`
+    );
+  }
+
+  const [targetConvo] = await matchProjectConversations(
     {
       user_id: getObjectIDFromString(currentUser._id),
-      note_id: getObjectIDFromString(noteID),
-      date_deleted: { $eq: null }
+      note_id: getObjectIDFromString(currentNote._id),
+      date_deleted: { $eq: null },
+      date_archived: { $eq: null }
     },
-    {
-      _id: 1,
-      s3_key: 1,
-      file_name: 1,
-      file_type: 1,
-      date_deleted: 1
-    }
+    { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 }
   );
 
-  console.log('files in ConvoIDPage ', files);
+  if (!targetConvo) {
+    throw new Error(
+      `There was an error getting the Conversation ${convoID} for User ${currentUser._id} Note ${noteID}. Try again later.`
+    );
+  }
 
-  // TODO: Move all content from app/notes/[noteID]/convos/new/page.tsx to this page
-
-  return <h1>ConvoIDPage</h1>;
+  return (
+    <ClientUI
+      convo={targetConvo}
+      currentNote={currentNote}
+      currentUser={currentUser}
+    />
+  );
 }
