@@ -1,21 +1,33 @@
 'use client';
-import { ReactNode, useState, ChangeEvent, FocusEvent } from 'react';
+import {
+  ReactNode,
+  useState,
+  ChangeEvent,
+  FocusEvent,
+  useContext,
+  useCallback,
+  useEffect
+} from 'react';
 import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
 import {
   getObjectIDFromString,
   LeanConversation,
+  LeanConvoMessage,
   LeanNote,
   LeanUser
 } from '@/utils/mongodb';
-import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { BackendResponse, InputEvent, SubmitEvent } from '@/utils/ts';
 import { updateConversationByID } from '@/actions/schemamodels/conversations';
 import { useBackendRequest } from '@/utils/hooks';
 import { HTTP_METHOD } from 'next/dist/server/web/http';
+import { ConvoContext } from './context';
+import { TempConvoMessage } from './context/convocontext';
+import { getConvoMessageByID } from '@/actions/schemamodels/convomessages';
 
 interface ChatBoxProps {
-  convo: null | LeanConversation;
   currentUser: LeanUser;
 }
 
@@ -23,14 +35,18 @@ const defaultInput = 'Ask something';
 const DEFAULT_TITLE = 'Untitled';
 const toastOptions = { duration: 6000 };
 
-export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
+export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
-  const [convoTitle, setConvoTitle] = useState(convo?.title || DEFAULT_TITLE);
-  const [defaultTitle, setDefaultTitle] = useState(
-    convo?.title || DEFAULT_TITLE
-  );
+  const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
+  const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
   const [inFlight, setFlightStatus] = useState(false); // May only need this for LLM submission.
   const { makeRequest } = useBackendRequest();
+  const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
+
+  console.log('currentConvo in ChatBox ', currentConvo);
+  console.log('convoThread in ChatBox ', convoThread);
+  console.log('\n');
+
   const router = useRouter();
 
   const chatBoxChange = (
@@ -59,29 +75,88 @@ export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
     }
   };
 
-  const submitChat = async (evt: SubmitEvent): Promise<void> => {
-    evt.preventDefault();
+  const submitChat = useCallback(
+    async (evt: SubmitEvent): Promise<void> => {
+      evt.preventDefault();
 
-    if (!convo) return;
+      if (!currentConvo || !updateThread) return;
 
-    const method: HTTP_METHOD = 'POST';
+      const method: HTTP_METHOD = 'POST';
 
-    setFlightStatus(true);
+      setFlightStatus(true);
 
-    const options = {
-      body: {
-        conversation_id: getObjectIDFromString(convo._id),
+      const userConvoMsg = {
+        conversation_id: getObjectIDFromString(currentConvo._id),
         user_id: getObjectIDFromString(currentUser._id),
         sender_type: 'user',
         message: userInput
-      },
-      method
-    };
+      };
 
-    const backendURL = `/convos/${convo._id}`;
+      const options = {
+        body: userConvoMsg,
+        method
+      };
 
-    await makeRequest(backendURL, options);
-  };
+      const backendURL = `/convos/${currentConvo._id}`;
+
+      try {
+        const tempUpdate = [
+          ...convoThread,
+          { ...userConvoMsg, is_pending: true, temp_id: uuidv4() },
+          { messsage: '...', is_thinking: true, temp_id: uuidv4() }
+        ];
+        updateThread(tempUpdate);
+        const chatRes = await makeRequest<
+          BackendResponse<{
+            user_msg_id: string;
+            llm_response: LeanConvoMessage;
+          }>
+        >(backendURL, options);
+
+        updateThread((prevState) => {
+            const filtered = prevState.filter(
+              (leanMsg: TempConvoMessage | LeanConvoMessage) => 'temp_id' in leanMsg === false
+            );
+
+            return filtered;
+          });
+
+        setFlightStatus(false);
+
+        if (chatRes && chatRes.payload) {
+          const { payload } = chatRes;
+          const { user_msg_id, llm_response } = payload;
+
+          const savedUserMsg = await getConvoMessageByID(user_msg_id);
+
+          updateThread((prevState) => [...prevState, savedUserMsg, llm_response]);
+
+          setUserInput(defaultInput);
+
+          return;
+        } 
+
+        throw new Error('Never received a response from the LLM Service.');
+      } catch (error) {
+        // TODO: Handle in telemetry.
+        console.log('Error in ChatBox submitChat ', error);
+        toast.error(
+          'There was a problem sending your message to the LLM. 🥺 Try again later.',
+          toastOptions
+        );
+      }
+
+      setFlightStatus(false);
+    },
+    [
+      convoThread,
+      currentConvo,
+      currentUser._id,
+      makeRequest,
+      updateThread,
+      userInput
+    ]
+  );
 
   const titleChange = (evt: InputEvent) => {
     console.log('evt in titleChange ', evt);
@@ -110,12 +185,12 @@ export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
   const updateTitle = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    if (!convo) return;
+    if (!currentConvo) return;
 
     setFlightStatus(true);
 
     const updatedConvo = await updateConversationByID(
-      convo._id,
+      currentConvo._id,
       { title: convoTitle },
       { returnDocument: 'after' }
     );
@@ -127,7 +202,14 @@ export const ChatBox = ({ convo, currentUser }: ChatBoxProps): ReactNode => {
     }
   };
 
-  if (!convo) return;
+  useEffect(() => {
+    if (currentConvo) {
+      setConvoTitle(currentConvo?.title || DEFAULT_TITLE);
+      setDefaultTitle(currentConvo.title || DEFAULT_TITLE);
+    }
+  }, [currentConvo]);
+
+  if (!currentConvo) return;
 
   return (
     <div className="max-w-[700px] mx-auto mb-8 fixed bottom-0 left-[11%] right-0 bg-white">

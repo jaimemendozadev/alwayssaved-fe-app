@@ -22,10 +22,12 @@ export const ClientUI = ({
   currentNote,
   convo
 }: ClientUIProps): ReactNode => {
-  const { currentConvo, convoThread, setCurrentConvo } =
+  const { currentConvo, convoThread, setCurrentConvo, } =
     useContext(ConvoContext);
 
-  console.log('currentConvo from context ', currentConvo);
+  console.log('currentConvo in ClientUI ', currentConvo);
+  console.log("convoThread in ClientUI ", convoThread);
+  console.log("\n");
 
   useEffect(() => {
     if (convo && setCurrentConvo && currentConvo === null) {
@@ -37,7 +39,7 @@ export const ClientUI = ({
   return (
     <div className="min-h-screen border p-6 flex flex-col justify-between relative">
       <ChatThread />
-      <ChatBox currentUser={currentUser} convo={convo} />
+      <ChatBox currentUser={currentUser} />
     </div>
   );
 };
