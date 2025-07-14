@@ -2,7 +2,12 @@
 import { ReactNode, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ChatBox } from '@/components/chatbox';
-import { LeanConversation, LeanUser, LeanNote } from '@/utils/mongodb';
+import {
+  LeanConversation,
+  LeanUser,
+  LeanNote,
+  LeanConvoMessage
+} from '@/utils/mongodb';
 import { createConversation } from '@/actions/schemamodels/conversations';
 import { SubmitEvent } from '@/utils/ts';
 import { ChatThread } from '@/components/chatthread';
@@ -13,25 +18,19 @@ interface ClientUIProps {
   convo: LeanConversation;
 }
 
-const toastOptions = { duration: 6000 };
-
-// /notes/[noteID]
-
 export const ClientUI = ({
   currentUser,
   currentNote,
   convo
 }: ClientUIProps): ReactNode => {
-  const { currentConvo, convoThread, setCurrentConvo } =
+  const { currentConvo, convoThread, setCurrentConvo, updateThread } =
     useContext(ConvoContext);
-
-  // console.log('currentConvo in ClientUI ', currentConvo);
-  // console.log('convoThread in ClientUI ', convoThread);
-  // console.log('\n');
 
   useEffect(() => {
     if (convo && setCurrentConvo && currentConvo === null) {
       setCurrentConvo(convo);
+    }
+    if (convoMessages) {
     }
   }, [convo, currentConvo, setCurrentConvo]);
 
