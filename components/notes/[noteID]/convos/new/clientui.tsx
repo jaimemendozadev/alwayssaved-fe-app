@@ -1,11 +1,12 @@
 'use client';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ChatBox } from '@/components/chatbox';
 import { LeanConversation, LeanUser, LeanNote } from '@/utils/mongodb';
 import { createConversation } from '@/actions/schemamodels/conversations';
 import { SubmitEvent } from '@/utils/ts';
 import { ChatThread } from '@/components/chatthread';
+import { ConvoContext } from '@/components/context';
 interface ClientUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
@@ -21,13 +22,16 @@ export const ClientUI = ({
   currentNote,
   convo
 }: ClientUIProps): ReactNode => {
-  const [localConvo, setLocalConvo] = useState<LeanConversation | null>(null);
+  const { currentConvo, convoThread, setCurrentConvo } =
+    useContext(ConvoContext);
+
+  console.log('currentConvo from context ', currentConvo);
 
   useEffect(() => {
-    if (convo) {
-      setLocalConvo(convo);
+    if (convo && setCurrentConvo && currentConvo === null) {
+      setCurrentConvo(convo);
     }
-  }, [convo]);
+  }, [convo, currentConvo, setCurrentConvo]);
 
   //   TODO: Delete border in parent container.
   return (
