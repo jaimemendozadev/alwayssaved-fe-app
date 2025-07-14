@@ -37,5 +37,7 @@ export default async function ConvoIDPage({
 
   console.log('files in ConvoIDPage ', files);
 
+  // TODO: Move all content from app/notes/[noteID]/convos/new/page.tsx to this page
+
   return <h1>ConvoIDPage</h1>;
 }

@@ -46,9 +46,10 @@ export default async function NoteIDPage({
     { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 }
   );
 
-  if (currentNote && noteFiles) {
+  if (currentUser && currentNote && noteFiles) {
     return (
       <ClientUI
+        currentUser={currentUser}
         currentNote={currentNote}
         noteFiles={noteFiles}
         convos={activeConvos}

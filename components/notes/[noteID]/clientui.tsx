@@ -4,14 +4,23 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Button, Tooltip } from '@heroui/react';
-import { LeanNote, LeanFile, LeanConversation } from '@/utils/mongodb';
+import {
+  LeanNote,
+  LeanFile,
+  LeanConversation,
+  LeanUser
+} from '@/utils/mongodb';
+import { createConversation } from '@/actions/schemamodels/conversations';
+
 interface ClientUIProps {
+  currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
   convos: LeanConversation[];
 }
 
 export const ClientUI = ({
+  currentUser,
   currentNote,
   noteFiles,
   convos
@@ -29,13 +38,21 @@ export const ClientUI = ({
     */
   };
 
+  const handleNewConvo = async () => {
+    const newConvo = await createConversation(currentUser._id, currentNote._id);
+
+    if (newConvo) {
+      router.push(`/notes/${currentNote._id}/convos/${newConvo._id}`);
+    }
+  };
+
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
         Note Page for: {currentNote?.title}
       </h1>
 
-      <div className="mb-24">
+      <div className="mb-16">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
           ✍🏼 Edit Note
         </Button>
@@ -75,15 +92,19 @@ export const ClientUI = ({
           <p className="text-2xl mb-4">
             You have no Conversations for this Note.
           </p>
-          <p className="text-2xl">
-            <Link
-              className="hover:underline underline-offset-4 text-blue-700"
-              href={`/notes/${currentNote._id}/convos/new`}
-            >
-              Create a Conversation for this Note
-            </Link>{' '}
-            to start chatting with the LLM. 🤖
+          <p className="text-2xl mb-8">
+            Create a Conversation for this Note to start chatting with the LLM.
+            🤖
           </p>
+          <div>
+            <Button
+              size="md"
+              variant="ghost"
+              onPress={async () => await handleNewConvo()}
+            >
+              💬 Create Convo
+            </Button>
+          </div>
         </div>
       ) : (
         <div>
