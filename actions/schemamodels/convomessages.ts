@@ -26,7 +26,5 @@ export const getConversationMessages = async (convoID: string) => {
     conversation_id: getObjectIDFromString(convoID)
   }).exec();
 
-  console.log('convoMessages in getConversationMessages ', convoMessages);
-
   return deepLean(convoMessages);
 };

@@ -43,18 +43,11 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
   const { makeRequest } = useBackendRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
 
-  console.log('currentConvo in ChatBox ', currentConvo);
-  console.log('convoThread in ChatBox ', convoThread);
-  console.log('\n');
-
   const router = useRouter();
 
   const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
   ) => {
-    console.log('evt in chatBoxOnChange ', evt);
-    console.log('\n');
-
     if (evt?.type === 'focus') {
       if (userInput === defaultInput) {
         setUserInput('');
