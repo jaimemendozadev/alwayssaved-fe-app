@@ -1,6 +1,6 @@
 'use client';
 import { LeanConvoMessage } from '@/utils/mongodb';
-import { ReactNode, useRef, CSSProperties } from 'react';
+import { ReactNode, useRef, useEffect, CSSProperties } from 'react';
 import {
   List,
   AutoSizer,
@@ -24,44 +24,58 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
     new CellMeasurerCache({ fixedWidth: true, defaultHeight: 200 })
   );
 
+  const listRef = useRef<List>(null);
+
+  useEffect(() => {
+    listRef.current?.scrollToRow(convoThread.length - 1);
+  }, [convoThread.length]);
+
   const Row = ({ index, parent, style }: RowProps): ReactNode => {
-    console.log('style ', style);
     const convoMsg = convoThread[index];
 
     if ('is_pending' in convoMsg) {
       return (
-        <CellMeasurer
-          key={convoMsg.temp_id}
-          cache={cache.current}
-          parent={parent}
-          columnIndex={0}
-          rowIndex={index}
-        >
-          <div className="border p-4 rounded-md" style={style}>
-            {convoMsg.message}
-          </div>
-        </CellMeasurer>
+        <div key={convoMsg.temp_id} style={{ ...style, paddingBottom: 20 }}>
+          {' '}
+          {/* spacing between items */}
+          <CellMeasurer
+            cache={cache.current}
+            parent={parent}
+            columnIndex={0}
+            rowIndex={index}
+          >
+            <div className="border p-6 rounded-md" style={style}>
+              {convoMsg.message}
+            </div>
+          </CellMeasurer>
+        </div>
       );
     } else if ('conversation_id' in convoMsg) {
       return (
-        <CellMeasurer
-          key={convoMsg._id}
-          cache={cache.current}
-          parent={parent}
-          columnIndex={0}
-          rowIndex={index}
-        >
-          <div className="border p-4 rounded-md" style={style}>
-            {convoMsg.message}
-          </div>
-        </CellMeasurer>
+        <div key={convoMsg._id} style={{ ...style, paddingBottom: 20 }}>
+          {' '}
+          {/* spacing between items */}
+          <CellMeasurer
+            cache={cache.current}
+            parent={parent}
+            columnIndex={0}
+            rowIndex={index}
+          >
+            <div className="border p-6 rounded-md">{convoMsg.message}</div>
+          </CellMeasurer>
+        </div>
       );
     }
 
     return null;
   };
 
-  if (!Array.isArray(convoThread)) return null;
+  // May delete this if it looks bad.
+  if (convoThread.length === 0) {
+    return (
+      <div className="w-[900px] h-[500px] mx-auto border-2 bg-white rounded-md"></div>
+    );
+  }
 
   return (
     <div
@@ -70,6 +84,7 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
       <AutoSizer>
         {({ width, height }) => (
           <List
+            ref={listRef}
             rowCount={convoThread.length}
             height={height}
             width={width}
