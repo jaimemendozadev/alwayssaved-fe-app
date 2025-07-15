@@ -26,7 +26,7 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
     "react-hot-toast": "^2.5.2",
-    "react-window": "^1.8.11",
+    "react-virtualized": "^9.22.6",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -34,6 +34,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-virtualized": "^9.22.2",
     "@types/react-window": "^1.8.8",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",

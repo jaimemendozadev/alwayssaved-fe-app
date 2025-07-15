@@ -1,44 +1,79 @@
 'use client';
 import { LeanConvoMessage } from '@/utils/mongodb';
-import { ReactNode } from 'react';
+import { ReactNode, useRef, CSSProperties } from 'react';
 import { Spinner } from '@heroui/react';
-import { FixedSizeList as List } from 'react-window';
+import {
+  List,
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache
+} from 'react-virtualized';
 import { TempConvoMessage } from './context/convocontext';
-
+import { MeasuredCellParent } from 'react-virtualized/dist/es/CellMeasurer';
 interface ChatThreadProps {
   convoThread: (LeanConvoMessage | TempConvoMessage)[];
 }
 
 interface RowProps {
   index: number;
+  parent: MeasuredCellParent;
+  style: CSSProperties;
 }
 
-// TODO: Need to fix ChatThread dimensions for reponsive design. Tailwind width classes don't work on <List />
 export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
-  const Row = ({ index }: RowProps): ReactNode => {
+  const cache = useRef(
+    new CellMeasurerCache({ fixedWidth: true, defaultHeight: 200 })
+  );
+
+  const Row = ({ index, parent, style }: RowProps): ReactNode => {
+    console.log('style ', style);
     const convoMsg = convoThread[index];
 
     if ('temp_id' in convoMsg) {
       if (convoMsg.is_thinking) {
         return (
-          <div
-            className="border p-4 rounded-md flex justify-center"
+          <CellMeasurer
             key={convoMsg.temp_id}
+            cache={cache.current}
+            parent={parent}
+            columnIndex={0}
+            rowIndex={index}
           >
-            <Spinner />
-          </div>
+            <div
+              className="border p-4 rounded-md flex justify-center"
+              style={style}
+            >
+              <Spinner />
+            </div>
+          </CellMeasurer>
         );
       }
       return (
-        <div className="border p-4 rounded-md" key={convoMsg.temp_id}>
-          {convoMsg.is_thinking ? <Spinner /> : convoMsg.message}
-        </div>
+        <CellMeasurer
+          key={convoMsg.temp_id}
+          cache={cache.current}
+          parent={parent}
+          columnIndex={0}
+          rowIndex={index}
+        >
+          <div className="border p-4 rounded-md" style={style}>
+            {convoMsg.is_thinking ? <Spinner /> : convoMsg.message}
+          </div>
+        </CellMeasurer>
       );
     } else if ('conversation_id' in convoMsg) {
       return (
-        <div className="border p-4 rounded-md" key={convoMsg._id}>
-          {convoMsg.message}
-        </div>
+        <CellMeasurer
+          key={convoMsg._id}
+          cache={cache.current}
+          parent={parent}
+          columnIndex={0}
+          rowIndex={index}
+        >
+          <div className="border p-4 rounded-md" style={style}>
+            {convoMsg.message}
+          </div>
+        </CellMeasurer>
       );
     }
 
@@ -48,14 +83,23 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
   if (!Array.isArray(convoThread)) return null;
 
   return (
-    <List
-      className="mx-auto mb-4 border rounded-md"
-      height={500}
-      itemCount={convoThread.length}
-      itemSize={35}
-      width={900}
+    <div
+      style={{ flex: '1 1 auto', width: '900px', margin: '0 auto 60px auto' }}
     >
-      {Row}
-    </List>
+      <AutoSizer>
+        {({ width, height }) => (
+          <List
+            rowCount={convoThread.length}
+            height={height}
+            width={width}
+            rowHeight={cache.current.rowHeight}
+            rowRenderer={Row}
+            deferredMeasurementCache={cache.current}
+          >
+            {Row}
+          </List>
+        )}
+      </AutoSizer>
+    </div>
   );
 };
