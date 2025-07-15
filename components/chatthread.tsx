@@ -1,7 +1,6 @@
 'use client';
 import { LeanConvoMessage } from '@/utils/mongodb';
 import { ReactNode, useRef, CSSProperties } from 'react';
-import { Spinner } from '@heroui/react';
 import {
   List,
   AutoSizer,
@@ -29,25 +28,7 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
     console.log('style ', style);
     const convoMsg = convoThread[index];
 
-    if ('temp_id' in convoMsg) {
-      if (convoMsg.is_thinking) {
-        return (
-          <CellMeasurer
-            key={convoMsg.temp_id}
-            cache={cache.current}
-            parent={parent}
-            columnIndex={0}
-            rowIndex={index}
-          >
-            <div
-              className="border p-4 rounded-md flex justify-center"
-              style={style}
-            >
-              <Spinner />
-            </div>
-          </CellMeasurer>
-        );
-      }
+    if ('is_pending' in convoMsg) {
       return (
         <CellMeasurer
           key={convoMsg.temp_id}
@@ -57,7 +38,7 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
           rowIndex={index}
         >
           <div className="border p-4 rounded-md" style={style}>
-            {convoMsg.is_thinking ? <Spinner /> : convoMsg.message}
+            {convoMsg.message}
           </div>
         </CellMeasurer>
       );

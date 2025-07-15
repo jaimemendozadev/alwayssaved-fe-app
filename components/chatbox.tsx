@@ -95,10 +95,12 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
       try {
         const tempUpdate = [
           ...convoThread,
-          { ...userConvoMsg, is_pending: true, temp_id: uuidv4() },
-          { messsage: '...', is_thinking: true, temp_id: uuidv4() }
+          { ...userConvoMsg, is_pending: true, temp_id: uuidv4() }
         ];
         updateThread(tempUpdate);
+
+        toast.loading('Wait for the LLM to respond.', toastOptions);
+
         const chatRes = await makeRequest<
           BackendResponse<{
             user_msg_id: string;
