@@ -14,9 +14,7 @@ import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
 import {
   getObjectIDFromString,
-  LeanConversation,
   LeanConvoMessage,
-  LeanNote,
   LeanUser
 } from '@/utils/mongodb';
 import { BackendResponse, InputEvent, SubmitEvent } from '@/utils/ts';
@@ -39,7 +37,7 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
   const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
   const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
-  const [inFlight, setFlightStatus] = useState(false); // May only need this for LLM submission.
+  const [inFlight, setFlightStatus] = useState(false);
   const { makeRequest } = useBackendRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
 
@@ -99,7 +97,10 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
         ];
         updateThread(tempUpdate);
 
-        toast.loading('Wait for the LLM to respond.', toastOptions);
+        toast.loading(
+          'The LLM message will appear at the bottom in a litle bit. ⏲️',
+          toastOptions
+        );
 
         const chatRes = await makeRequest<
           BackendResponse<{
@@ -159,9 +160,6 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
   );
 
   const titleChange = (evt: InputEvent) => {
-    console.log('evt in titleChange ', evt);
-    console.log('\n');
-
     if (evt?.type === 'focus') {
       if (convoTitle === defaultTitle) {
         setConvoTitle('');
@@ -196,10 +194,11 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
     );
 
     if (updatedConvo) {
-      setFlightStatus(false);
       setDefaultTitle(updatedConvo.title);
       toast.success('Your Conversation title has been updated.', toastOptions);
     }
+
+    setFlightStatus(false);
   };
 
   useEffect(() => {
@@ -211,7 +210,6 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
 
   if (!currentConvo) return;
 
-  // TODO: Need to fix ChatBox dimensions to align perfectly with ChatThread dimensions for reponsive design.
   return (
     <div className="w-[700px] mx-auto mb-8 bg-white">
       <form onSubmit={submitChat} className="mb-3 border-2 p-4 rounded-md">

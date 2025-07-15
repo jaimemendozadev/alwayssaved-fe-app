@@ -1,33 +1,18 @@
 'use client';
-import { ReactNode, useContext, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { ReactNode, useContext, useEffect } from 'react';
 import { ChatBox } from '@/components/chatbox';
-import {
-  LeanConversation,
-  LeanUser,
-  LeanNote,
-  LeanConvoMessage
-} from '@/utils/mongodb';
-import { createConversation } from '@/actions/schemamodels/conversations';
-import { SubmitEvent } from '@/utils/ts';
+import { LeanConversation, LeanUser } from '@/utils/mongodb';
 import { ChatThread } from '@/components/chatthread';
 import { ConvoContext } from '@/components/context';
 import { getConversationMessages } from '@/actions/schemamodels/convomessages';
 interface ClientUIProps {
   currentUser: LeanUser;
-  currentNote: LeanNote;
   convo: LeanConversation;
 }
 
-export const ClientUI = ({
-  currentUser,
-  currentNote,
-  convo
-}: ClientUIProps): ReactNode => {
+export const ClientUI = ({ currentUser, convo }: ClientUIProps): ReactNode => {
   const { currentConvo, convoThread, setCurrentConvo, updateThread } =
     useContext(ConvoContext);
-
-  console.log('convoThread in ParentUI ', convoThread);
 
   useEffect(() => {
     if (convo && setCurrentConvo && currentConvo === null) {
@@ -38,18 +23,18 @@ export const ClientUI = ({
   useEffect(() => {
     async function setConvoMessage(convoID: string) {
       const convoMessages = await getConversationMessages(convoID);
-      console.log('convoMessages in CDM useEffect ', convoMessages);
+
       if (updateThread) {
         updateThread(convoMessages);
       }
     }
 
     if (convo && updateThread) {
-      console.log('FIRING CDM useEffect');
       setConvoMessage(convo._id);
     }
   }, []);
 
+  // See Dev Notes below.
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
       <ChatThread convoThread={convoThread} />
@@ -57,3 +42,13 @@ export const ClientUI = ({
     </div>
   );
 };
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) If there's time to implement for MVP, will need to 
+    implement responsive layout for every page, including 
+    work on ChatThread & ChatBox responsive layout.
+
+*/

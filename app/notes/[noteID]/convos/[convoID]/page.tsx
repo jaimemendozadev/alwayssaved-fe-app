@@ -44,11 +44,5 @@ export default async function ConvoIDPage({
     );
   }
 
-  return (
-    <ClientUI
-      convo={targetConvo}
-      currentNote={currentNote}
-      currentUser={currentUser}
-    />
-  );
+  return <ClientUI convo={targetConvo} currentUser={currentUser} />;
 }
