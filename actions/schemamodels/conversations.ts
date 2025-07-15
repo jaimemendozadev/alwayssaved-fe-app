@@ -75,3 +75,25 @@ export const updateConversationByID = async (
 
   return deepLean(updatedConvo);
 };
+
+export const deleteConvoByID = async (
+  convoID: string
+): Promise<LeanConversation> => {
+  const _id = getObjectIDFromString(convoID);
+
+  const deleteDate = new Date();
+
+  const deleteUpdate = await ConversationModel.findOneAndUpdate(
+    _id,
+    { date_deleted: deleteDate },
+    { returnDocument: 'after' }
+  ).exec();
+
+  if (!deleteUpdate || deleteUpdate.date_deleted === null) {
+    throw new Error(
+      `There was a problem deleting the Conversation ${convoID}. Try again later`
+    );
+  }
+
+  return deepLean(deleteUpdate);
+};
