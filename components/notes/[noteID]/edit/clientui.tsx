@@ -6,7 +6,8 @@ import { Button, Tooltip, useDisclosure } from '@heroui/react';
 import { LeanUser, LeanNote, LeanFile } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
 import { purgeFileByID } from '@/actions/schemamodels/files';
-import { DeleteNoteModal } from '@/components/deletenotemodal';
+import { deleteNoteByID } from '@/actions/schemamodels/notes';
+import { DeleteModal } from '@/components/deletemodal';
 
 interface ClientUIProps {
   currentUser: LeanUser;
@@ -32,6 +33,23 @@ export const ClientUI = ({
 
   const noteID = currentNote._id.toString();
 
+  const deleteCallback = async (onClose: () => void) => {
+    const deleteRes = await deleteNoteByID(noteID);
+
+    if (deleteRes.date_deleted) {
+      toast.success('Your Note has been delete. 👍🏽', toastOptions);
+      onClose();
+      router.push('/notes');
+    } else {
+      toast.error(
+        'There was a problem deleting your Note. Try again later. 🤦🏽',
+        toastOptions
+      );
+    }
+
+    onClose();
+  };
+
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
@@ -44,10 +62,11 @@ export const ClientUI = ({
         </Button>
       </div>
 
-      <DeleteNoteModal
-        noteID={noteID}
+      <DeleteModal
+        deleteCallback={deleteCallback}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
+        resourceType="Note"
       />
 
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
