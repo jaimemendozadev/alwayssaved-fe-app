@@ -39,20 +39,24 @@ export default async function NoteEditPage({
     );
   }
 
-  const files = await matchProjectFiles(
+  const files = await matchProjectFiles([
     {
-      user_id: getObjectIDFromString(currentUser._id),
-      note_id: getObjectIDFromString(currentNote._id),
-      date_deleted: { $eq: null }
+      $match: {
+        user_id: getObjectIDFromString(currentUser._id),
+        note_id: getObjectIDFromString(currentNote._id),
+        date_deleted: { $eq: null }
+      }
     },
     {
-      _id: 1,
-      s3_key: 1,
-      file_name: 1,
-      file_type: 1,
-      date_deleted: 1
+      $project: {
+        _id: 1,
+        s3_key: 1,
+        file_name: 1,
+        file_type: 1,
+        date_deleted: 1
+      }
     }
-  );
+  ]);
 
   return (
     <ClientUI

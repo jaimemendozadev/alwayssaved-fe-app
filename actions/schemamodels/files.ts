@@ -1,4 +1,5 @@
 'use server';
+import { PipelineStage } from 'mongoose';
 import { deleteFileFromS3 } from '@/utils/aws';
 import {
   deepLean,
@@ -22,36 +23,10 @@ export const getFilesByNoteID = async (
   return deepLean(noteFiles);
 };
 
-interface SpecifiedFileFields {
-  _id?: number;
-  user_id?: number;
-  note_id?: number;
-  s3_key?: number;
-  file_name?: number;
-  file_type?: number;
-  date_uploaded?: number;
-  date_deleted?: number;
-}
-
-interface FileMatch {
-  _id?: unknown;
-  user_id?: unknown;
-  note_id?: unknown;
-  s3_key?: unknown;
-  file_name?: unknown;
-  file_type?: unknown;
-  date_uploaded?: unknown;
-  date_deleted?: unknown;
-}
-
 export const matchProjectFiles = async (
-  match: FileMatch,
-  docFields: SpecifiedFileFields
+  pipeline: PipelineStage[]
 ): Promise<LeanFile[]> => {
-  const foundNotes = await FileModel.aggregate([
-    { $match: match },
-    { $project: docFields }
-  ]);
+  const foundNotes = await FileModel.aggregate(pipeline);
 
   return deepLean(foundNotes);
 };

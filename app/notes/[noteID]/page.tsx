@@ -23,18 +23,22 @@ export default async function NoteIDPage({
     );
   }
 
-  const noteFiles = await matchProjectFiles(
+  const noteFiles = await matchProjectFiles([
     {
-      user_id: getObjectIDFromString(currentUser._id),
-      note_id: getObjectIDFromString(currentNote._id)
+      $match: {
+        user_id: getObjectIDFromString(currentUser._id),
+        note_id: getObjectIDFromString(currentNote._id)
+      }
     },
     {
-      _id: 1,
-      s3_key: 1,
-      file_name: 1,
-      file_type: 1
+      $project: {
+        _id: 1,
+        s3_key: 1,
+        file_name: 1,
+        file_type: 1
+      }
     }
-  );
+  ]);
 
   const activeConvos = await matchProjectConversations([
     {
