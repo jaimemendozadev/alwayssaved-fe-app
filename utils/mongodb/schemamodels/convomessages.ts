@@ -9,6 +9,8 @@ export interface IConvoMessage {
   conversation_id: mongoose.Types.ObjectId | IConversation;
   user_id?: mongoose.Types.ObjectId | IUser;
   date_sent: Date;
+  date_archived: Date | null;
+  date_deleted: Date | null;
   sender_type: string; // "user" | "llm" | "system"
   llm_info?: {
     llm_company: string;  // e.g., "OpenAI", "MistralAI"
@@ -35,6 +37,8 @@ const ConvoMessageSchema = new Schema<IConvoMessage>({
   },
   user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   date_sent: { type: Date, default: Date.now },
+  date_archived: { type: Date, default: null },
+  date_deleted: { type: Date, default: null },
   sender_type: { type: String, required: true },
   llm_info: {
     type: {

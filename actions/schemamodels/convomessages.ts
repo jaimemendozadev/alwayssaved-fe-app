@@ -28,3 +28,19 @@ export const getConversationMessages = async (convoID: string) => {
 
   return deepLean(convoMessages);
 };
+
+export const deleteMessagesByConvoID = async (
+  convoID: string
+): Promise<void> => {
+  const conversation_id = getObjectIDFromString(convoID);
+
+  const deleteDate = new Date();
+
+  const deleteRes = await ConvoMessageModel.updateMany(
+    { conversation_id },
+    { date_deleted: deleteDate }
+  ).exec();
+
+  console.log('deleteRes in deleteMessagesByConvoID ', deleteRes);
+  console.log('\n');
+};
