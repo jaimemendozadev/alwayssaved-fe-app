@@ -1,16 +1,22 @@
 'use client';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import { Button, Tooltip } from '@heroui/react';
+import { Button, Tooltip, useDisclosure } from '@heroui/react';
+import { DeleteModal } from '@/components/deletemodal';
 import {
   LeanNote,
   LeanFile,
   LeanConversation,
   LeanUser
 } from '@/utils/mongodb';
-import { createConversation } from '@/actions/schemamodels/conversations';
+import {
+  createConversation,
+  deleteConvoByID
+} from '@/actions/schemamodels/conversations';
+import { deleteMessagesByConvoID } from '@/actions/schemamodels/convomessages';
 
 interface ClientUIProps {
   currentUser: LeanUser;
@@ -19,24 +25,18 @@ interface ClientUIProps {
   convos: LeanConversation[];
 }
 
+const toastOptions = { duration: 6000 };
+
 export const ClientUI = ({
   currentUser,
   currentNote,
   noteFiles,
   convos
 }: ClientUIProps): ReactNode => {
+  const [convoDeleteID, updateConvoDeletion] = useState<string | null>(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const editURL = `/notes/${currentNote._id.toString()}/edit`;
-  const convoURL = `/notes/${currentNote._id.toString()}/convos`;
-
-  const handleConvoDeletion = async (convoID: string): Promise<void> => {
-    /*
-      TODO: On Conversation Deletion:
-       - Delete All ConvoMessages attached to Conversation._id
-       - Delete Conversation.
-
-    */
-  };
 
   const handleNewConvo = async () => {
     const newConvo = await createConversation(currentUser._id, currentNote._id);
@@ -50,6 +50,30 @@ export const ClientUI = ({
     );
   };
 
+  // See Dev Notes below.
+  const deleteCallback = async (onClose: () => void): Promise<void> => {
+    if (convoDeleteID === null) return;
+
+    console.log('convoDeleteID  in deleteCallback ', convoDeleteID);
+
+    await deleteConvoByID(convoDeleteID);
+
+    await deleteMessagesByConvoID(convoDeleteID);
+
+    toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
+
+    updateConvoDeletion(null);
+
+    onClose();
+
+    router.refresh();
+  };
+
+  const onModalClose = (onClose: () => void) => {
+    updateConvoDeletion(null);
+    onClose();
+  };
+
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
@@ -61,6 +85,14 @@ export const ClientUI = ({
           ✍🏼 Edit Note
         </Button>
       </div>
+
+      <DeleteModal
+        deleteCallback={deleteCallback}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        resourceType="Conversation"
+        onModalClose={onModalClose}
+      />
 
       <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
 
@@ -136,7 +168,10 @@ export const ClientUI = ({
                       variant="ghost"
                       isIconOnly={true}
                       aria-label="Delete"
-                      onPress={async () => await handleConvoDeletion(convo._id)}
+                      onPress={() => {
+                        updateConvoDeletion(convo._id);
+                        onOpen();
+                      }}
                     >
                       🗑️
                     </Button>
@@ -150,3 +185,15 @@ export const ClientUI = ({
     </div>
   );
 };
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) Conversation & ConvoMessage documents are not
+    hard deleted in the app. They're marked with
+    date_deleted value in the document. They will
+    be removed from the database in a separate
+    async job.
+
+*/

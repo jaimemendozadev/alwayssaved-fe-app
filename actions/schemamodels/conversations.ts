@@ -76,6 +76,7 @@ export const updateConversationByID = async (
   return deepLean(updatedConvo);
 };
 
+// See Dev Note #1 below.
 export const deleteConvoByID = async (
   convoID: string
 ): Promise<LeanConversation> => {
@@ -89,6 +90,9 @@ export const deleteConvoByID = async (
     { returnDocument: 'after' }
   ).exec();
 
+  console.log('deleteUpdate in deleteConvoByID ', deleteUpdate);
+  console.log('\n');
+
   if (!deleteUpdate || deleteUpdate.date_deleted === null) {
     throw new Error(
       `There was a problem deleting the Conversation ${convoID}. Try again later`
@@ -97,3 +101,15 @@ export const deleteConvoByID = async (
 
   return deepLean(deleteUpdate);
 };
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) Conversation documents are not
+    hard deleted in the app. They're marked with
+    date_deleted value in the document and will
+    be removed from the database in a separate
+    async job.
+
+*/

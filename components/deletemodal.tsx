@@ -14,13 +14,15 @@ interface DeleteNoteModalProps {
   resourceType: string;
   onOpenChange: () => void;
   deleteCallback: (onClose: () => void) => void;
+  onModalClose?: (onClose: () => void) => void;
 }
 
 export const DeleteModal = ({
   isOpen,
   resourceType,
   onOpenChange,
-  deleteCallback
+  deleteCallback,
+  onModalClose
 }: DeleteNoteModalProps): ReactNode => {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -35,7 +37,18 @@ export const DeleteModal = ({
               <p>Are you sure you want to delete your {resourceType}? 🤔</p>
             </ModalBody>
             <ModalFooter>
-              <Button color="default" variant="light" onPress={onClose}>
+              <Button
+                color="default"
+                variant="light"
+                onPress={() => {
+                  if (onModalClose) {
+                    onModalClose(onClose);
+                    return;
+                  }
+
+                  onClose();
+                }}
+              >
                 Cancel
               </Button>
               <Button color="danger" onPress={() => deleteCallback(onClose)}>
