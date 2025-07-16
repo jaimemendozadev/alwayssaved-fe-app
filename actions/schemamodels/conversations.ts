@@ -1,4 +1,5 @@
 'use server';
+import { PipelineStage } from 'mongoose';
 import {
   ConversationModel,
   deepLean,
@@ -6,34 +7,11 @@ import {
   LeanConversation
 } from '@/utils/mongodb';
 import dayjs from 'dayjs';
-interface SpecifiedConvoFields {
-  _id?: number;
-  user_id?: number;
-  note_id?: number;
-  title?: number;
-  date_started?: number;
-  date_archived?: number;
-  date_deleted?: number;
-}
-
-interface ConvoMatch {
-  _id?: unknown;
-  user_id?: unknown;
-  note_id?: unknown;
-  title?: unknown;
-  date_started?: unknown;
-  date_archived?: unknown;
-  date_deleted?: unknown;
-}
 
 export const matchProjectConversations = async (
-  match: ConvoMatch,
-  projectFields: SpecifiedConvoFields
+  pipeline: PipelineStage[]
 ): Promise<LeanConversation[]> => {
-  const foundNotes = await ConversationModel.aggregate([
-    { $match: match },
-    { $project: projectFields }
-  ]);
+  const foundNotes = await ConversationModel.aggregate(pipeline);
 
   return deepLean(foundNotes);
 };
