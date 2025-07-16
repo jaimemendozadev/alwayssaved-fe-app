@@ -1,7 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { getSecret } from '../aws';
 
-export const getQdrantDB = async () => {
+export const getQdrantDB = async (): Promise<QdrantClient> => {
   const hostURL = await getSecret('/alwayssaved/QDRANT_URL');
   const apiKey = await getSecret('/alwayssaved/QDRANT_API_KEY');
 

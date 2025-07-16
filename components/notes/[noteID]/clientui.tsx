@@ -56,6 +56,7 @@ export const ClientUI = ({
 
     console.log('convoDeleteID  in deleteCallback ', convoDeleteID);
 
+    // TODO: Review the return value of each asyn function.
     await deleteConvoByID(convoDeleteID);
 
     await deleteMessagesByConvoID(convoDeleteID);

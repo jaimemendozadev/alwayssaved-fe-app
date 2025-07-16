@@ -7,6 +7,9 @@ import {
   getObjectIDFromString,
   LeanFile
 } from '@/utils/mongodb';
+import { getQdrantDB } from '@/utils/qdrant';
+
+const { QDRANT_COLLECTION_NAME } = process.env;
 
 export const getFilesByNoteID = async (
   noteID: string
@@ -46,6 +49,7 @@ export const purgeFileByID = async (
     );
   }
 
+  // 1) Delete the file from s3.
   const s3Response = await deleteFileFromS3(foundFile.s3_key);
 
   if (s3Response.$metadata.httpStatusCode !== 204) {
@@ -54,6 +58,48 @@ export const purgeFileByID = async (
     );
   }
 
+  // 2) Delete the Qdrant points if it's a .txt file.
+  if (fileType === '.txt') {
+    const qdrantDB = await getQdrantDB();
+
+    if (qdrantDB && QDRANT_COLLECTION_NAME) {
+      console.log('deleting .txt file from Qdrant ', foundFile);
+      console.log('\n');
+
+      const qdrantRes = await qdrantDB.delete(QDRANT_COLLECTION_NAME, {
+        filter: {
+          must: [
+            {
+              key: 'note_id',
+              match: { value: foundFile.note_id.toString() }
+            },
+            {
+              key: 'file_id',
+              match: { value: foundFile._id.toString() }
+            },
+            {
+              key: 'user_id',
+              match: { value: foundFile.user_id.toString() }
+            },
+            {
+              key: 's3_key',
+              match: { value: foundFile.s3_key }
+            }
+          ]
+        },
+        wait: true
+      });
+
+      console.log('qdrantRes for point deletion ', qdrantRes);
+      console.log('\n');
+    } else {
+      throw new Error(
+        `There was a problem getting the Qdrant Database connection for File ${fileID}.`
+      );
+    }
+  }
+
+  // 3) Update the document's date_deleted field.
   const updatedFile = await FileModel.findByIdAndUpdate(
     convertedFileID,
     { date_deleted: new Date() },
@@ -78,15 +124,6 @@ export const purgeFileByID = async (
  1) For MVP v1, purgeFileByID "deletes" by 
     - Deleting the File from s3.
     - Updating the File.date_deleted property to today's date.
-
-    If the file is .txt file, deleting al the Qdrant
-    Vector DB points will have to be done in a 
-    separate async job. For MVP, it's enough just to
-    delete the files from s3 and update the File
-    date_deleted property. A separate Async job will
-    remove the deleted MongoDB documents and any
-    Qdrant Vector DB points if any.
-    
-
+    - Deleting the Qdrant Vector DB points if it's a '.txt' file.
 
  */
