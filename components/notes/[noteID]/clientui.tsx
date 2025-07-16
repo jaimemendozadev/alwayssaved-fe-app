@@ -81,6 +81,12 @@ export const ClientUI = ({
         Note Page for: {currentNote?.title}
       </h1>
 
+      {/* TODOs: 
+        1) Need to fix placement of Edit Note button; and
+
+        2) Add instructions on how to 'edit' a note by adding/removing files or changing the Note's title.
+      
+      */}
       <div className="mb-16">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
           ✍🏼 Edit Note
@@ -124,6 +130,15 @@ export const ClientUI = ({
         💬 Conversations for {currentNote.title} Note
       </h2>
 
+      {/* TODOs: 
+      
+         1) Should I allow Convo deletion in the main /notes/[noteID] Page? 
+      
+            Or rather in the /notes/[noteID]/edit Page? 🤔
+
+        2) Need to move convos display to the top of the page.
+         
+      */}
       {convos.length === 0 ? (
         <div>
           <p className="text-2xl mb-4">
