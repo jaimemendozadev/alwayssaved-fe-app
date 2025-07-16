@@ -27,7 +27,8 @@ export default async function NoteIDPage({
     {
       $match: {
         user_id: getObjectIDFromString(currentUser._id),
-        note_id: getObjectIDFromString(currentNote._id)
+        note_id: getObjectIDFromString(currentNote._id),
+        date_deleted: { $eq: null }
       }
     },
     {
