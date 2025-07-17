@@ -81,13 +81,16 @@ export const ClientUI = ({
         Note Page for: {currentNote?.title}
       </h1>
 
-      {/* TODOs: 
-        1) Need to fix placement of Edit Note button; and
+      <p className="text-2xl mb-4">
+        Click on the &lsquo;Edit Note&rsquo; button to do any of the following:
+      </p>
+      <ul className="text-2xl mb-8">
+        <li>☑️ Delete or upload new files to your Note;</li>
+        <li>☑️ Change the Title of your Note; or</li>
+        <li>☑️ Delete your entire Note. 😱</li>
+      </ul>
 
-        2) Add instructions on how to 'edit' a note by adding/removing files or changing the Note's title.
-      
-      */}
-      <div className="mb-16">
+      <div className="mb-32">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
           ✍🏼 Edit Note
         </Button>
@@ -101,31 +104,6 @@ export const ClientUI = ({
         onModalClose={onModalClose}
       />
 
-      <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
-
-      {noteFiles.length === 0 ? (
-        <div className="mb-36">
-          <p className="text-xl mb-1">
-            You have no files attached to this Note. 😔
-          </p>
-          <p className="text-xl mb-20">
-            You can add files to the note by clicking on the 👆🏽 above
-            &ldquo;Edit Your Note&rdquo; link.
-          </p>
-        </div>
-      ) : (
-        <ul className="space-y-4 mb-40">
-          {noteFiles.map((fileDoc) => (
-            <li key={fileDoc._id} className="border p-5">
-              <span className="font-semibold">File Name</span>:{' '}
-              {fileDoc.file_name} &nbsp; | &nbsp;{' '}
-              <span className="font-semibold">File Type</span>:{' '}
-              {fileDoc.file_type}
-            </li>
-          ))}
-        </ul>
-      )}
-
       <h2 className="text-3xl lg:text-4xl mb-10">
         💬 Conversations for {currentNote.title} Note
       </h2>
@@ -135,12 +113,10 @@ export const ClientUI = ({
          1) Should I allow Convo deletion in the main /notes/[noteID] Page? 
       
             Or rather in the /notes/[noteID]/edit Page? 🤔
-
-        2) Need to move convos display to the top of the page.
          
       */}
       {convos.length === 0 ? (
-        <div>
+        <div className="mb-32">
           <p className="text-2xl mb-4">
             You have no Conversations for this Note.
           </p>
@@ -159,7 +135,8 @@ export const ClientUI = ({
           </div>
         </div>
       ) : (
-        <div>
+        <div className="mb-32">
+          {/* TODO: Add Create Convo button here */}
           <p className="text-2xl mb-16">
             Click on the Conversation link to view the Convo Chat thread and
             continue chatting with the LLM about your Note. 🦾
@@ -197,6 +174,31 @@ export const ClientUI = ({
             })}
           </ul>
         </div>
+      )}
+
+      <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
+
+      {noteFiles.length === 0 ? (
+        <div className="mb-36">
+          <p className="text-xl mb-1">
+            You have no files attached to this Note. 😔
+          </p>
+          <p className="text-xl mb-20">
+            You can add files to the note by clicking on the 👆🏽 above
+            &ldquo;Edit Your Note&rdquo; link.
+          </p>
+        </div>
+      ) : (
+        <ul className="space-y-4 mb-40">
+          {noteFiles.map((fileDoc) => (
+            <li key={fileDoc._id} className="border p-5">
+              <span className="font-semibold">File Name</span>:{' '}
+              {fileDoc.file_name} &nbsp; | &nbsp;{' '}
+              <span className="font-semibold">File Type</span>:{' '}
+              {fileDoc.file_type}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
