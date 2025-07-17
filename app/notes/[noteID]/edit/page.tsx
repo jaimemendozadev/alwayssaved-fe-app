@@ -40,11 +40,13 @@ export default async function NoteEditPage({
     );
   }
 
-  const files = await matchProjectFiles([
+  // See Dev Note #1 below.
+  const textFiles = await matchProjectFiles([
     {
       $match: {
         user_id: getObjectIDFromString(currentUser._id),
         note_id: getObjectIDFromString(currentNote._id),
+        file_type: { $eq: '.txt' },
         date_deleted: { $eq: null }
       }
     },
@@ -75,9 +77,19 @@ export default async function NoteEditPage({
     <ClientUI
       currentUser={currentUser}
       currentNote={currentNote}
-      noteFiles={files}
+      noteFiles={textFiles}
       currentNoteID={noteID}
       convos={activeConvos}
     />
   );
 }
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) For MVP v1, only rendering .txt files.
+    If there's time to implement paid tiered
+    users, access to .mp4 & .mp3 files will
+    be for higher subscription paying users.
+*/
