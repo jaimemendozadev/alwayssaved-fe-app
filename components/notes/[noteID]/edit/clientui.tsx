@@ -179,8 +179,6 @@ export const ClientUI = ({
         💬 Remove or Add Conversations for {currentNote.title} Note
       </h2>
 
-      {/* TODO: Will have to disable handleNewConvo button if there are no Files attached to the Note. */}
-
       {convos.length === 0 && (
         <div className="mb-32">
           <p className="text-2xl mb-4">
@@ -258,9 +256,40 @@ export const ClientUI = ({
         </div>
       )}
 
-      <h2 className="text-3xl lg:text-4xl mb-6">
+      <h2 className="text-3xl lg:text-4xl mb-10">
         Remove Files Attached to Your Note
       </h2>
+
+      {/* 
+        TODOs: 
+
+            1) For v1 MVP, will need to only query .txt files from Database. If we
+               implement subscriptions, rendering .txt is for lower tier users and
+               .mp4 and mp3 files are for paid users.
+
+            2) Will have to disable handleNewConvo button if there are no Files attached to the Note.
+      
+      */}
+
+      <article className="mb-24">
+        <p className="text-lg mb-5 font-bold text-red-700">
+          📢 WARNING ABOUT DELETING .txt FILES:
+        </p>
+
+        <p className="text-lg mb-3">
+          If you delete a .txt text file from your Note, any conversation that
+          references that text file{' '}
+          <strong>
+            will severely affect the quality of your ongoing conversation
+          </strong>
+          .
+        </p>
+
+        <p className="text-lg">
+          In other words, the LLM will no longer understand what you&apos;re
+          talking about going forward. 😵‍💫
+        </p>
+      </article>
 
       <DeleteModal
         deleteCallback={deleteTxtFileCallback}
@@ -275,23 +304,6 @@ export const ClientUI = ({
           in the dropdown below.
         </p>
       )}
-
-      {/* 
-        TODOs: 
-        
-            1) Will need to add User instructions that once they delete a .txt Transcript file, 
-               any ongoing conversations that reference a deleted file won't work properly
-               because the LLM no longer has access to that information. 😱
-
-            2) Need to add Warning Modal to warn the User if they try deleting a .txt file
-               and how it affects ongoing conversations that reference that soon to be
-               deleted .txt file. 😱
-
-            3) For v1 MVP, will need to only query .txt files from Database. If we
-               implement subscriptions, rendering .txt is for lower tier users and
-               .mp4 and mp3 files are for paid users.
-      
-      */}
 
       {noteFiles.length > 0 && (
         <ul className="space-y-4 mb-16">
