@@ -2,9 +2,10 @@
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
 import { ClientUI } from '@/components/notes/[noteID]/edit';
+import { getObjectIDFromString } from '@/utils/mongodb';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
-import { getObjectIDFromString } from '@/utils/mongodb';
+import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 
 export default async function NoteEditPage({
   params
@@ -58,12 +59,25 @@ export default async function NoteEditPage({
     }
   ]);
 
+  const activeConvos = await matchProjectConversations([
+    {
+      $match: {
+        user_id: getObjectIDFromString(currentUser._id),
+        note_id: getObjectIDFromString(currentNote._id),
+        date_deleted: { $eq: null },
+        date_archived: { $eq: null }
+      }
+    },
+    { $project: { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 } }
+  ]);
+
   return (
     <ClientUI
       currentUser={currentUser}
       currentNote={currentNote}
       noteFiles={files}
       currentNoteID={noteID}
+      convos={activeConvos}
     />
   );
 }

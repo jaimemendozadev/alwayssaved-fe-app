@@ -1,22 +1,16 @@
 'use client';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import Link from 'next/link';
-import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import { Button, Tooltip, useDisclosure } from '@heroui/react';
-import { DeleteModal } from '@/components/deletemodal';
+import { Button } from '@heroui/react';
 import {
   LeanNote,
   LeanFile,
   LeanConversation,
   LeanUser
 } from '@/utils/mongodb';
-import {
-  createConversation,
-  deleteConvoByID
-} from '@/actions/schemamodels/conversations';
-import { deleteMessagesByConvoID } from '@/actions/schemamodels/convomessages';
+import { createConversation } from '@/actions/schemamodels/conversations';
 
 interface ClientUIProps {
   currentUser: LeanUser;
@@ -25,16 +19,12 @@ interface ClientUIProps {
   convos: LeanConversation[];
 }
 
-const toastOptions = { duration: 6000 };
-
 export const ClientUI = ({
   currentUser,
   currentNote,
   noteFiles,
   convos
 }: ClientUIProps): ReactNode => {
-  // const [convoDeleteID, updateConvoDeletion] = useState<string | null>(null);
-  // const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const editURL = `/notes/${currentNote._id.toString()}/edit`;
 
@@ -49,31 +39,6 @@ export const ClientUI = ({
       `There was an error creating a new Conversation for Note ${currentNote._id}`
     );
   };
-
-  // See Dev Notes below.
-  // const deleteCallback = async (onClose: () => void): Promise<void> => {
-  //   if (convoDeleteID === null) return;
-
-  //   console.log('convoDeleteID  in deleteCallback ', convoDeleteID);
-
-  //   // TODO: Review the return value of each asyn function.
-  //   await deleteConvoByID(convoDeleteID);
-
-  //   await deleteMessagesByConvoID(convoDeleteID);
-
-  //   toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
-
-  //   updateConvoDeletion(null);
-
-  //   onClose();
-
-  //   router.refresh();
-  // };
-
-  // const onModalClose = (onClose: () => void) => {
-  //   updateConvoDeletion(null);
-  //   onClose();
-  // };
 
   return (
     <div className="p-6 w-[85%]">
@@ -97,24 +62,10 @@ export const ClientUI = ({
         </Button>
       </div>
 
-      {/* <DeleteModal
-        deleteCallback={deleteCallback}
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        resourceType="Conversation"
-        onModalClose={onModalClose}
-      /> */}
-
       <h2 className="text-3xl lg:text-4xl mb-10">
         💬 Conversations for {currentNote.title} Note
       </h2>
 
-      {/* TODOs: 
-      
-      
-            Or rather in the /notes/[noteID]/edit Page? 🤔
-         
-      */}
       {convos.length === 0 ? (
         <div className="mb-32">
           <p className="text-2xl mb-4">
@@ -171,20 +122,6 @@ export const ClientUI = ({
                     <span className="font-semibold">Convo Start Date</span>:{' '}
                     {dayjs(convo.date_started).format('dddd, MMMM D, YYYY')}
                   </Link>
-                  {/* <Tooltip content="Delete Convo">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      isIconOnly={true}
-                      aria-label="Delete"
-                      onPress={() => {
-                        updateConvoDeletion(convo._id);
-                        onOpen();
-                      }}
-                    >
-                      🗑️
-                    </Button>
-                  </Tooltip> */}
                 </li>
               );
             })}
