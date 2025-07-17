@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -38,7 +38,13 @@ export const ClientUI = ({
   currentNoteID,
   convos
 }: ClientUIProps): ReactNode => {
+  const [targetFile, setTargetFile] = useState<LeanFile | null>(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: txtIsOpen,
+    onOpen: textOnOpen,
+    onOpenChange: txtOnOpenChange
+  } = useDisclosure();
   const router = useRouter();
 
   const handleRedirect = () => {
@@ -63,6 +69,28 @@ export const ClientUI = ({
     );
 
     onClose();
+  };
+
+  const deleteTxtFileCallback = async (onClose: () => void) => {
+    if (targetFile === null) return;
+
+    const { _id, file_type } = targetFile;
+
+    const deletedFile = await purgeFileByID(_id, file_type);
+
+    if (deletedFile && deletedFile.date_deleted) {
+      toast.success(
+        'Your text transcript File was successfully deleted. 👍🏽',
+        toastOptions
+      );
+      onClose();
+      router.refresh();
+      return;
+    }
+
+    throw new Error(
+      `There was an error deleting the .txt File ${_id} for User ${currentUser._id} in deleteTxtFileCallback.`
+    );
   };
 
   const handleNewConvo = async () => {
@@ -148,12 +176,12 @@ export const ClientUI = ({
       </div>
 
       <h2 className="text-3xl lg:text-4xl mb-10">
-        💬 Remove of Add Conversations for {currentNote.title} Note
+        💬 Remove or Add Conversations for {currentNote.title} Note
       </h2>
 
       {/* TODO: Will have to disable handleNewConvo button if there are no Files attached to the Note. */}
 
-      {convos.length === 0 ? (
+      {convos.length === 0 && (
         <div className="mb-32">
           <p className="text-2xl mb-4">
             You have no Conversations for this Note.
@@ -172,7 +200,9 @@ export const ClientUI = ({
             </Button>
           </div>
         </div>
-      ) : (
+      )}
+
+      {convos.length > 0 && (
         <div className="mb-48">
           <div className="mb-24">
             <p className="text-2xl mb-4">
@@ -207,7 +237,8 @@ export const ClientUI = ({
                     <span className="font-semibold">Convo Name</span>:{' '}
                     {convo.title} &nbsp; | &nbsp;{' '}
                     <span className="font-semibold">Convo Start Date</span>:{' '}
-                    {dayjs(convo.date_started).format('dddd, MMMM D, YYYY')}
+                    {dayjs(convo.date_started).format('dddd, MMMM D, YYYY')}{' '}
+                    &nbsp;{' '}
                   </Link>
                   <Tooltip content="Delete Convo">
                     <Button
@@ -231,6 +262,13 @@ export const ClientUI = ({
         Remove Files Attached to Your Note
       </h2>
 
+      <DeleteModal
+        deleteCallback={deleteTxtFileCallback}
+        isOpen={txtIsOpen}
+        onOpenChange={txtOnOpenChange}
+        resourceType=".txt File"
+      />
+
       {noteFiles.length === 0 && (
         <p className="text-xl mb-16">
           You have no files attached to this Note. You can add files to the note
@@ -248,6 +286,10 @@ export const ClientUI = ({
             2) Need to add Warning Modal to warn the User if they try deleting a .txt file
                and how it affects ongoing conversations that reference that soon to be
                deleted .txt file. 😱
+
+            3) For v1 MVP, will need to only query .txt files from Database. If we
+               implement subscriptions, rendering .txt is for lower tier users and
+               .mp4 and mp3 files are for paid users.
       
       */}
 
@@ -266,6 +308,12 @@ export const ClientUI = ({
                   isIconOnly={true}
                   aria-label="Delete"
                   onPress={async () => {
+                    if (fileDoc.file_type === '.txt') {
+                      setTargetFile(fileDoc);
+                      textOnOpen();
+                      return;
+                    }
+
                     const purgedResult = await purgeFileByID(
                       fileDoc._id,
                       fileDoc.file_type
