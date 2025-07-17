@@ -33,8 +33,8 @@ export const ClientUI = ({
   noteFiles,
   convos
 }: ClientUIProps): ReactNode => {
-  const [convoDeleteID, updateConvoDeletion] = useState<string | null>(null);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  // const [convoDeleteID, updateConvoDeletion] = useState<string | null>(null);
+  // const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const editURL = `/notes/${currentNote._id.toString()}/edit`;
 
@@ -51,29 +51,29 @@ export const ClientUI = ({
   };
 
   // See Dev Notes below.
-  const deleteCallback = async (onClose: () => void): Promise<void> => {
-    if (convoDeleteID === null) return;
+  // const deleteCallback = async (onClose: () => void): Promise<void> => {
+  //   if (convoDeleteID === null) return;
 
-    console.log('convoDeleteID  in deleteCallback ', convoDeleteID);
+  //   console.log('convoDeleteID  in deleteCallback ', convoDeleteID);
 
-    // TODO: Review the return value of each asyn function.
-    await deleteConvoByID(convoDeleteID);
+  //   // TODO: Review the return value of each asyn function.
+  //   await deleteConvoByID(convoDeleteID);
 
-    await deleteMessagesByConvoID(convoDeleteID);
+  //   await deleteMessagesByConvoID(convoDeleteID);
 
-    toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
+  //   toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
 
-    updateConvoDeletion(null);
+  //   updateConvoDeletion(null);
 
-    onClose();
+  //   onClose();
 
-    router.refresh();
-  };
+  //   router.refresh();
+  // };
 
-  const onModalClose = (onClose: () => void) => {
-    updateConvoDeletion(null);
-    onClose();
-  };
+  // const onModalClose = (onClose: () => void) => {
+  //   updateConvoDeletion(null);
+  //   onClose();
+  // };
 
   return (
     <div className="p-6 w-[85%]">
@@ -86,6 +86,7 @@ export const ClientUI = ({
       </p>
       <ul className="text-2xl mb-8">
         <li>☑️ Delete or upload new files to your Note;</li>
+        <li>☑️ Delete unwanted Conversations;</li>
         <li>☑️ Change the Title of your Note; or</li>
         <li>☑️ Delete your entire Note. 😱</li>
       </ul>
@@ -96,13 +97,13 @@ export const ClientUI = ({
         </Button>
       </div>
 
-      <DeleteModal
+      {/* <DeleteModal
         deleteCallback={deleteCallback}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         resourceType="Conversation"
         onModalClose={onModalClose}
-      />
+      /> */}
 
       <h2 className="text-3xl lg:text-4xl mb-10">
         💬 Conversations for {currentNote.title} Note
@@ -110,7 +111,6 @@ export const ClientUI = ({
 
       {/* TODOs: 
       
-         1) Should I allow Convo deletion in the main /notes/[noteID] Page? 
       
             Or rather in the /notes/[noteID]/edit Page? 🤔
          
@@ -135,12 +135,29 @@ export const ClientUI = ({
           </div>
         </div>
       ) : (
-        <div className="mb-32">
-          {/* TODO: Add Create Convo button here */}
-          <p className="text-2xl mb-16">
-            Click on the Conversation link to view the Convo Chat thread and
-            continue chatting with the LLM about your Note. 🦾
-          </p>
+        <div className="mb-44">
+          <div className="mb-24">
+            <p className="text-2xl mb-4">
+              Click on any Conversation link below to view the Convo Chat thread
+              and continue chatting with the LLM about your Note files. 🦾
+            </p>
+
+            <p className="text-2xl mb-16">
+              Or you can click on the &lsquo;Create Convo&rsquo; button and
+              start a new Conversation about your Note Files.
+            </p>
+
+            <div>
+              <Button
+                size="md"
+                variant="ghost"
+                onPress={async () => await handleNewConvo()}
+              >
+                💬 Create Convo
+              </Button>
+            </div>
+          </div>
+
           <ul className="space-y-7">
             {convos.map((convo) => {
               return (
@@ -154,8 +171,7 @@ export const ClientUI = ({
                     <span className="font-semibold">Convo Start Date</span>:{' '}
                     {dayjs(convo.date_started).format('dddd, MMMM D, YYYY')}
                   </Link>
-                  &nbsp; | &nbsp;{' '}
-                  <Tooltip content="Delete Convo">
+                  {/* <Tooltip content="Delete Convo">
                     <Button
                       size="sm"
                       variant="ghost"
@@ -168,7 +184,7 @@ export const ClientUI = ({
                     >
                       🗑️
                     </Button>
-                  </Tooltip>
+                  </Tooltip> */}
                 </li>
               );
             })}
