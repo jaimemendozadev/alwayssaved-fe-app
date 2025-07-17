@@ -78,6 +78,19 @@ export const ClientUI = ({
         </p>
       )}
 
+      {/* 
+        TODOs: 
+        
+            1) Will need to add User instructions that once they delete a .txt Transcript file, 
+               any ongoing conversations that reference a deleted file won't work properly
+               because the LLM no longer has access to that information. 😱
+
+            2) Need to add Warning Modal to warn the User if they try deleting a .txt file
+               and how it affects ongoing conversations that reference that soon to be
+               deleted .txt file. 😱
+      
+      */}
+
       {noteFiles.length > 0 && (
         <ul className="space-y-4 mb-44">
           {noteFiles.map((fileDoc) => (
