@@ -34,7 +34,7 @@ export const matchProjectFiles = async (
   return deepLean(foundNotes);
 };
 
-// See Dev Notes below.
+// See Dev Note #1 below.
 export const purgeFileByID = async (
   fileID: string,
   fileType: string
@@ -63,35 +63,43 @@ export const purgeFileByID = async (
     const qdrantDB = await getQdrantDB();
 
     if (qdrantDB && QDRANT_COLLECTION_NAME) {
-      console.log('deleting .txt file from Qdrant ', foundFile);
-      console.log('\n');
+      const note_id = foundFile.note_id.toString();
+      const file_id = foundFile._id.toString();
+      const user_id = foundFile.user_id.toString();
 
-      const qdrantRes = await qdrantDB.delete(QDRANT_COLLECTION_NAME, {
-        filter: {
-          must: [
-            {
-              key: 'note_id',
-              match: { value: foundFile.note_id.toString() }
-            },
-            {
-              key: 'file_id',
-              match: { value: foundFile._id.toString() }
-            },
-            {
-              key: 'user_id',
-              match: { value: foundFile.user_id.toString() }
-            },
-            {
-              key: 's3_key',
-              match: { value: foundFile.s3_key }
-            }
-          ]
-        },
-        wait: true
+      const qdrantFilter = {
+        must: [
+          { key: 'note_id', match: { value: note_id } },
+          { key: 'file_id', match: { value: file_id } },
+          { key: 'user_id', match: { value: user_id } }
+        ]
+      };
+
+      console.log(`🔍 Scrolling Qdrant for points to delete...`);
+      const scrollResult = await qdrantDB.scroll(QDRANT_COLLECTION_NAME, {
+        filter: qdrantFilter,
+        limit: 10
       });
 
-      console.log('qdrantRes for point deletion ', qdrantRes);
-      console.log('\n');
+      const matchedPoints = scrollResult?.points || [];
+
+      if (matchedPoints.length === 0) {
+        console.warn(
+          `⚠️ No Qdrant points matched for note_id: ${note_id}, file_id: ${file_id}, user_id: ${user_id}. Skipping delete.`
+        );
+      } else {
+        console.log(
+          `🗑️ Found ${matchedPoints.length} Qdrant point(s) to delete. Proceeding...`
+        );
+
+        // TODO: Should we do something with qdrantResult of { operation_id: num, status: 'completed' }?
+        const qdrantRes = await qdrantDB.delete(QDRANT_COLLECTION_NAME, {
+          filter: qdrantFilter,
+          wait: true
+        });
+
+        console.log('✅ Qdrant delete result in purgeFileByID: ', qdrantRes);
+      }
     } else {
       throw new Error(
         `There was a problem getting the Qdrant Database connection for File ${fileID}.`
