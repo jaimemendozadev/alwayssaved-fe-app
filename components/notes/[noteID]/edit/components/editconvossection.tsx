@@ -87,7 +87,7 @@ export const EditConvosSection = ({
             Click on the &lsquo;Create Convo&rsquo; button and start chatting
             with the LLM about your Note Files. 🤖
           </p>
-          <div>
+          <div className="mb-10">
             <Button
               size="md"
               variant="ghost"
@@ -96,13 +96,10 @@ export const EditConvosSection = ({
               💬 Create Convo
             </Button>
           </div>
-        </div>
-      )}
 
-      {convos.length === 0 && (
-        <div className="mb-32">
-          <p className="text-3xl lg:text-4xl mb-4">Note Conversations</p>
-          <p className="text-2xl">You have no Conversations for this Note.</p>
+          {convos.length === 0 && (
+            <p className="text-2xl">You have no Conversations for this Note.</p>
+          )}
         </div>
       )}
 
