@@ -1,3 +1,3 @@
 import { FileUploadSection } from './fileuploadsection';
-
-export { FileUploadSection };
+import { EditConvosSection } from './editconvossection';
+export { FileUploadSection, EditConvosSection };
