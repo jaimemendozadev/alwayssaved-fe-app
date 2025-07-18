@@ -1,31 +1,74 @@
 'use client';
 import { ReactNode } from 'react';
-import dayjs from 'dayjs';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 import { Button, Tooltip } from '@heroui/react';
-import { LeanConversation, LeanFile, LeanNote } from '@/utils/mongodb';
+import {
+  createConversation,
+  deleteConvoByID
+} from '@/actions/schemamodels/conversations';
+import { deleteMessagesByConvoID } from '@/actions/schemamodels/convomessages';
+import {
+  LeanConversation,
+  LeanFile,
+  LeanNote,
+  LeanUser
+} from '@/utils/mongodb';
 
 interface EditConvosSectionProps {
+  currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
   convos: LeanConversation[];
-  handleNewConvo: () => void;
-  handleConvoDeletion: (convoID: string) => void;
 }
+
+const toastOptions = { duration: 6000 };
+
 export const EditConvosSection = ({
+  currentUser,
   currentNote,
   noteFiles,
-  convos,
-  handleNewConvo,
-  handleConvoDeletion
+  convos
 }: EditConvosSectionProps): ReactNode => {
+  const router = useRouter();
+
+  const handleNewConvo = async () => {
+    const newConvo = await createConversation(currentUser._id, currentNote._id);
+
+    if (newConvo) {
+      router.push(`/notes/${currentNote._id}/convos/${newConvo._id}`);
+    }
+
+    throw new Error(
+      `There was an error creating a new Conversation for Note ${currentNote._id}`
+    );
+  };
+
+  // See Dev Note #1 below.
+  const handleConvoDeletion = async (convoID: string): Promise<void> => {
+    if (convoID === null) return;
+
+    console.log('convoID  in handleConvoDeletion ', convoID);
+
+    // TODO: Review the return value of each asyn function.
+    await deleteConvoByID(convoID);
+
+    await deleteMessagesByConvoID(convoID);
+
+    toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
+
+    router.refresh();
+  };
+
   return (
     <>
       <h2 className="text-3xl lg:text-4xl mb-10">
         💬 Remove or Add Conversations for {currentNote.title} Note
       </h2>
 
-      {noteFiles.length === 0 ? (
+      {noteFiles.length === 0 && (
         <div className="mb-32">
           <p className="text-xl mb-8">
             You have no Files attached to this Note. 😔
@@ -38,7 +81,9 @@ export const EditConvosSection = ({
             You can add Files to the Note in the file uploader above. ☝️
           </p>
         </div>
-      ) : (
+      )}
+
+      {noteFiles.length > 0 && (
         <div className="mb-32">
           <p className="text-2xl mb-8">
             Click on the &lsquo;Create Convo&rsquo; button and start chatting
@@ -56,7 +101,13 @@ export const EditConvosSection = ({
         </div>
       )}
 
-      {convos.length > 0 ? (
+      {convos.length === 0 && (
+        <div className="mb-24">
+          <p className="text-2xl">You have no Conversations for this Note.</p>
+        </div>
+      )}
+
+      {convos.length > 0 && (
         <div className="mb-24">
           <p className="text-2xl mb-4">
             Click on the &lsquo;Delete Convo&rsquo; trash can button to remove
@@ -93,11 +144,19 @@ export const EditConvosSection = ({
             })}
           </ul>
         </div>
-      ) : (
-        <div className="mb-24">
-          <p className="text-2xl">You have no Conversations for this Note.</p>
-        </div>
       )}
     </>
   );
 };
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) Conversation & ConvoMessage documents are not
+    hard deleted in the app. They're marked with
+    date_deleted value in the document. They will
+    be removed from the database in a separate
+    async job.
+
+*/

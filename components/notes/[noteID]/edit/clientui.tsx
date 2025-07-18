@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, } from 'react';
+import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Button, useDisclosure } from '@heroui/react';
@@ -11,11 +11,6 @@ import {
 } from '@/utils/mongodb';
 import { deleteNoteByID } from '@/actions/schemamodels/notes';
 import { DeleteModal } from '@/components/deletemodal';
-import {
-  createConversation,
-  deleteConvoByID
-} from '@/actions/schemamodels/conversations';
-import { deleteMessagesByConvoID } from '@/actions/schemamodels/convomessages';
 import {
   EditConvosSection,
   FileUploadSection,
@@ -66,37 +61,6 @@ export const ClientUI = ({
     onClose();
   };
 
-  const handleNewConvo = async () => {
-    const newConvo = await createConversation(currentUser._id, currentNote._id);
-
-    if (newConvo) {
-      router.push(`/notes/${currentNote._id}/convos/${newConvo._id}`);
-    }
-
-    throw new Error(
-      `There was an error creating a new Conversation for Note ${currentNote._id}`
-    );
-  };
-
-  // See Dev Note #2 below.
-  const handleConvoDeletion = async (convoID: string): Promise<void> => {
-    if (convoID === null) return;
-
-    console.log('convoID  in handleConvoDeletion ', convoID);
-
-    // TODO: Review the return value of each asyn function.
-    await deleteConvoByID(convoID);
-
-    await deleteMessagesByConvoID(convoID);
-
-    toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
-
-    router.refresh();
-  };
-
-  console.log('noteFiles in /notes/[noteID]/edit ', noteFiles);
-  console.log('\n');
-
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
@@ -123,11 +87,10 @@ export const ClientUI = ({
       />
 
       <EditConvosSection
+        currentUser={currentUser}
         currentNote={currentNote}
         noteFiles={noteFiles}
         convos={convos}
-        handleConvoDeletion={handleConvoDeletion}
-        handleNewConvo={handleNewConvo}
       />
 
       <RemoveFilesSection currentUser={currentUser} noteFiles={noteFiles} />
@@ -148,11 +111,5 @@ export const ClientUI = ({
       - Deleting all the Vector points in Vector DB.
       - Deleting File DB document.
     - Deleting the Note DB document.
-
- 2) Conversation & ConvoMessage documents are not
-    hard deleted in the app. They're marked with
-    date_deleted value in the document. They will
-    be removed from the database in a separate
-    async job.
 
 */

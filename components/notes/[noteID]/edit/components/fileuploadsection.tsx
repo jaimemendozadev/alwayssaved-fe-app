@@ -1,7 +1,7 @@
 'use client';
-
 import { ReactNode } from 'react';
 import { LeanUser } from '@/utils/mongodb';
+import { FileUpload } from '@/components/fileupload';
 
 interface FileUploadSectionProps {
   currentUser: LeanUser;
