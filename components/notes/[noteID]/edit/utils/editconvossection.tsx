@@ -25,8 +25,6 @@ export const EditConvosSection = ({
         💬 Remove or Add Conversations for {currentNote.title} Note
       </h2>
 
-      {/* <p className="text-2xl mb-4">You have no Conversations for this Note.</p> */}
-
       {noteFiles.length === 0 ? (
         <div className="mb-32">
           <p className="text-xl mb-8">
@@ -43,8 +41,8 @@ export const EditConvosSection = ({
       ) : (
         <div className="mb-32">
           <p className="text-2xl mb-8">
-            Create a Conversation for this Note to start chatting with the LLM.
-            🤖
+            Click on the &lsquo;Create Convo&rsquo; button and start chatting
+            with the LLM about your Note Files. 🤖
           </p>
           <div>
             <Button
@@ -58,7 +56,7 @@ export const EditConvosSection = ({
         </div>
       )}
 
-      {convos.length > 0 && (
+      {convos.length > 0 ? (
         <div className="mb-24">
           <p className="text-2xl mb-4">
             Click on the &lsquo;Delete Convo&rsquo; trash can button to remove
@@ -95,23 +93,9 @@ export const EditConvosSection = ({
             })}
           </ul>
         </div>
-      )}
-
-      {noteFiles.length > 0 && (
-        <div className="mb-48">
-          <p className="text-2xl mb-16">
-            Or you can click on the &lsquo;Create Convo&rsquo; button and start
-            a new Conversation about your Note Files.
-          </p>
-          <div>
-            <Button
-              size="md"
-              variant="ghost"
-              onPress={async () => await handleNewConvo()}
-            >
-              💬 Create Convo
-            </Button>
-          </div>{' '}
+      ) : (
+        <div className="mb-24">
+          <p className="text-2xl">You have no Conversations for this Note.</p>
         </div>
       )}
     </>
