@@ -66,26 +66,32 @@ export const ClientUI = ({
         💬 Conversations for {currentNote.title} Note
       </h2>
 
-      {convos.length === 0 ? (
+      {convos.length === 0 && (
         <div className="mb-32">
           <p className="text-2xl mb-4">
             You have no Conversations for this Note.
           </p>
-          <p className="text-2xl mb-8">
-            Create a Conversation for this Note to start chatting with the LLM.
-            🤖
-          </p>
-          <div>
-            <Button
-              size="md"
-              variant="ghost"
-              onPress={async () => await handleNewConvo()}
-            >
-              💬 Create Convo
-            </Button>
-          </div>
+          {noteFiles.length > 0 && (
+            <>
+              <p className="text-2xl mb-8">
+                Create a Conversation for this Note to start chatting with the
+                LLM. 🤖
+              </p>
+              <div>
+                <Button
+                  size="md"
+                  variant="ghost"
+                  onPress={async () => await handleNewConvo()}
+                >
+                  💬 Create Convo
+                </Button>
+              </div>
+            </>
+          )}
         </div>
-      ) : (
+      )}
+
+      {convos.length > 0 && (
         <div className="mb-44">
           <div className="mb-24">
             <p className="text-2xl mb-4">
@@ -93,20 +99,24 @@ export const ClientUI = ({
               and continue chatting with the LLM about your Note files. 🦾
             </p>
 
-            <p className="text-2xl mb-16">
-              Or you can click on the &lsquo;Create Convo&rsquo; button and
-              start a new Conversation about your Note Files.
-            </p>
+            {noteFiles.length > 0 && (
+              <>
+                <p className="text-2xl mb-16">
+                  Or you can click on the &lsquo;Create Convo&rsquo; button and
+                  start a new Conversation about your Note Files.
+                </p>
 
-            <div>
-              <Button
-                size="md"
-                variant="ghost"
-                onPress={async () => await handleNewConvo()}
-              >
-                💬 Create Convo
-              </Button>
-            </div>
+                <div>
+                  <Button
+                    size="md"
+                    variant="ghost"
+                    onPress={async () => await handleNewConvo()}
+                  >
+                    💬 Create Convo
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
 
           <ul className="space-y-7">
