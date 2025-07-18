@@ -64,12 +64,9 @@ export const EditConvosSection = ({
 
   return (
     <>
-      <h2 className="text-3xl lg:text-4xl mb-10">
-        💬 Remove or Add Conversations for {currentNote.title} Note
-      </h2>
-
       {noteFiles.length === 0 && (
         <div className="mb-32">
+          <h2 className="text-3xl lg:text-4xl mb-4">Attached Note Files</h2>
           <p className="text-xl mb-8">
             You have no Files attached to this Note. 😔
           </p>
@@ -85,6 +82,7 @@ export const EditConvosSection = ({
 
       {noteFiles.length > 0 && (
         <div className="mb-32">
+          <h2 className="text-3xl lg:text-4xl mb-4">Note Conversations</h2>
           <p className="text-2xl mb-8">
             Click on the &lsquo;Create Convo&rsquo; button and start chatting
             with the LLM about your Note Files. 🤖
@@ -102,7 +100,8 @@ export const EditConvosSection = ({
       )}
 
       {convos.length === 0 && (
-        <div className="mb-24">
+        <div className="mb-32">
+          <p className="text-3xl lg:text-4xl mb-4">Note Conversations</p>
           <p className="text-2xl">You have no Conversations for this Note.</p>
         </div>
       )}

@@ -46,6 +46,8 @@ export const RemoveFilesSection = ({
     );
   };
 
+  if (noteFiles.length === 0) return null;
+
   return (
     <>
       <h2 className="text-3xl lg:text-4xl mb-10">
@@ -78,13 +80,6 @@ export const RemoveFilesSection = ({
         onOpenChange={onOpenChange}
         resourceType=".txt File"
       />
-
-      {noteFiles.length === 0 && (
-        <p className="text-xl mb-16">
-          You have no files attached to this Note. You can add files to the note
-          in the file uploader above. ☝️
-        </p>
-      )}
 
       {noteFiles.length > 0 && (
         <ul className="space-y-4 mb-16">
