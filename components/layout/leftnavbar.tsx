@@ -21,11 +21,11 @@ export const LeftNavbar = (): ReactNode => {
         </p>
       </div>
 
-      <div className="min-w-28 p-5 mb-2 w-36">
+      {/* <div className="min-w-28 p-5 mb-2 w-36">
         <p className="text-[#919191] font-semibold">
           <Link href="/convos">💬 Convos</Link>
         </p>
-      </div>
+      </div> */}
 
       <div className="min-w-28 p-5 w-36">
         <div className="text-[#919191] font-semibold">
