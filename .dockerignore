@@ -1,0 +1,24 @@
+# Node modules & build output
+node_modules
+.next
+dist
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files (keep only the one you explicitly copy)
+.env*
+!.env.production
+
+# Misc
+.DS_Store
+.vscode
+.idea
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
