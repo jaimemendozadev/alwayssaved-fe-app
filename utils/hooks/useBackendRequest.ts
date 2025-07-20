@@ -2,7 +2,7 @@ import { useAuth } from '@clerk/nextjs';
 import { HTTP_METHODS } from '../ts';
 const BACKEND_BASE_URL =
   process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_PRODUCTION_BACKEND_BASE_URL
+    ? process.env.PRODUCTION_BACKEND_BASE_URL
     : process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL;
 
 interface MakeRequestOptions {

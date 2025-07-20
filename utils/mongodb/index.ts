@@ -1,11 +1,13 @@
+import mongoose from 'mongoose';
 export * from './schemamodels/users';
 export * from './schemamodels/files';
 export * from './schemamodels/notes';
 export * from './schemamodels/conversations';
 export * from './schemamodels/convomessages';
 export * from './utils';
+import { getDBVarsByEnv } from './utils';
 
-import mongoose from 'mongoose';
+const NODE_ENV = process.env.NODE_ENV;
 
 interface MongooseGlobal {
   conn: mongoose.Connection | null;
@@ -34,27 +36,15 @@ export async function dbConnect() {
         bufferCommands: false
       };
 
-      // TODO: May have to refactor and fetch env variables with get ssm getSecret()
+      const dbVars = await getDBVarsByEnv(NODE_ENV);
+
       const {
-        MONGO_DB_USER,
-        MONGO_DB_PASSWORD,
-        MONGO_DB_NAME,
         MONGO_DB_BASE_URI,
-        MONGO_DB_CLUSTER_NAME
-      } = process.env;
-
-      const haveMissingEnvVars =
-        MONGO_DB_USER === undefined ||
-        MONGO_DB_PASSWORD === undefined ||
-        MONGO_DB_BASE_URI === undefined ||
-        MONGO_DB_NAME === undefined ||
-        MONGO_DB_CLUSTER_NAME === undefined;
-
-      if (haveMissingEnvVars) {
-        throw new Error(
-          'Please define the necessary MongoDB env vars in your .env file.'
-        );
-      }
+        MONGO_DB_CLUSTER_NAME,
+        MONGO_DB_NAME,
+        MONGO_DB_PASSWORD,
+        MONGO_DB_USER
+      } = dbVars;
 
       // See Dev Notes below.
       const connectString = `mongodb+srv://${MONGO_DB_USER}:${MONGO_DB_PASSWORD}@${MONGO_DB_BASE_URI}/${MONGO_DB_NAME}?retryWrites=true&w=majority&appName=${MONGO_DB_CLUSTER_NAME}`;
