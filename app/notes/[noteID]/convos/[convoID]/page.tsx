@@ -7,10 +7,12 @@ import { matchProjectConversations } from '@/actions/schemamodels/conversations'
 import { getObjectIDFromString } from '@/utils/mongodb';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
 
+type Params = Promise<{ noteID: string; convoID: string }>;
+
 export default async function ConvoIDPage({
   params
 }: {
-  params: { noteID: string; convoID: string };
+  params: Params;
 }): Promise<ReactNode> {
   const currentUser = await getUserFromDB();
   const { noteID, convoID } = await params;
