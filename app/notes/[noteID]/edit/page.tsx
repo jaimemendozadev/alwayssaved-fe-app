@@ -7,10 +7,12 @@ import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { matchProjectFiles } from '@/actions/schemamodels/files';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 
+type Params = Promise<{ noteID: string }>;
+
 export default async function NoteEditPage({
   params
 }: {
-  params: { noteID: string };
+  params: Params;
 }): Promise<ReactNode> {
   const { noteID } = await params;
 
