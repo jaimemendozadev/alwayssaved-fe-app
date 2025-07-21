@@ -2,6 +2,9 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
+# Disable Husky hooks in CI or Docker
+ENV HUSKY=0
+
 # Install dependencies
 COPY package.json package-lock.json ./
 RUN npm ci
