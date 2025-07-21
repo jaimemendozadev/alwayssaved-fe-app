@@ -34,13 +34,14 @@ export async function DELETE(
       `Could not delete file with fileID ${fileID} from database.`
     );
   } catch (error) {
+    const { fileID } = await params;
     // TODO: Handle in telemetry.
-    console.log(`Error in DELETE /api/files/${params.fileID} `, error);
+    console.log(`Error in DELETE /api/files/${fileID} `, error);
 
     return NextResponse.json(
       {
         status: 500,
-        message: `There was a problem deleting the file ${params.fileID}. Try again later.`
+        message: `There was a problem deleting the file ${fileID}. Try again later.`
       },
       { status: 500 }
     );
