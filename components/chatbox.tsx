@@ -8,7 +8,7 @@ import {
   useCallback,
   useEffect
 } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
@@ -49,7 +49,7 @@ export const ChatBox = ({
   const { makeRequest } = useBackendRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
 
-  const router = useRouter();
+  // const router = useRouter(); // TODO: Resolve what to do with this because this prevents build from happening.
 
   const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>

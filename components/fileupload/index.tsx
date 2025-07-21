@@ -121,8 +121,8 @@ export const FileUpload = ({
     setFlightStatus(true);
     updateProgress(7);
 
-    // TODO: Should we use this or delete it?
-    const isNewNote = currentNoteID === null;
+    // TODO: Resolve what to do with this because this prevents build from happening.
+    // const isNewNote = currentNoteID === null;
 
     // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
