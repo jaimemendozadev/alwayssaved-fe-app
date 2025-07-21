@@ -2,9 +2,11 @@ import { NextResponse, NextRequest } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { deleteFileFromS3 } from '@/utils/aws';
 
+type Params = Promise<{ s3_key: string }>;
+
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { s3_key: string } }
+  { params }: { params: Params }
 ): Promise<void | Response> {
   const user = await currentUser();
 
