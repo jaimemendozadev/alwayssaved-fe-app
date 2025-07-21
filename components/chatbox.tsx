@@ -15,6 +15,8 @@ import { Button } from '@heroui/react';
 import {
   getObjectIDFromString,
   LeanConvoMessage,
+  LeanFile,
+  LeanNote,
   LeanUser
 } from '@/utils/mongodb';
 import { BackendResponse, InputEvent, SubmitEvent } from '@/utils/ts';
@@ -27,13 +29,19 @@ import { getConvoMessageByID } from '@/actions/schemamodels/convomessages';
 
 interface ChatBoxProps {
   currentUser: LeanUser;
+  convoFiles: LeanFile[];
+  currentNote: LeanNote;
 }
 
 const defaultInput = 'Ask something';
 const DEFAULT_TITLE = 'Untitled';
 const toastOptions = { duration: 6000 };
 
-export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
+export const ChatBox = ({
+  currentUser,
+  convoFiles,
+  currentNote
+}: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
   const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
   const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
@@ -76,11 +84,18 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
 
       setFlightStatus(true);
 
+      // TODO: Should we return a toast message is convoFiles[] length is 0? 🤔
+
+      const file_ids_list = convoFiles.map((leanFile) => leanFile._id);
+      const note_id = currentNote._id;
+
       const userConvoMsg = {
         conversation_id: getObjectIDFromString(currentConvo._id),
         user_id: getObjectIDFromString(currentUser._id),
         sender_type: 'user',
-        message: userInput
+        message: userInput.trim(),
+        file_ids_list,
+        note_id
       };
 
       const options = {
@@ -150,6 +165,7 @@ export const ChatBox = ({ currentUser }: ChatBoxProps): ReactNode => {
       setFlightStatus(false);
     },
     [
+      convoFiles,
       convoThread,
       currentConvo,
       currentUser._id,

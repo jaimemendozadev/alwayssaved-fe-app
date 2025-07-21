@@ -1,16 +1,28 @@
 'use client';
 import { ReactNode, useContext, useEffect } from 'react';
 import { ChatBox } from '@/components/chatbox';
-import { LeanConversation, LeanUser } from '@/utils/mongodb';
+import {
+  LeanConversation,
+  LeanFile,
+  LeanNote,
+  LeanUser
+} from '@/utils/mongodb';
 import { ChatThread } from '@/components/chatthread';
 import { ConvoContext } from '@/components/context';
 import { getConversationMessages } from '@/actions/schemamodels/convomessages';
 interface ClientUIProps {
   currentUser: LeanUser;
   convo: LeanConversation;
+  convoFiles: LeanFile[];
+  currentNote: LeanNote;
 }
 
-export const ClientUI = ({ currentUser, convo }: ClientUIProps): ReactNode => {
+export const ClientUI = ({
+  currentUser,
+  convo,
+  convoFiles,
+  currentNote
+}: ClientUIProps): ReactNode => {
   const { currentConvo, convoThread, setCurrentConvo, updateThread } =
     useContext(ConvoContext);
 
@@ -38,7 +50,11 @@ export const ClientUI = ({ currentUser, convo }: ClientUIProps): ReactNode => {
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
       <ChatThread convoThread={convoThread} />
-      <ChatBox currentUser={currentUser} />
+      <ChatBox
+        currentUser={currentUser}
+        currentNote={currentNote}
+        convoFiles={convoFiles}
+      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { ClientUI } from '@/components/notes/[noteID]/convos/[convoID]';
 import { getNoteByID } from '@/actions/schemamodels/notes';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 import { getObjectIDFromString } from '@/utils/mongodb';
+import { matchProjectFiles } from '@/actions/schemamodels/files';
 
 export default async function ConvoIDPage({
   params
@@ -46,5 +47,28 @@ export default async function ConvoIDPage({
     );
   }
 
-  return <ClientUI convo={targetConvo} currentUser={currentUser} />;
+  const convoFiles = await matchProjectFiles([
+    {
+      $match: {
+        user_id: getObjectIDFromString(currentUser._id),
+        note_id: getObjectIDFromString(currentNote._id),
+        file_type: { $eq: '.txt' },
+        date_deleted: { $eq: null }
+      }
+    },
+    {
+      $project: {
+        _id: 1
+      }
+    }
+  ]);
+
+  return (
+    <ClientUI
+      convo={targetConvo}
+      currentUser={currentUser}
+      currentNote={currentNote}
+      convoFiles={convoFiles}
+    />
+  );
 }
