@@ -2,9 +2,11 @@ import { NextResponse, NextRequest } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
 import { FileModel, getObjectIDFromString } from '@/utils/mongodb';
 
+type Params = Promise<{ fileID: string }>;
+
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { fileID: string } }
+  { params }: { params: Params }
 ): Promise<Response> {
   const user = await currentUser();
 
