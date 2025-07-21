@@ -84,7 +84,12 @@ export const ChatBox = ({
 
       setFlightStatus(true);
 
-      // TODO: Should we return a toast message is convoFiles[] length is 0? 🤔
+      /*
+        TODOs: 
+        - Should we return a toast message is convoFiles[] length is 0? 🤔
+        - Shoud we show a list of all the files attached to the Convo as a reminder to the user? 🤔
+      */
+
 
       const file_ids_list = convoFiles.map((leanFile) => leanFile._id);
       const note_id = currentNote._id;
