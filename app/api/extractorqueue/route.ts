@@ -3,7 +3,7 @@ import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { currentUser } from '@clerk/nextjs/server';
 import { getAWSConfigByEnv, getSecret } from '@/utils/aws';
 
-const { NODE_ENV } = process.env;
+const { NODE_ENV, AWS_PARAM_BASE_PATH } = process.env;
 
 export async function POST(request: NextRequest): Promise<void | Response> {
   const user = await currentUser();
@@ -16,11 +16,11 @@ export async function POST(request: NextRequest): Promise<void | Response> {
 
   const body = await request.json();
 
-   const { note_id, user_id, s3_key } = body;
+  const { note_id, user_id, s3_key } = body;
 
   try {
     const EXTRACTOR_PUSH_QUEUE_URL = await getSecret(
-      '/alwayssaved/EXTRACTOR_PUSH_QUEUE_URL'
+      `/${AWS_PARAM_BASE_PATH}/EXTRACTOR_PUSH_QUEUE_URL`
     );
 
     if (!EXTRACTOR_PUSH_QUEUE_URL) {
@@ -31,11 +31,13 @@ export async function POST(request: NextRequest): Promise<void | Response> {
 
     const sqs_message = {
       user_id,
-      media_uploads: [{
-        note_id,
-        user_id,
-        s3_key
-      }]
+      media_uploads: [
+        {
+          note_id,
+          user_id,
+          s3_key
+        }
+      ]
     };
 
     const MessageBody = JSON.stringify(sqs_message);
