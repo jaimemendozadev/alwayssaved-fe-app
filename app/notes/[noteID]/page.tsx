@@ -6,10 +6,13 @@ import { matchProjectFiles } from '@/actions/schemamodels/files';
 import { ClientUI } from '@/components/notes/[noteID]';
 import { getObjectIDFromString } from '@/utils/mongodb';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
+
+type Params = Promise<{ noteID: string }>;
+
 export default async function NoteIDPage({
   params
 }: {
-  params: { noteID: string };
+  params: Params;
 }): Promise<ReactNode> {
   const { noteID } = await params;
 
