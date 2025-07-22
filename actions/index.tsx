@@ -4,8 +4,10 @@ import { currentUser } from '@clerk/nextjs/server';
 import { UserModel, LeanUser } from '@/utils/mongodb';
 import { deepLean } from '@/utils/mongodb/utils';
 export const getUserFromDB = async (): Promise<LeanUser | void> => {
-  await dbConnect();
+  
   const clerkUser = await currentUser();
+
+  await dbConnect();
 
   if (clerkUser === null) {
     throw new Error(

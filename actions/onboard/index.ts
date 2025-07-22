@@ -3,8 +3,10 @@ import { dbConnect, UserModel, LeanUser, deepLean } from '@/utils/mongodb';
 import { currentUser } from '@clerk/nextjs/server';
 
 export const registerNewUser = async (): Promise<LeanUser | void> => {
-  await dbConnect();
+  
   const clerkUser = await currentUser();
+
+  await dbConnect();
 
   if (clerkUser === null) {
     throw new Error(
