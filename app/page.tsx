@@ -38,7 +38,7 @@ export default function LandingPage() {
         <SignedOut>
           <SignUpButton>
             <button className="border-2 py-3 px-6 rounded-sm">
-              Sign Up
+              Sign Up &#47; Sign In
             </button>
           </SignUpButton>
           

@@ -1,34 +1,31 @@
 'use client';
-import { ReactNode, useEffect} from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {Spinner} from "@heroui/react";
+import { Spinner } from '@heroui/react';
 
 import { getUserFromDB } from '@/actions';
 
-const errorMessage = "Looks like you might have never registered to AlwaysSaved. 😬 Try again later.";
+const errorMessage =
+  'Looks like you might have never registered to AlwaysSaved. 😬 Try again later.';
 
 export default function SignInCheckPage(): ReactNode {
-
-  const router = useRouter();  
+  const router = useRouter();
 
   useEffect(() => {
     async function checkUserRegistration() {
-        const currentUser = await getUserFromDB()
+      const currentUser = await getUserFromDB();
 
-        console.log("currentUser in /signin-check ", currentUser);
+      console.log('currentUser in /signin-check ', currentUser);
 
-        if(currentUser) {
-            router.push('/home');
-        }
+      if (currentUser) {
+        router.push('/home');
+      }
 
-        throw new Error(errorMessage);
-
+      throw new Error(errorMessage);
     }
 
     checkUserRegistration();
-
-  }, [router])
-
+  }, [router]);
 
   return (
     <div className="flex justify-center">
