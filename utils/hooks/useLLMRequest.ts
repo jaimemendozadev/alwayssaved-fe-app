@@ -28,7 +28,7 @@ export const useLLMRequest = () => {
     baseURL =
       NODE_ENV === 'development'
         ? process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL
-        : getLLMBaseURL();
+        : await getLLMBaseURL();
 
     console.log('baseURL in Hook ', baseURL);
     console.log('\n');
