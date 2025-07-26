@@ -25,7 +25,15 @@ export const useBackendRequest = () => {
       Authorization: `Bearer ${token}`
     };
 
-    const res = await fetch(`${BACKEND_BASE_URL}/api${endpoint}`, {
+    console.log("BACKEND_BASE_URL in makeRequest ", BACKEND_BASE_URL);
+    console.log("\n");
+
+    const finalizedURL = `${BACKEND_BASE_URL}/api${endpoint}`;
+
+    console.log("finalizedURL ", finalizedURL);
+    console.log("\n");
+
+    const res = await fetch(finalizedURL, {
       method: options.method || 'GET',
       headers: {
         ...defaultHeaders,

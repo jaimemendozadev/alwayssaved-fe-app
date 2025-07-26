@@ -169,15 +169,7 @@ export const ChatBox = ({
 
       setFlightStatus(false);
     },
-    [
-      convoFiles,
-      convoThread,
-      currentConvo,
-      currentUser._id,
-      makeRequest,
-      updateThread,
-      userInput
-    ]
+    [convoFiles, convoThread, currentConvo, currentNote._id, currentUser._id, makeRequest, updateThread, userInput]
   );
 
   const titleChange = (evt: InputEvent) => {
