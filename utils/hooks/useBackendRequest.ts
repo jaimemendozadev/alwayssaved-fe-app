@@ -1,10 +1,8 @@
 import { useAuth } from '@clerk/nextjs';
 import { HTTP_METHODS } from '../ts';
-const BACKEND_BASE_URL =
-  process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_BACKEND_BASE_URL
-    : process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL;
+import { getLLMBaseURL } from '@/actions/hooks';
 
+const NODE_ENV = process.env.NODE_ENV;
 interface MakeRequestOptions {
   headers?: unknown;
   body?: unknown;
@@ -25,13 +23,26 @@ export const useBackendRequest = () => {
       Authorization: `Bearer ${token}`
     };
 
-    console.log("BACKEND_BASE_URL in makeRequest ", BACKEND_BASE_URL);
-    console.log("\n");
+    let baseURL: string | undefined = undefined;
 
-    const finalizedURL = `${BACKEND_BASE_URL}/api${endpoint}`;
+    baseURL =
+      NODE_ENV === 'development'
+        ? process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL
+        : getLLMBaseURL();
 
-    console.log("finalizedURL ", finalizedURL);
-    console.log("\n");
+    console.log('baseURL in Hook ', baseURL);
+    console.log('\n');
+
+    if (typeof baseURL !== 'string') {
+      throw new Error(
+        'BaseURL to connect and chat with LLM is missing in useBackendRequest. Try again later.'
+      );
+    }
+
+    const finalizedURL = `${baseURL}/api${endpoint}`;
+
+    console.log('finalizedURL ', finalizedURL);
+    console.log('\n');
 
     const res = await fetch(finalizedURL, {
       method: options.method || 'GET',
