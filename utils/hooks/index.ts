@@ -1,3 +1,3 @@
-import { useBackendRequest } from './useBackendRequest';
+import { useLLMRequest } from './useLLMRequest';
 
-export { useBackendRequest };
+export { useLLMRequest };

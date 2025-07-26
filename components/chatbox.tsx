@@ -21,7 +21,7 @@ import {
 } from '@/utils/mongodb';
 import { BackendResponse, InputEvent, SubmitEvent } from '@/utils/ts';
 import { updateConversationByID } from '@/actions/schemamodels/conversations';
-import { useBackendRequest } from '@/utils/hooks';
+import { useLLMRequest } from '@/utils/hooks';
 import { HTTP_METHOD } from 'next/dist/server/web/http';
 import { ConvoContext } from './context';
 import { TempConvoMessage } from './context/convocontext';
@@ -46,7 +46,7 @@ export const ChatBox = ({
   const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
   const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
   const [inFlight, setFlightStatus] = useState(false);
-  const { makeRequest } = useBackendRequest();
+  const { makeRequest } = useLLMRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
 
   // const router = useRouter(); // TODO: Resolve what to do with this because this prevents build from happening.

@@ -9,7 +9,7 @@ interface MakeRequestOptions {
   method?: HTTP_METHODS;
 }
 
-export const useBackendRequest = () => {
+export const useLLMRequest = () => {
   const { getToken } = useAuth();
 
   const makeRequest = async <T>(
@@ -35,7 +35,7 @@ export const useBackendRequest = () => {
 
     if (typeof baseURL !== 'string') {
       throw new Error(
-        'BaseURL to connect and chat with LLM is missing in useBackendRequest. Try again later.'
+        'BaseURL to connect and chat with LLM is missing in useLLMRequest. Try again later.'
       );
     }
 
@@ -53,7 +53,7 @@ export const useBackendRequest = () => {
       body: options.body ? JSON.stringify(options.body) : undefined
     }).then((res) => res.json());
 
-    console.log('res in useBackendRequest ', res);
+    console.log('res in useLLMRequest ', res);
 
     return res;
   };
