@@ -1,8 +1,10 @@
 import { useAuth } from '@clerk/nextjs';
 import { HTTP_METHODS } from '../ts';
-import { getLLMBaseURL } from '@/actions/hooks';
+import { getSecret } from '../aws';
 
 const NODE_ENV = process.env.NODE_ENV;
+const AWS_PARAM_BASE_PATH = process.env.NEXT_PUBLIC_AWS_PARAM_BASE_PATH;
+
 interface MakeRequestOptions {
   headers?: unknown;
   body?: unknown;
@@ -23,12 +25,12 @@ export const useLLMRequest = () => {
       Authorization: `Bearer ${token}`
     };
 
-    let baseURL: string | undefined = undefined;
+    let baseURL: string | null | undefined = undefined;
 
     baseURL =
       NODE_ENV === 'development'
         ? process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL
-        : await getLLMBaseURL();
+        : await getSecret(`/${AWS_PARAM_BASE_PATH}/LLM_PRIVATE_IP`);
 
     console.log('baseURL in Hook ', baseURL);
     console.log('\n');
@@ -39,7 +41,7 @@ export const useLLMRequest = () => {
       );
     }
 
-    const finalizedURL = `${baseURL}/api${endpoint}`;
+    const finalizedURL = `${baseURL}:8000/api${endpoint}`;
 
     console.log('finalizedURL ', finalizedURL);
     console.log('\n');
