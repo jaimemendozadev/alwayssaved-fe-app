@@ -27,6 +27,9 @@ export const useLLMRequest = () => {
 
     let baseURL: string | null | undefined = undefined;
 
+    console.log("AWS_PARAM_BASE_PATH ", AWS_PARAM_BASE_PATH);
+    console.log("\n");
+
     baseURL =
       NODE_ENV === 'development'
         ? process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL
