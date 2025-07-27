@@ -34,4 +34,4 @@ EXPOSE 3000
 ENV NODE_ENV=production
 
 # Run the Next.js app
-CMD ["npm", "start"]
+CMD ["npm", "run", "aws-deploy"]
