@@ -34,9 +34,6 @@ export const getDBVarsByEnv = async (
   env: string
 ): Promise<MongoEnvVariables> => {
 
-  // TODO: Delete this ASAP, only for debugging.
-  console.log("process.env in getDBVarsByEnv ", process.env);
-  console.log("\n");
   if (env === 'development') {
     const {
       MONGO_DB_USER,

@@ -1,10 +1,8 @@
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
-import { fromNodeProviderChain } from "@aws-sdk/credential-providers";
-
 
 const AWS_REGION = process.env.AWS_REGION || "us-east-1";
 
-const ssmClient = new SSMClient({ region: AWS_REGION, credentials: fromNodeProviderChain() });
+const ssmClient = new SSMClient({ region: AWS_REGION });
 
 export const getSecret = async (paramName: string): Promise<string | null> => {
   try {
