@@ -46,7 +46,7 @@ export const useLLMRequest = () => {
       );
     }
 
-    const finalizedURL = `${baseURL}:8000/llm-api${endpoint}`;
+    const finalizedURL = `${baseURL}/llm-api${endpoint}`;
 
     console.log('finalizedURL ', finalizedURL);
     console.log('\n');
