@@ -122,7 +122,7 @@ export const ClientUI = ({
           <ul className="space-y-7">
             {convos.map((convo) => {
               return (
-                <li className="border p-5" key={convo._id}>
+                <li className="border-2 p-5" key={convo._id}>
                   <Link
                     className="hover:underline underline-offset-4"
                     href={`/notes/${convo.note_id}/convos/${convo._id}`}
@@ -152,9 +152,9 @@ export const ClientUI = ({
           </p>
         </div>
       ) : (
-        <ul className="space-y-4 mb-40">
+        <ul className="space-y-6 mb-40">
           {noteFiles.map((fileDoc) => (
-            <li key={fileDoc._id} className="border p-5">
+            <li key={fileDoc._id} className="border-2 p-5">
               <span className="font-semibold">File Name</span>:{' '}
               {fileDoc.file_name} &nbsp; | &nbsp;{' '}
               <span className="font-semibold">File Type</span>:{' '}
