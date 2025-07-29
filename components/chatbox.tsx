@@ -8,7 +8,7 @@ import {
   useCallback,
   useEffect
 } from 'react';
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
@@ -48,8 +48,7 @@ export const ChatBox = ({
   const [inFlight, setFlightStatus] = useState(false);
   const { makeRequest } = useLLMRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
-
-  // const router = useRouter(); // TODO: Resolve what to do with this because this prevents build from happening.
+  const router = useRouter(); // TODO: Resolve what to do with this because this prevents build from happening.
 
   const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
@@ -175,13 +174,6 @@ export const ChatBox = ({
   );
 
   const titleChange = (evt: InputEvent) => {
-    if (evt?.type === 'focus') {
-      if (convoTitle === defaultTitle) {
-        setConvoTitle('');
-        return;
-      }
-    }
-
     if (evt?.type === 'blur') {
       if (convoTitle.length === 0) {
         setConvoTitle(defaultTitle);
@@ -214,6 +206,7 @@ export const ChatBox = ({
     }
 
     setFlightStatus(false);
+    router.refresh();
   };
 
   useEffect(() => {
