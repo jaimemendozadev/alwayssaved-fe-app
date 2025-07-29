@@ -23,7 +23,11 @@ export const ClientUI = ({
       {convos.length === 0 && (
         <div className="mb-32">
           <p className="text-2xl mb-4">
-            You have no active Conversations at this time.
+            You have no active Conversations at this time. 😔
+          </p>
+
+          <p className="text-2xl">
+            Go back to the <Link className="hover:underline underline-offset-4 text-blue-700" href="/home">Home Page</Link>, upload some video files, and create a Note to get the LLM convos started! 🤖💬
           </p>
         </div>
       )}
