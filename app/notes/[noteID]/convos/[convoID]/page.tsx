@@ -66,6 +66,12 @@ export default async function ConvoIDPage({
     }
   ]);
 
+  if (convoFiles.length === 0) {
+    throw new Error(
+      `The Note ${noteID} for the conversation ${convoID} has no attached convo Files. Can't engage in a conversation without Files attached.`
+    );
+  }
+
   return (
     <ClientUI
       convo={targetConvo}

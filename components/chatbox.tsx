@@ -84,11 +84,6 @@ export const ChatBox = ({
 
       setFlightStatus(true);
 
-      /*
-        TODOs: 
-        - Should we return a toast message is convoFiles[] length is 0? 🤔
-      */
-
       const file_ids_list = convoFiles.map((leanFile) => leanFile._id);
       const note_id = currentNote._id;
 
@@ -274,7 +269,7 @@ export const ChatBox = ({
       </form>
 
       <div className="border-2 p-4 rounded-md">
-        <p>
+        <p className="mb-1">
           <span className="font-bold">Convo Files</span>:
         </p>
         {convoFiles.length > 0 && (
