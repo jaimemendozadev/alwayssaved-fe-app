@@ -27,7 +27,7 @@ interface FileUploadProps {
 const toastOptions = { duration: 6000 };
 
 const getDefaultNoteTitle = () =>
-  `Enter a New Note Title - ${dayjs().format('dddd, MMMM D, YYYY h:mm A')}`;
+  `Enter a New Note Title - ${dayjs().format('dddd, MMMM D, YYYY')}`;
 
 export const FileUpload = ({
   currentUser,
@@ -41,9 +41,6 @@ export const FileUpload = ({
   const [progressValue, updateProgress] = useState(0);
 
   const router = useRouter();
-
-  console.log('localNote in FileUpload ', localNote);
-  console.log('\n');
 
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
@@ -70,8 +67,6 @@ export const FileUpload = ({
 
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
-
-    console.log('INSIIIIIDE handleSubmit');
 
     if (!currentUser) return;
 
