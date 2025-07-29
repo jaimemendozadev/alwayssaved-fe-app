@@ -1,7 +1,7 @@
 'use server';
 import { ReactNode } from 'react';
 import { getUserFromDB } from '@/actions';
-import { ClientUI } from '@/components/notes/[noteID]';
+import { ClientUI } from '@/components/convos';
 import { getObjectIDFromString } from '@/utils/mongodb';
 import { matchProjectConversations } from '@/actions/schemamodels/conversations';
 
@@ -26,5 +26,5 @@ export default async function ConvosPage(): Promise<ReactNode> {
   if (currentUser && activeConvos) {
     return <ClientUI currentUser={currentUser} convos={activeConvos} />;
   }
-  throw new Error(`There was an error displaying the Convos Page.`);
+  throw new Error('There was an error displaying the Convos Page.');
 }
