@@ -17,7 +17,7 @@ export const ClientUI = ({
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
-        💬 Convos Page for: {currentUser.first_name}
+        💬 {currentUser.first_name}&#39;s Convos
       </h1>
 
       {convos.length === 0 && (
