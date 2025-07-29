@@ -1,5 +1,4 @@
 'use server';
-
 import { getSecret } from "@/utils/aws";
 
 

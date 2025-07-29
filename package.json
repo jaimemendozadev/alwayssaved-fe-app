@@ -15,7 +15,6 @@
     "@aws-sdk/client-s3": "^3.817.0",
     "@aws-sdk/client-sqs": "^3.817.0",
     "@aws-sdk/client-ssm": "^3.821.0",
-    "@aws-sdk/credential-providers": "^3.848.0",
     "@aws-sdk/s3-request-presigner": "^3.817.0",
     "@clerk/nextjs": "^6.20.0",
     "@heroui/react": "^2.7.9",
