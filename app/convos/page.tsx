@@ -20,7 +20,26 @@ export default async function ConvosPage(): Promise<ReactNode> {
         date_archived: { $eq: null }
       }
     },
-    { $project: { _id: 1, user_id: 1, note_id: 1, title: 1, date_started: 1 } }
+    {
+      $lookup: {
+        from: 'notes',
+        localField: 'note_id',
+        foreignField: '_id',
+        as: 'note_id'
+      }
+    },
+    { $unwind: '$note_id' },
+    {
+      $project: {
+        _id: 1,
+        user_id: 1,
+        note_id: 1,
+        title: 1,
+        date_started: 1,
+        target_note: 1
+      }
+    },
+    { $sort: { date_started: -1 } }
   ]);
 
   if (currentUser && activeConvos) {
