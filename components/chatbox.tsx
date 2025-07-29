@@ -87,9 +87,7 @@ export const ChatBox = ({
       /*
         TODOs: 
         - Should we return a toast message is convoFiles[] length is 0? 🤔
-        - Shoud we show a list of all the files attached to the Convo as a reminder to the user? 🤔
       */
-
 
       const file_ids_list = convoFiles.map((leanFile) => leanFile._id);
       const note_id = currentNote._id;
@@ -169,7 +167,16 @@ export const ChatBox = ({
 
       setFlightStatus(false);
     },
-    [convoFiles, convoThread, currentConvo, currentNote._id, currentUser._id, makeRequest, updateThread, userInput]
+    [
+      convoFiles,
+      convoThread,
+      currentConvo,
+      currentNote._id,
+      currentUser._id,
+      makeRequest,
+      updateThread,
+      userInput
+    ]
   );
 
   const titleChange = (evt: InputEvent) => {
@@ -225,7 +232,7 @@ export const ChatBox = ({
 
   return (
     <div className="w-[700px] mx-auto mb-8 bg-white">
-      <form onSubmit={submitChat} className="mb-3 border-2 p-4 rounded-md">
+      <form onSubmit={submitChat} className="mb-8 border-2 p-4 rounded-md">
         <div className="flex items-center">
           <textarea
             aria-label="Ask the LLM a Question"
@@ -244,7 +251,7 @@ export const ChatBox = ({
           </Button>
         </div>
       </form>
-      <form onSubmit={updateTitle} className="border-2 p-4 rounded-md">
+      <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
         <div className="flex items-end">
           <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
             <span className="font-bold">Conversation Title</span>:<br />
@@ -265,6 +272,19 @@ export const ChatBox = ({
           </Button>
         </div>
       </form>
+
+      <div className="border-2 p-4 rounded-md">
+        <p>
+          <span className="font-bold">Convo Files</span>:
+        </p>
+        {convoFiles.length > 0 && (
+          <ul className="space-y-2">
+            {convoFiles.map((convoFile) => {
+              return <li key={convoFile._id}>{convoFile.file_name}</li>;
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

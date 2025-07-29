@@ -60,7 +60,8 @@ export default async function ConvoIDPage({
     },
     {
       $project: {
-        _id: 1
+        _id: 1,
+        file_name: 1
       }
     }
   ]);

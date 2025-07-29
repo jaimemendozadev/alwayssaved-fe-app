@@ -79,7 +79,7 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
 
   return (
     <div
-      style={{ flex: '1 1 auto', width: '900px', margin: '0 auto 60px auto' }}
+      style={{ flex: '1 1 auto', width: '900px', height: '500px', margin: '0 auto 60px auto' }}
     >
       <AutoSizer>
         {({ width, height }) => (
