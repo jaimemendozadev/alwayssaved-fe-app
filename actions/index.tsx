@@ -21,7 +21,7 @@ export const getUserFromDB = async (): Promise<LeanUser | void> => {
 
   if (!foundUser) {
     throw new Error(
-      `No user with the email of ${email} exists in the database. Can't continue the sign in process.`
+      `No user with the email of ${email} exists in the database. Can't allow the user to access the app.`
     );
   }
 
