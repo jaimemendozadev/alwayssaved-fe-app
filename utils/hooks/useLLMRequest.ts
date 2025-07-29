@@ -4,6 +4,8 @@ import { getSSMParam } from '@/actions/hooks/useLLMRequest';
 
 const NODE_ENV = process.env.NODE_ENV;
 const AWS_PARAM_BASE_PATH = process.env.NEXT_PUBLIC_AWS_PARAM_BASE_PATH;
+const DEV_BACKEND_BASE_URL = process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL;
+const PROD_SSM_PARAM_NAME = `/${AWS_PARAM_BASE_PATH}/LLM_PRIVATE_IP`;
 
 interface MakeRequestOptions {
   headers?: unknown;
@@ -27,18 +29,10 @@ export const useLLMRequest = () => {
 
     let baseURL: string | null | undefined = undefined;
 
-    console.log("AWS_PARAM_BASE_PATH in useLLMRequest Hook ", AWS_PARAM_BASE_PATH);
-    console.log("\n");
-
     baseURL =
       NODE_ENV === 'development'
-        ? process.env.NEXT_PUBLIC_DEVELOPMENT_BACKEND_BASE_URL
-        : await getSSMParam(`/${AWS_PARAM_BASE_PATH}/LLM_PRIVATE_IP`);
-
-        
-
-    console.log('baseURL in useLLMRequest Hook ', baseURL);
-    console.log('\n');
+        ? DEV_BACKEND_BASE_URL
+        : await getSSMParam(PROD_SSM_PARAM_NAME);
 
     if (typeof baseURL !== 'string') {
       throw new Error(
@@ -47,9 +41,6 @@ export const useLLMRequest = () => {
     }
 
     const finalizedURL = `${baseURL}/llm-api${endpoint}`;
-
-    console.log('finalizedURL ', finalizedURL);
-    console.log('\n');
 
     const res = await fetch(finalizedURL, {
       method: options.method || 'GET',
