@@ -49,6 +49,9 @@ export const ClientUI = ({
   // See Dev Notes below.
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
+      <h1 className="text-3xl lg:text-6xl mb-16">
+        💬 Convo Page for: {convo.title}
+      </h1>
       <ChatThread convoThread={convoThread} />
       <ChatBox
         currentUser={currentUser}
