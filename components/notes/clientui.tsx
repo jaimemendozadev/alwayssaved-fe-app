@@ -75,7 +75,7 @@ export const ClientUI = ({
         <ul className="space-y-7">
           {userNotes.map((noteDoc) => {
             return (
-              <li className="border p-5" key={noteDoc._id}>
+              <li className="border-2 p-5" key={noteDoc._id}>
                 <Link
                   className="hover:underline underline-offset-4"
                   href={`/notes/${noteDoc._id}`}
