@@ -36,7 +36,7 @@ interface SearchNoteFields {
   files?: unknown;
 }
 
-// TODO: May need to refactor sortBy argument for better sorting options.
+// TODO: Refactor matchProjectNotes to pass PipelineStage[] as function argument.
 export const matchProjectNotes = async (
   match: SearchNoteFields,
   projectFields: SpecifiedNoteFields,

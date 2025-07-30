@@ -36,11 +36,9 @@ export const deleteMessagesByConvoID = async (
 
   const deleteDate = new Date();
 
-  const deleteRes = await ConvoMessageModel.updateMany(
+  await ConvoMessageModel.updateMany(
     { conversation_id },
     { date_deleted: deleteDate }
   ).exec();
 
-  console.log('deleteRes in deleteMessagesByConvoID ', deleteRes);
-  console.log('\n');
 };

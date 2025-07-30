@@ -18,9 +18,6 @@ export const getFilesByNoteID = async (
 
   const noteFiles = await FileModel.find({ note_id: mongoID }).exec();
 
-  // TODO: Need to delete possibly fix return value.
-  console.log('noteFiles in getFilesByNoteID ', noteFiles);
-
   if (noteFiles.length === 0) return;
 
   return deepLean(noteFiles);

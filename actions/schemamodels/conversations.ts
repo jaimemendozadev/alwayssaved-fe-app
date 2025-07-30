@@ -68,8 +68,6 @@ export const deleteConvoByID = async (
     { returnDocument: 'after' }
   ).exec();
 
-  console.log('deleteUpdate in deleteConvoByID ', deleteUpdate);
-  console.log('\n');
 
   if (!deleteUpdate || deleteUpdate.date_deleted === null) {
     throw new Error(
