@@ -43,7 +43,7 @@ export const updateConversationByID = async (
     getObjectIDFromString(convoID),
     update,
     options
-  );
+  ).exec();
 
   if (!updatedConvo) {
     throw new Error(
