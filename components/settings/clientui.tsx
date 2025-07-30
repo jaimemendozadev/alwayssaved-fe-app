@@ -65,7 +65,7 @@ export const ClientUI = ({ currentUser }: ClientUIProps): ReactNode => {
     <div className="p-2">
       <h1 className="text-3xl lg:text-6xl mb-16">⚙️ Settings Page</h1>
 
-      <Card className="max-w-[300px]">
+      <Card className="max-w-[300px] mb-8">
         <CardHeader>
           <Avatar src={avatarSrc} />
         </CardHeader>
@@ -83,18 +83,18 @@ export const ClientUI = ({ currentUser }: ClientUIProps): ReactNode => {
         </CardBody>
       </Card>
 
+      <div className="mb-32">
+        <Button size="md" variant="ghost" onPress={onOpen}>
+          ❌ Delete Account
+        </Button>
+      </div>
+
       <DeleteModal
         deleteCallback={deleteAccount}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         resourceType="AlwaysSaved Account"
       />
-
-      <div className="mb-32">
-        <Button size="md" variant="ghost" onPress={onOpen}>
-          ❌ Delete Account
-        </Button>
-      </div>
     </div>
   );
 };

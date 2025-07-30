@@ -23,7 +23,5 @@ export const deleteUserAccount = async (userID: string): Promise<LeanUser> => {
     );
   }
 
-  console.log('deletedUser ', deletedUser);
-
   return deepLean(deletedUser);
 };
