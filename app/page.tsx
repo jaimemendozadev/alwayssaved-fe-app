@@ -7,10 +7,12 @@ import {
   SignUpButton,
   SignOutButton
 } from '@clerk/nextjs';
+import { useClerk } from '@clerk/clerk-react';
 import { getUserFromDB } from '@/actions';
 
 export default function LandingPage() {
   const router = useRouter();
+  const { signOut } = useClerk();
 
   useEffect(() => {
     async function redirectToHomepage() {
@@ -19,10 +21,12 @@ export default function LandingPage() {
       if (foundUser && foundUser.cancel_date === null) {
         router.push('/home');
       }
+
+      await signOut();
     }
 
     redirectToHomepage();
-  }, [router]);
+  }, [router, signOut]);
 
   return (
     <div className="max-w-[90%] mx-auto p-28">

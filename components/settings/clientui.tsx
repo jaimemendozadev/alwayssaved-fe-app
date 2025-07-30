@@ -22,8 +22,6 @@ interface ClientUIProps {
 const toastOptions = { duration: 6000 };
 
 export const ClientUI = ({ currentUser }: ClientUIProps): ReactNode => {
-  console.log('currentUser in Settings Page ', currentUser);
-
   const { signOut } = useClerk();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
