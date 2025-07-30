@@ -16,7 +16,7 @@ export default function NotesErrorPage({
   useEffect(() => {
     toast.error(toastMessage, duration);
     // TODO: Handle in telemetry.
-    console.log("Error in NotePage: ", error);
+    console.log("Error in NotesPage: ", error);
 
     setTimeout(() => {
       router.push('/');

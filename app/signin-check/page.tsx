@@ -18,8 +18,6 @@ export default function SignInCheckPage(): ReactNode {
     async function checkUserRegistration() {
       const currentUser = await getUserFromDB();
 
-      console.log('currentUser in /signin-check ', currentUser);
-
       if (currentUser) {
         if (currentUser.cancel_date !== null) {
           toast.error(

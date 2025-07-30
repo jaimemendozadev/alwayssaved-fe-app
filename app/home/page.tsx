@@ -9,8 +9,7 @@ const errorMessage =
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
-  console.log('currentUser in Home Page: ', currentUser);
-
+  
   useEffect(() => {
     async function loadCurrentUser() {
       const currentUser = await getUserFromDB();

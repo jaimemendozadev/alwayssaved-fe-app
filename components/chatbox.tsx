@@ -48,7 +48,7 @@ export const ChatBox = ({
   const [inFlight, setFlightStatus] = useState(false);
   const { makeRequest } = useLLMRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
-  const router = useRouter(); // TODO: Resolve what to do with this because this prevents build from happening.
+  const router = useRouter();
 
   const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>

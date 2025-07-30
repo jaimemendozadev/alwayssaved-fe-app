@@ -50,9 +50,6 @@ export const EditConvosSection = ({
   const handleConvoDeletion = async (convoID: string): Promise<void> => {
     if (convoID === null) return;
 
-    console.log('convoID  in handleConvoDeletion ', convoID);
-
-    // TODO: Review the return value of each asyn function.
     await deleteConvoByID(convoID);
 
     await deleteMessagesByConvoID(convoID);
