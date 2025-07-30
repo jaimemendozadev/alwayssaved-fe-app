@@ -16,7 +16,7 @@ export default function LandingPage() {
     async function redirectToHomepage() {
       const foundUser = await getUserFromDB();
 
-      if (foundUser) {
+      if (foundUser && foundUser.cancel_date === null) {
         router.push('/home');
       }
     }
@@ -29,9 +29,7 @@ export default function LandingPage() {
       <nav className="max-w-[90%] m-auto mb-36 flex justify-end">
         <SignedIn>
           <SignOutButton>
-            <button className="border-2 py-3 px-6 rounded-sm">
-              Sign Out
-            </button>
+            <button className="border-2 py-3 px-6 rounded-sm">Sign Out</button>
           </SignOutButton>
         </SignedIn>
 
@@ -41,7 +39,6 @@ export default function LandingPage() {
               Sign Up &#47; Sign In
             </button>
           </SignUpButton>
-          
         </SignedOut>
       </nav>
       <section className="mb-16">
@@ -104,12 +101,6 @@ export default function LandingPage() {
             <i>Drag-and-Drop Simplicity</i>
             <br />
             Upload a video or audio file and let the AI handle the rest.
-          </li>
-
-          <li className="text-lg mb-4">
-            <i>Smart Summaries</i>
-            <br />
-            Skip the fluff - get concise, readable overviews of each file.
           </li>
 
           <li className="text-lg mb-4">
