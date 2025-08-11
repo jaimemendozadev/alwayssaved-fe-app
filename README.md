@@ -160,7 +160,7 @@ But to kick off the ML/AI Pipeline from the Frontend, you'll need to create what
 
 Above 👆🏽you will see the entire System Design and App Flow for Always Saved.
 
-If you need a better view of the entire screenshot, feel free to [download the Excalidraw File](https://github.com/jaimemendozadev/alwayssaved-fe-app/blob/jm-branch/README/alwayssaved-system-design.excalidraw) and view the System Design document in <a href="https://excalidraw.com/" target="_blank">Excalidraw</a>.
+If you need a better view of the entire screenshot, feel free to [download the Excalidraw File](https://github.com/jaimemendozadev/alwayssaved-fe-app/blob/main/README/alwayssaved-system-design.excalidraw) and view the System Design document in <a href="https://excalidraw.com/" target="_blank">Excalidraw</a>.
 
 
 [Back to TOC](#table-of-contents-toc)
