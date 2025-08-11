@@ -22,3 +22,7 @@ yarn-error.log*
 # Git
 .git
 .gitignore
+
+# README
+README.md
+/README

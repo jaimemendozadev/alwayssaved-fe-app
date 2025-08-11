@@ -1,6 +1,6 @@
 # 🧠 [AlwaysSaved Frontend](https://github.com/jaimemendozadev/alwayssaved-fe-app)
 
-Welcome to the **AlwaysSaved** Next.js frontend — the user-facing web app that powers your private, searchable knowledge base for long-form media. Built to deliver fast, intelligent, and intuitive experiences, this interface lets users upload, explore, and query their personal content with ease.
+Welcome to the **AlwaysSaved** Next.js Frontend — the user-facing web app that powers your private, searchable knowledge base for long-form media. Built to deliver fast, intelligent, and intuitive experiences, this interface lets users upload, explore, and query their personal content with ease.
 
 ---
 
@@ -10,6 +10,7 @@ Welcome to the **AlwaysSaved** Next.js frontend — the user-facing web app that
 - [3rd Party Services Needed](#3rd-party-services-needed)
 - [Environment Variables](#environment-variables)
 - [AWS Systems Manager Parameter Store Variables](#aws-systems-manager-parameter-store-variables)
+- [AlwaysSaved System Design / App Flow](#alwayssaved-system-design--app-flow)
 
 ---
 
@@ -21,6 +22,9 @@ Welcome to the **AlwaysSaved** Next.js frontend — the user-facing web app that
 
 Whether it’s a Zoom call, a lecture, or a YouTube clip, AlwaysSaved uses cutting-edge AI to make your content **searchable**, **understandable**, and **interactive**.
 
+[Back to TOC](#table-of-contents-toc)
+
+---
 
 ## 🔍 Key Features
 
@@ -34,7 +38,8 @@ Whether it’s a Zoom call, a lecture, or a YouTube clip, AlwaysSaved uses cutti
   Ask any question and get accurate answers pulled directly from your files using Retrieval-Augmented Generation.
 
 - 🚀 **Drag-and-Drop Uploads**  
-  Upload audio/video files effortlessly. Let the backend handle the heavy lifting.
+  Upload media files* effortlessly. Let the backend handle the heavy lifting.
+  (*Video files for now in v1)
 
 - 🔒 **Private & Secure**  
   All your media and queries stay private — no data scraping, no leaks.
@@ -59,9 +64,9 @@ This app requires quite a few services in order for you to play with it on your 
 - A <a href="https://clerk.com/" target="_blank">Clerk.com</a> account for authentication;
 - A <a href="https://qdrant.tech/" target="_blank">Qdrant</a> Vector database;
 - An <a href="https://aws.amazon.com/" target="_blank">AWS User Account</a> that has admin access; and
-- the following AWS Resources: 
+- The following AWS Resources: 
   - An <a href="https://aws.amazon.com/s3/" target="_blank">S3 Bucket</a> with the right permissions for storing media files.
-  - Parameters stored in <a href="https://aws.amazon.com/systems-manager/" target="_blank">AWS Systems Manager Parameter Store</a>.
+  - Parameters stored in the <a href="https://aws.amazon.com/systems-manager/" target="_blank">AWS Systems Manager Parameter Store</a>.
   - Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a> for sending payloads to the Extractor Queue that kicks off the ML/AI Pipeline.
 
 <strong>IMPORTANT</strong>: 👆🏽 For the services I mentioned, I expect you to have some knowledge on how to setup the services yourself or do the requisite research on how to set them up properly to fill out the environment variables mentioned in the section below 👇🏽.
@@ -73,6 +78,8 @@ This app requires quite a few services in order for you to play with it on your 
 
 ## Environment Variables
 
+In order to setup the app for local development, you'll need to prefill all the required Environment Variables and a couple variables in the AWS Parameter Store (<a href="#aws-systems-manager-parameter-store-variables">see next section</a>).
+
 Once you've finished setting up all the 3rd party services, you'll need to create an `.env.local` file in the root of the project so the app can work properly.
 
 You'll need to prefill the `.env.local` file with values from the 3rd party services you setup.
@@ -80,8 +87,8 @@ You'll need to prefill the `.env.local` file with values from the 3rd party serv
 For example:
 
 - You'll need to specify the `REGION`, the name of your S3 `BUCKET`, etc.
-- You'll need to specify the MongoDB `USER` name, database `PASSWORD`, and the url of the `MONGO_DB_CLUSTER` so we can connect to the running instance of your database.
-- Notice you also need to have setup a <a href="https://qdrant.tech/" target="_blank">Qdrant</a> Database ahead of time with the name of your collection. Your Qdrant connection details need to be stored in the AWS Parameter Store (<a href="#aws-systems-manager-parameter-store-variables">see next section</a>) 
+- You'll need to specify all the `MONGO_DB_` variables from your MongoDB Cluter so you can connect to the running instance of your database.
+- Notice you also need to have setup a <a href="https://qdrant.tech/" target="_blank">Qdrant</a> Database ahead of time with the name of your collection. Your Qdrant connection details need to be stored in the AWS Parameter Store (<a href="#aws-systems-manager-parameter-store-variables">see next section</a>).
 
 Here's a list of all the env variables you'll need in the file, with some of the variables already prefilled for you:
 
@@ -136,10 +143,28 @@ You may have noticed in the <a href="#environment-variables">Environment Variabl
 /alwayssaved/QDRANT_API_KEY
 ```
 
-You will need to have setup a Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a> Queue ahead of time and store the URL of that queue in the Parameter Store as `/alwayssaved/EXTRACTOR_PUSH_QUEUE_URL`. We call the queue the `Extractor Queue` and it's used to send payloads to that kicks off the ML/AI Pipeline on the deployed Backend.
+In order for the Backend ML/AI Pipeline to work, you will need to have setup 2 Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a> Queues ahead of time.
+
+More details about the entire app flow are explained in the next seciton. 
+
+But to kick off the ML/AI Pipeline from the Frontend, you'll need to create what we call the `EXTRACTOR_PUSH_QUEUE` in Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a>. Once the queue is created, you store the URL of that queue in the Parameter Store as `/alwayssaved/EXTRACTOR_PUSH_QUEUE_URL`.
 
 
 [Back to TOC](#table-of-contents-toc)
+
+---
+
+## AlwaysSaved System Design / App Flow
+
+<img src="./README/alwayssaved-system-design.png" alt="Screenshot of AlwaysSaved System Design and App Flow" />
+
+Above 👆🏽you will see the entire System Design and App Flow for Always Saved.
+
+If you need a better view of the entire screenshot, feel free to <a href="./README/alwayssaved-system-design.excalidraw">download the Excalidraw File</a> and view the System Design document in <a href="https://excalidraw.com/" target="_blank">Excalidraw</a>.
+
+
+[Back to TOC](#table-of-contents-toc)
+
 ---
 
 ## Created By
