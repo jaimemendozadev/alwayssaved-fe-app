@@ -122,6 +122,7 @@ export const FileUpload = ({
     // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
+    // TODO: Might want to add a check to handle only uploading '.mp4' or '.mp3' files in v1.
     const fileInfoArray = currentFiles.map((file) => ({
       name: file.name
     }));

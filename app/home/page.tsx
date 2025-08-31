@@ -36,7 +36,7 @@ export default function HomePage() {
           <span className="font-bold">Media Upload Instructions</span>:
         </p>
         <p className="text-lg mb-8">
-          Create a new Note by giving your note a new name AND THEN add video
+          Create a new Note by giving your note a new name AND THEN add video or audio
           files to your note for transcribing.
         </p>
 
@@ -46,10 +46,10 @@ export default function HomePage() {
 
         <p className="text-lg mb-8">
           <span className="font-bold">
-            Wait until all the video files are uploaded
+            Wait until all the video or audio files are uploaded
           </span>{' '}
           to the cloud for transcribing. Then you can create a brand new Note
-          with new video files or navigate to another part of the app.
+          with new video/audio files or navigate to another part of the app.
         </p>
 
         <p className="text-lg mb-3">

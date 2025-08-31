@@ -38,8 +38,7 @@ Whether it’s a Zoom call, a lecture, or a YouTube clip, AlwaysSaved uses cutti
   Ask any question and get accurate answers pulled directly from your files using Retrieval-Augmented Generation.
 
 - 🚀 **Drag-and-Drop Uploads**  
-  Upload media files* effortlessly. Let the backend handle the heavy lifting.
-  (*Video files for now in v1)
+  Upload `.mp4` Video or `.mp3` Audio files effortlessly. Let the backend handle the heavy lifting.
 
 - 🔒 **Private & Secure**  
   All your media and queries stay private — no data scraping, no leaks.
