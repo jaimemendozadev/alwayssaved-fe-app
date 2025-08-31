@@ -11,7 +11,6 @@ export const processFile = async <T extends File>(
   file: T,
   targetPayload: presignPayload
 ): Promise<ProcessStatus> => {
-  const controller = new AbortController();
 
   const { presigned_url, file_id, s3_key, note_id, user_id } = targetPayload;
 
@@ -23,15 +22,12 @@ export const processFile = async <T extends File>(
   const s3DeleteURL = `/api/s3/${s3_key}`;
   const fileDeleteURL = `/api/files/${file_id}`;
 
-  // TODO: Refactor and use makeBackEndRequest
-
   try {
     // 1) Upload file to s3.
     const s3UploadRes = await fetch(presigned_url, {
       method: 'PUT',
       headers: { 'Content-Type': file.type },
       body: file,
-      signal: controller.signal
     });
 
     if (s3UploadRes.status !== 200) {
