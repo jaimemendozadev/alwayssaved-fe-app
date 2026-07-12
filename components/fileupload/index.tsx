@@ -42,6 +42,19 @@ export const FileUpload = ({
 
   const router = useRouter();
 
+  const noteKey = currentUser
+    ? `${currentUser._id}-${currentNoteID ?? ''}`
+    : null;
+  const [prevNoteKey, setPrevNoteKey] = useState(noteKey);
+  if (noteKey !== prevNoteKey) {
+    setPrevNoteKey(noteKey);
+    if (currentUser && !currentNoteID) {
+      const newDefaultTitle = getDefaultNoteTitle();
+      setNoteTitle(newDefaultTitle);
+      setDefaultTitle(newDefaultTitle);
+    }
+  }
+
   const handleChange = (evt: InputEvent) => {
     if (!setNoteTitle) return;
 
@@ -280,14 +293,8 @@ export const FileUpload = ({
       );
     }
 
-    if (currentUser) {
-      if (currentNoteID) {
-        getTargetNote(currentNoteID);
-        return;
-      }
-      const defaultTitle = getDefaultNoteTitle();
-      setNoteTitle(defaultTitle);
-      setDefaultTitle(defaultTitle);
+    if (currentUser && currentNoteID) {
+      getTargetNote(currentNoteID);
     }
   }, [currentNoteID, currentUser]);
 

@@ -1,7 +1,7 @@
 'use client';
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/nextjs';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 import {

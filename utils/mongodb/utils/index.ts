@@ -33,7 +33,6 @@ const dbVarKeys: (keyof MongoEnvVariables)[] = [
 export const getDBVarsByEnv = async (
   env: string
 ): Promise<MongoEnvVariables> => {
-
   if (env === 'development') {
     const {
       MONGO_DB_USER,
@@ -109,22 +108,26 @@ export const getObjectIDFromString = (
 };
 
 // Utility to check if value is plain (not Date, ObjectId, etc.)
-export const isPlainObject = (val: any) =>
+export const isPlainObject = (val: unknown) =>
   val !== null &&
   typeof val === 'object' &&
   !Array.isArray(val) &&
   !(val instanceof Date) &&
   !(val instanceof mongoose.Types.ObjectId);
 
+interface LeanableDocument {
+  toObject?: (opts: { virtuals: boolean }) => Record<string, unknown>;
+}
+
 /**
  * Main deepLean function with circular reference + subdoc deduplication
  */
-export function deepLean(doc: any, cache = new WeakMap()): any {
+export function deepLean<T>(doc: T, cache = new WeakMap<object, unknown>()): T {
   if (doc == null) return doc;
 
   // Convert ObjectIds to string
   if (doc instanceof mongoose.Types.ObjectId) {
-    return doc.toString();
+    return doc.toString() as unknown as T;
   }
 
   // Leave Dates as-is
@@ -134,29 +137,30 @@ export function deepLean(doc: any, cache = new WeakMap()): any {
 
   // Recurse over arrays
   if (Array.isArray(doc)) {
-    return doc.map((item) => deepLean(item, cache));
+    return doc.map((item) => deepLean(item, cache)) as unknown as T;
   }
 
   // If already processed, reuse the result (for shared or circular refs)
   if (typeof doc === 'object') {
     if (cache.has(doc)) {
-      return cache.get(doc);
+      return cache.get(doc) as T;
     }
 
     // Convert to plain object if it's a Mongoose doc
-    const plain = doc.toObject?.({ virtuals: false }) ?? doc;
-    const result: Record<string, any> = {};
+    const plain =
+      (doc as LeanableDocument).toObject?.({ virtuals: false }) ?? doc;
+    const result: Record<string, unknown> = {};
 
     // Store placeholder in cache early to prevent infinite loops
     cache.set(doc, result);
 
     for (const key in plain) {
       if (Object.prototype.hasOwnProperty.call(plain, key)) {
-        result[key] = deepLean(plain[key], cache);
+        result[key] = deepLean((plain as Record<string, unknown>)[key], cache);
       }
     }
 
-    return result;
+    return result as T;
   }
 
   // Primitives

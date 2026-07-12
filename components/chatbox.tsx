@@ -5,8 +5,7 @@ import {
   ChangeEvent,
   FocusEvent,
   useContext,
-  useCallback,
-  useEffect
+  useCallback
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
@@ -49,6 +48,15 @@ export const ChatBox = ({
   const { makeRequest } = useLLMRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
   const router = useRouter();
+
+  const [prevConvo, setPrevConvo] = useState(currentConvo);
+  if (currentConvo !== prevConvo) {
+    setPrevConvo(currentConvo);
+    if (currentConvo) {
+      setConvoTitle(currentConvo?.title || DEFAULT_TITLE);
+      setDefaultTitle(currentConvo.title || DEFAULT_TITLE);
+    }
+  }
 
   const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
@@ -208,13 +216,6 @@ export const ChatBox = ({
     setFlightStatus(false);
     router.refresh();
   };
-
-  useEffect(() => {
-    if (currentConvo) {
-      setConvoTitle(currentConvo?.title || DEFAULT_TITLE);
-      setDefaultTitle(currentConvo.title || DEFAULT_TITLE);
-    }
-  }, [currentConvo]);
 
   if (!currentConvo) return;
 

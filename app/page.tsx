@@ -2,12 +2,11 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  SignedOut,
-  SignedIn,
+  Show,
   SignUpButton,
-  SignOutButton
+  SignOutButton,
+  useClerk
 } from '@clerk/nextjs';
-import { useClerk } from '@clerk/clerk-react';
 import { getUserFromDB } from '@/actions';
 
 export default function LandingPage() {
@@ -31,19 +30,19 @@ export default function LandingPage() {
   return (
     <div className="max-w-[90%] mx-auto p-28">
       <nav className="max-w-[90%] m-auto mb-36 flex justify-end">
-        <SignedIn>
+        <Show when="signed-in">
           <SignOutButton>
             <button className="border-2 py-3 px-6 rounded-sm">Sign Out</button>
           </SignOutButton>
-        </SignedIn>
+        </Show>
 
-        <SignedOut>
+        <Show when="signed-out">
           <SignUpButton>
             <button className="border-2 py-3 px-6 rounded-sm">
               Sign Up &#47; Sign In
             </button>
           </SignUpButton>
-        </SignedOut>
+        </Show>
       </nav>
       <section className="mb-16">
         <h1 className="text-4xl font-medium mb-10">
