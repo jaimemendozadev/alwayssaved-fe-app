@@ -15,10 +15,16 @@ export default function LandingPage() {
 
   useEffect(() => {
     async function redirectToHomepage() {
-      const foundUser = await getUserFromDB();
+      try {
 
-      if (foundUser && foundUser.cancel_date === null) {
-        router.push('/home');
+        const foundUser = await getUserFromDB();
+
+        if (foundUser && foundUser.cancel_date === null) {
+          router.push('/home');
+        }
+
+      } catch(error) {
+        console.log("Error in app/page.tsx ", error);
       }
 
       await signOut();
