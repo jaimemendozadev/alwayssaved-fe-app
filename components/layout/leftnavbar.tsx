@@ -31,7 +31,7 @@ export const LeftNavbar = (): ReactNode => {
 
       <div className="min-w-28 p-5 w-36">
         <div className="text-[#919191] font-semibold">
-          <SignOutButton />
+          <SignOutButton redirectUrl='/' />
         </div>
       </div>
     </div>

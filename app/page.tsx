@@ -1,37 +1,33 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect,} from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Show,
   SignUpButton,
   SignOutButton,
-  useClerk
+  useUser
 } from '@clerk/nextjs';
-import { getUserFromDB } from '@/actions';
 
 export default function LandingPage() {
   const router = useRouter();
-  const { signOut } = useClerk();
+
+  const { isSignedIn } = useUser()
+
+
+  if(isSignedIn) {
+    router.push('/home')
+  }
 
   useEffect(() => {
-    async function redirectToHomepage() {
-      try {
 
-        const foundUser = await getUserFromDB();
-
-        if (foundUser && foundUser.cancel_date === null) {
-          router.push('/home');
-        }
-
-      } catch(error) {
-        console.log("Error in app/page.tsx ", error);
-      }
-
-      await signOut();
+    if(isSignedIn) {
+      router.push('/home')
     }
 
-    redirectToHomepage();
-  }, [router, signOut]);
+  }, [isSignedIn, router])
+
+
+  
 
   return (
     <div className="max-w-[90%] mx-auto p-28">
