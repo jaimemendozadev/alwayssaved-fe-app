@@ -307,7 +307,7 @@ export const FileUpload = ({
           <label htmlFor="noteTitle" className="text-lg min-w-[400px]">
             <span className="font-bold">Note Title</span>:<br />
             <input
-              className="w-[100%] p-1"
+              className="w-[100%] p-1 border-2"
               onBlur={handleChange}
               onFocus={handleChange}
               onChange={handleChange}
