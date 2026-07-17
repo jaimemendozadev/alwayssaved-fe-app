@@ -29,10 +29,9 @@ export default function SignInCheckPage(): ReactNode {
           }, toastOptions.duration);
           return;
         }
-        router.push('/home');
       }
 
-      throw new Error(errorMessage);
+      router.push('/home');
     }
 
     checkUserRegistration();

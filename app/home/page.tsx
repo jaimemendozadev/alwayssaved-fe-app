@@ -5,7 +5,7 @@ import { getUserFromDB } from '@/actions';
 import { FileUpload } from '@/components/fileupload';
 
 const errorMessage =
-  'Looks like you might have never registered to AlwaysSaved. 😬 Try again later.';
+  'Looks like you might have never registered or deleted your AlwaysSaved account. 😬 Try again later.';
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
