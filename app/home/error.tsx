@@ -20,7 +20,7 @@ export default function HomeErrorPage({
 
     setTimeout(() => {
       router.push('/');
-    }, 5000);
+    }, 3000);
   }, [error, router])
  
   return null;

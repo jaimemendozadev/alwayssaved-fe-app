@@ -9,21 +9,27 @@ const errorMessage =
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
-  
+  const [loadError, setLoadError] = useState<Error | null>(null);
+
   useEffect(() => {
     async function loadCurrentUser() {
-      const currentUser = await getUserFromDB();
+      try {
+        const currentUser = await getUserFromDB();
 
-      if (currentUser) {
-        setCurrentUser(currentUser);
-        return;
+        if (currentUser) {
+          setCurrentUser(currentUser);
+          return;
+        }
+      } catch (error) {
+        console.log('Error in app/home/page.tsx: ', error);
       }
-
-      throw new Error(errorMessage);
+      setLoadError(new Error(errorMessage));
     }
 
     loadCurrentUser();
   }, []);
+
+  if (loadError) throw loadError;
 
   if (currentUser === null) return currentUser;
 
