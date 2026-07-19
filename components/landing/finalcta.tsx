@@ -1,6 +1,6 @@
 'use client';
 import { ReactNode } from 'react';
-import { SignUpButton } from '@clerk/nextjs';
+import { SignUpButton, Show } from '@clerk/nextjs';
 
 export const FinalCTA = (): ReactNode => {
   return (
@@ -14,11 +14,14 @@ export const FinalCTA = (): ReactNode => {
       <p className="max-w-lg text-white/75">
         Upload once, ask questions forever. Get started free today.
       </p>
-      <SignUpButton>
-        <button className="rounded-lg bg-brand-600 px-7 py-3.5 text-sm font-bold hover:bg-brand-500">
-          Start free
-        </button>
-      </SignUpButton>
+
+      <Show when="signed-out">
+        <SignUpButton>
+          <button className="rounded-lg bg-brand-600 px-7 py-3.5 text-sm font-bold hover:bg-brand-500">
+            Sign Up &#47; Sign In
+          </button>
+        </SignUpButton>
+      </Show>
     </section>
   );
 };
