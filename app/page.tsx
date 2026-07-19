@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Show, SignUpButton, SignOutButton, useUser } from '@clerk/nextjs';
 
+import { Hero, Nav, Why } from '@/components/landing';
+
 const HOW_IT_WORKS = [
   {
     title: 'Transcribe',
@@ -96,106 +98,13 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-cream text-ink">
-      {/* NAV */}
-      <header className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 border-b border-line sm:px-8 lg:px-16">
-        <div className="flex items-center gap-2.5">
-          <Image
-            src="/alwayssaved-logo-mark.png"
-            alt="AlwaysSaved logo"
-            width={34}
-            height={34}
-            className="rounded-[10px] object-cover"
-          />
-          <span className="text-xl font-bold">AlwaysSaved</span>
-        </div>
-        <nav className="flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-8">
-          <a href="#what-it-does" className="text-sm text-muted hover:text-ink">
-            How it works
-          </a>
-          <a href="#features" className="text-sm text-muted hover:text-ink">
-            Features
-          </a>
-          <a href="#pricing" className="text-sm text-muted hover:text-ink">
-            Pricing
-          </a>
-          <Show when="signed-in">
-            <SignOutButton>
-              <button className="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
-                Sign Out
-              </button>
-            </SignOutButton>
-          </Show>
-          <Show when="signed-out">
-            <SignUpButton>
-              <button className="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
-                Sign Up &#47; Sign In
-              </button>
-            </SignUpButton>
-          </Show>
-        </nav>
-      </header>
 
-      {/* HERO */}
-      <section className="mx-auto flex max-w-4xl flex-col items-center gap-5 px-5 py-12 text-center sm:py-16 lg:py-24">
-        <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3.5 py-1.5 text-xs font-semibold text-brand-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-600" />
-          Your private, searchable knowledge base
-        </div>
-        <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl [text-wrap:pretty]">
-          Every idea buried in your recordings,{' '}
-          <span className="text-brand-600">instantly findable.</span>
-        </h1>
-        <p className="max-w-xl text-lg text-muted sm:text-xl">
-          AlwaysSaved transforms podcasts, Zoom calls, lectures, interviews, and
-          YouTube videos into searchable, AI-understandable knowledge. Upload
-          once, ask questions forever.
-        </p>
+      <Nav />
+      
+      <Hero />
 
-        <div className="mt-2 flex w-full max-w-md flex-wrap justify-center gap-2.5">
-          <SignUpButton>
-            <button className="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
-              Sign Up &#47; Sign In
-            </button>
-          </SignUpButton>
-        </div>
-
-        <p className="text-xs text-muted">
-          No credit card required · Cancel anytime
-        </p>
-
-        <div className="mt-8 w-full max-w-3xl rounded-2xl border border-line bg-white p-5 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.4)] sm:p-7">
-          <div className="flex items-center gap-2.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-line" />
-            <span className="h-2.5 w-2.5 rounded-full bg-line" />
-            <span className="h-2.5 w-2.5 rounded-full bg-line" />
-            <div className="ml-3 flex-1 truncate rounded-md bg-cream px-3 py-1.5 font-mono text-xs text-muted">
-              &quot;what did the speaker say about market trends?&quot;
-            </div>
-          </div>
-          <div className="mt-3.5 flex flex-col gap-2">
-            <div className="h-3 w-[90%] rounded-md bg-cream" />
-            <div className="h-3 w-[75%] rounded-md bg-cream" />
-            <div className="h-3 w-[60%] rounded-md bg-cream" />
-          </div>
-          <div className="mt-3 border-t border-dashed border-line pt-2.5 font-mono text-xs text-muted">
-            [ product preview ]
-          </div>
-        </div>
-      </section>
-
-      {/* WHY */}
-      <section className="bg-line/20 px-5 py-14 sm:py-20 lg:px-16">
-        <div className="mx-auto flex max-w-2xl flex-col gap-3.5 text-center">
-          <h2 className="text-3xl font-extrabold sm:text-4xl">
-            Why AlwaysSaved?
-          </h2>
-          <p className="text-lg text-muted [text-wrap:pretty]">
-            Information should never be lost in a 90-minute content file.
-            AlwaysSaved turns your media library into a second brain — one you
-            can ask questions of, forever.
-          </p>
-        </div>
-      </section>
+      <Why />
+      
 
       {/* WHAT IT DOES */}
       <section
