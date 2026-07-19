@@ -9,10 +9,12 @@ import {
   Footer,
   Hero,
   Nav,
-  Pricing,
   WhatDoes,
   Why
 } from '@/components/landing';
+
+
+// 7-19-26 TODO: Figure out pricing/memberships and reimplement <Pricing /> on landing page.
 
 export default function LandingPage() {
   const router = useRouter();
@@ -35,8 +37,6 @@ export default function LandingPage() {
       <WhatDoes />
 
       <Features />
-
-      <Pricing />
 
       <FinalCTA />
 
