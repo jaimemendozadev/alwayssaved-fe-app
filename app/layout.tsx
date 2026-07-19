@@ -17,8 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title:
-    '🧠 AlwaysSaved - Your Private, Searchable Knowledge Base for Your Info',
+  title: 'AlwaysSaved - Your Private, Searchable Knowledge Base for Your Info',
   description: 'alwayssaved-fe-app'
 };
 
@@ -30,14 +29,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <ConvoProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <Toaster />
-          <HeroUIProvider>{children}</HeroUIProvider>
-        </body>
-      </html>
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <Toaster />
+            <HeroUIProvider>{children}</HeroUIProvider>
+          </body>
+        </html>
       </ConvoProvider>
     </ClerkProvider>
   );
