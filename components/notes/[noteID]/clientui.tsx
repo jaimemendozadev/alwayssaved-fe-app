@@ -28,6 +28,7 @@ export const ClientUI = ({
   const router = useRouter();
   const editURL = `/notes/${currentNote._id.toString()}/edit`;
 
+  // 7-19-26 TODO: Handle error when creating a new convo
   const handleNewConvo = async () => {
     const newConvo = await createConversation(currentUser._id, currentNote._id);
 
