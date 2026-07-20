@@ -61,7 +61,10 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
             columnIndex={0}
             rowIndex={index}
           >
-            <div className="border p-6 rounded-md">{convoMsg.message}</div>
+            <div
+              dangerouslySetInnerHTML={{ __html: convoMsg.message }}
+              className="border p-6 rounded-md"
+            />
           </CellMeasurer>
         </div>
       );
@@ -79,7 +82,12 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
 
   return (
     <div
-      style={{ flex: '1 1 auto', width: '900px', height: '500px', margin: '0 auto 60px auto' }}
+      style={{
+        flex: '1 1 auto',
+        width: '900px',
+        height: '500px',
+        margin: '0 auto 60px auto'
+      }}
     >
       <AutoSizer>
         {({ width, height }) => (
