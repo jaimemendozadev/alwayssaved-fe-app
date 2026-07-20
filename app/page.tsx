@@ -20,8 +20,6 @@ export default function LandingPage() {
   const router = useRouter();
   const { isSignedIn } = useUser();
 
-  if (isSignedIn) router.push('/home');
-
   useEffect(() => {
     if (isSignedIn) router.push('/home');
   }, [isSignedIn, router]);
