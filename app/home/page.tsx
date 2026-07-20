@@ -59,8 +59,11 @@ export default function HomePage() {
         </p>
 
         <p className="text-lg mb-3">
-          While you wait for the files to be transcribed, go do something else.
-          ☕️ We&apos;ll let you know when it&apos;s done.
+          While you wait for the files to be transcribed, go do something else. ☕️ 
+        </p>
+
+        <p className="text-lg mb-3">
+          We&apos;ll send you an email 📬 to let you know when it&apos;s done.
         </p>
       </article>
 
