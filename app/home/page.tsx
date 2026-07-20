@@ -41,30 +41,26 @@ export default function HomePage() {
         <p className="text-xl mb-2">
           <span className="font-bold">Media Upload Instructions</span>:
         </p>
-        <p className="text-lg mb-8">
-          Create a new Note by giving your note a new name AND THEN add video or audio
-          files to your note for transcribing.
-        </p>
+        <ol className="list-decimal ml-6">
+          <li className="text-lg mb-8">
+            Fill out the form below to create a new Note by giving the note a new name.
+          </li>
 
-        <p className="text-lg mb-3 font-bold text-red-700">
-          🙅🏽‍♀️ DO NOT GO TO ANOTHER PAGE IN THE APP WHILE UPLOADING FILES.
-        </p>
+          <li className="text-lg mb-8">
+            Add video or audio files to your note for transcribing. <span className="font-bold">WAIT UNTIL ALL FILES ARE UPLOADED</span> to the cloud for transcribing.
+          </li>
+          <ul className="text-lg mb-8">
+            <li className="mb-3 font-bold text-red-700">🙅🏽‍♀️ DO NOT GO TO ANOTHER PAGE IN THE APP WHILE UPLOADING FILES.</li>
+          </ul>
 
-        <p className="text-lg mb-8">
-          <span className="font-bold">
-            Wait until all the video or audio files are uploaded
-          </span>{' '}
-          to the cloud for transcribing. Then you can create a brand new Note
-          with new video/audio files or navigate to another part of the app.
-        </p>
+          <li className="text-lg mb-8">
+            When the files are finished uploading, the transcription process starts. You may now create a brand new Note with new media files or navigate to another part of the app.
+          </li>
 
-        <p className="text-lg mb-3">
-          While you wait for the files to be transcribed, go do something else. ☕️ 
-        </p>
-
-        <p className="text-lg mb-3">
-          We&apos;ll send you an email 📬 to let you know when it&apos;s done.
-        </p>
+          <li className="text-lg mb-8">
+            We&apos;ll send you an email 📬 to let you know when your files are transcribed.
+          </li>
+        </ol>
       </article>
 
       <FileUpload currentUser={currentUser} currentNoteID={null} />

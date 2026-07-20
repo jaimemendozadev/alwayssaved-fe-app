@@ -9,6 +9,8 @@ interface FileUploadSectionProps {
   handleRedirect: () => void;
 }
 
+// TODO: Update page instructions from app/home/page.tsx
+
 export const FileUploadSection = ({
   currentNoteID,
   currentUser,
