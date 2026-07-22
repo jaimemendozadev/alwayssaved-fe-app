@@ -61,7 +61,7 @@ export const ClientUI = ({ currentUser }: ClientUIProps): ReactNode => {
 
   return (
     <div className="p-2">
-      <h1 className="text-3xl lg:text-6xl mb-16">⚙️ Settings Page</h1>
+      <h1 className="text-3xl lg:text-6xl mb-16">⚙️ Settings</h1>
 
       <Card className="max-w-[300px] mb-8">
         <CardHeader>
