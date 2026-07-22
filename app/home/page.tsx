@@ -36,7 +36,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home Page</h1>
+      <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home</h1>
 
       <UploadText />
 
