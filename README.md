@@ -49,11 +49,9 @@ Whether it’s a Zoom call, a lecture, or a YouTube clip, AlwaysSaved uses cutti
 - ⚡ **GPU-Powered Performance**  
   Transcoding and processing happens quickly thanks to cloud-hosted NVIDIA GPUs.
 
-
 [Back to TOC](#table-of-contents-toc)
 
 ---
-
 
 ## 3rd Party Services Needed
 
@@ -63,7 +61,7 @@ This app requires quite a few services in order for you to play with it on your 
 - A <a href="https://clerk.com/" target="_blank">Clerk.com</a> account for authentication;
 - A <a href="https://qdrant.tech/" target="_blank">Qdrant</a> Vector database;
 - An <a href="https://aws.amazon.com/" target="_blank">AWS User Account</a> that has admin access; and
-- The following AWS Resources: 
+- The following AWS Resources:
   - An <a href="https://aws.amazon.com/s3/" target="_blank">S3 Bucket</a> with the right permissions for storing media files.
   - Parameters stored in the <a href="https://aws.amazon.com/systems-manager/" target="_blank">AWS Systems Manager Parameter Store</a>.
   - Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a> for sending payloads to the Extractor Queue that kicks off the ML/AI Pipeline.
@@ -73,7 +71,6 @@ This app requires quite a few services in order for you to play with it on your 
 [Back to TOC](#table-of-contents-toc)
 
 ---
-
 
 ## Environment Variables
 
@@ -124,13 +121,11 @@ QDRANT_COLLECTION_NAME=
 
 [Back to TOC](#table-of-contents-toc)
 
-
 ---
-
 
 ## AWS Systems Manager Parameter Store Variables
 
-For both development and production, there are a few variables that we couldn't store in the .env file, so we had to resort to using the <a href="https://aws.amazon.com/systems-manager/" target="_blank">AWS Systems Manager Parameter Store</a> ahead of time in order to get the app functioning. 
+For both development and production, there are a few variables that we couldn't store in the .env file, so we had to resort to using the <a href="https://aws.amazon.com/systems-manager/" target="_blank">AWS Systems Manager Parameter Store</a> ahead of time in order to get the app functioning.
 
 You may have noticed in the <a href="#environment-variables">Environment Variables section</a> there's a `AWS_PARAM_BASE_PATH` variable with a value of `alwayssaved`. The following variable keys have their values stored in the Parameter store as follows:
 
@@ -144,10 +139,9 @@ You may have noticed in the <a href="#environment-variables">Environment Variabl
 
 In order for the Backend ML/AI Pipeline to work, you will need to have setup 2 Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a> Queues ahead of time.
 
-More details about the entire app flow are explained in the next seciton. 
+More details about the entire app flow are explained in the next seciton.
 
 But to kick off the ML/AI Pipeline from the Frontend, you'll need to create what we call the `EXTRACTOR_PUSH_QUEUE` in Amazon <a href = "https://aws.amazon.com/sqs/" target="_blank">Simple Queue Service</a>. Once the queue is created, you store the URL of that queue in the Parameter Store as `/alwayssaved/EXTRACTOR_PUSH_QUEUE_URL`.
-
 
 [Back to TOC](#table-of-contents-toc)
 
@@ -161,6 +155,14 @@ Above 👆🏽you will see the entire System Design and App Flow for Always Save
 
 If you need a better view of the entire screenshot, feel free to [download the Excalidraw File](https://github.com/jaimemendozadev/alwayssaved-fe-app/blob/main/README/alwayssaved-system-design.excalidraw) and view the System Design document in <a href="https://excalidraw.com/" target="_blank">Excalidraw</a>.
 
+You can inspect the rest of the repos for each service in the diagram at the following URLs:
+
+- [Extractor Service](https://github.com/jaimemendozadev/alwayssaved-extractor-service)
+- [Embedding Service](https://github.com/jaimemendozadev/alwayssaved-embedding-service)
+- [LLM Service](https://github.com/jaimemendozadev/alwayssaved-llm-service)
+- [Terraform Infra](https://github.com/jaimemendozadev/alwayssaved-terraform)
+
+<br />
 
 [Back to TOC](#table-of-contents-toc)
 
