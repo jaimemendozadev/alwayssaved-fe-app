@@ -5,11 +5,14 @@ import { getUserFromDB } from '@/actions';
 import { FileUpload } from '@/components/fileupload';
 import { UploadText } from '@/components/uploadtext';
 
+const DEFAULT_TITLE = '🏡 Home';
+
 const errorMessage =
   'Looks like you might have never registered or deleted your AlwaysSaved account. 😬 Try again later.';
 
 export default function HomePage() {
   const [currentUser, setCurrentUser] = useState<LeanUser | null>(null);
+  const [pageTitle, setPageTitle] = useState<string>(DEFAULT_TITLE);
   const [loadError, setLoadError] = useState<Error | null>(null);
 
   useEffect(() => {
@@ -19,6 +22,9 @@ export default function HomePage() {
 
         if (currentUser) {
           setCurrentUser(currentUser);
+
+          const updatedTitle = currentUser && currentUser.first_name ? `🏡 Welcome ${currentUser.first_name}` : DEFAULT_TITLE;
+          setPageTitle(updatedTitle);
           return;
         }
       } catch (error) {
@@ -34,9 +40,10 @@ export default function HomePage() {
 
   if (currentUser === null) return currentUser;
 
+
   return (
     <div>
-      <h1 className="text-3xl lg:text-6xl mb-16">🏡 Home</h1>
+      <h1 className="text-3xl lg:text-6xl mb-16">{pageTitle}</h1>
 
       <UploadText />
 
