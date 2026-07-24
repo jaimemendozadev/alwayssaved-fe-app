@@ -2,7 +2,7 @@
 import { ReactNode } from 'react';
 import { LeanUser } from '@/utils/mongodb';
 import { FileUpload } from '@/components/fileupload';
-import { UploadText } from '@/components/uploadtext';
+import { UploadInstructions } from '@/components/uploadinstructions';
 
 interface FileUploadSectionProps {
   currentUser: LeanUser;
@@ -21,7 +21,7 @@ export const FileUploadSection = ({
         Upload More Files to Your Note
       </h2>
 
-      <UploadText />
+      <UploadInstructions />
 
       <div className="mb-44">
         <FileUpload

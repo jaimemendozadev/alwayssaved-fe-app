@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { LeanUser } from '@/utils/mongodb';
 import { getUserFromDB } from '@/actions';
 import { FileUpload } from '@/components/fileupload';
-import { UploadText } from '@/components/uploadtext';
+import { UploadInstructions } from '@/components/uploadinstructions';
 
 const DEFAULT_TITLE = '🏡 Home';
 
@@ -45,7 +45,7 @@ export default function HomePage() {
     <div>
       <h1 className="text-3xl lg:text-6xl mb-16">{pageTitle}</h1>
 
-      <UploadText />
+      <UploadInstructions />
 
       <FileUpload currentUser={currentUser} currentNoteID={null} />
     </div>

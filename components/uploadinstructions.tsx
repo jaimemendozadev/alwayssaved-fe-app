@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 
 
-export const UploadText = ():ReactNode => {
+export const UploadInstructions = ():ReactNode => {
 
     return (
         <article className="mb-16">
