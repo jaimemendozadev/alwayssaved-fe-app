@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-
+import Link from 'next/link';
 
 
 export const UploadInstructions = ():ReactNode => {
@@ -13,6 +13,13 @@ export const UploadInstructions = ():ReactNode => {
           <li className="text-lg mb-8">
             Create a new Note by filling out the form to give it a new name.
           </li>
+
+          <ul className="text-lg mb-8">
+            <li className="mb-3">All your media files &amp; separate LLM convos 🤖 will be stored as a Note.</li>
+            <li>Go to the <Link className="underline underline-offset-4" href="/notes">Notes</Link> page to access individual Notes.</li>
+          </ul>
+
+
 
           <li className="text-lg mb-8">
             Add video or audio files to your note for transcribing. <span className="font-bold">WAIT UNTIL ALL FILES ARE UPLOADED</span> to the cloud ☁️ for transcribing.
@@ -31,7 +38,7 @@ export const UploadInstructions = ():ReactNode => {
           </ul>
 
           <li className="text-lg mb-8">
-            We&apos;ll send you an email 📬 to let you know when your files are finished processing so you conversate with the LLM about them. 🤖
+            We&apos;ll send you an email 📬 to let you know when your files are finished processing so you can talk to the LLM about them. 🤖
           </li>
         </ol>
       </article>
