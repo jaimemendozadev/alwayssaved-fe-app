@@ -65,7 +65,7 @@ export const ClientUI = ({
           </p>
 
           <p className="text-2xl">
-            From the selected Note Page, you can also start a new chat with the
+            From there, you can also start a new Conversation with the
             LLM about your Note Files. 🤖
           </p>
         </div>
