@@ -48,14 +48,13 @@ export const ClientUI = ({
       </h1>
 
       <p className="text-2xl mb-4">
-        Click on the &lsquo;Edit Note&rsquo; button to do any of the following:
+        Click on the &lsquo;Edit Note&rsquo; button to make permanent changes to the Note.
       </p>
-      <ul className="text-2xl mb-8">
-        <li>☑️ Delete or upload new files to your Note;</li>
-        <li>☑️ Delete unwanted Conversations;</li>
-        <li>☑️ Change the Title of your Note; or</li>
-        <li>☑️ Delete your entire Note. 😱</li>
-      </ul>
+
+      <p className="text-2xl mb-8">
+        You can delete unwanted Conversations or files from the Note, change the Note&rsquo;s Title, or delete the entire Note.
+      </p>
+
 
       <div className="mb-32">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
