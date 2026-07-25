@@ -60,13 +60,13 @@ export const ClientUI = ({
       ) : (
         <div className="mb-16">
           <p className="text-2xl mb-4">
-            Click on any Note Page link to view all the Files and Conversations
-            attached to that Note.
+            Click on any Note Page link to manage all the files attached to that
+            Note.
           </p>
 
           <p className="text-2xl">
-            From there, you can also start a new Conversation with the
-            LLM about your Note Files. 🤖
+            From there, you can also start a new Conversation with the LLM about
+            your Note Files. 🤖
           </p>
         </div>
       )}
