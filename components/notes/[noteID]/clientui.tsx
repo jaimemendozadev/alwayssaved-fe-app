@@ -47,11 +47,36 @@ export const ClientUI = ({
         Note Page for: {currentNote?.title}
       </h1>
 
-      
-
       <h2 className="text-3xl lg:text-4xl mb-10">
-        💬 Conversations for {currentNote.title} Note
+        💬 Create a New Conversation
       </h2>
+
+      {noteFiles.length > 0 ? (
+        <>
+          <p className="text-2xl mb-8">
+            Create a new Conversation for this Note to start chatting with the
+            LLM. 🤖
+          </p>
+          <div className="mb-8">
+            <Button
+              size="md"
+              variant="ghost"
+              onPress={async () => await handleNewConvo()}
+            >
+              💬 Create Convo
+            </Button>
+          </div>
+        </>
+      ) : (
+        <p className="text-2xl mb-8">
+          You have no media files attached to this Note. Add media files in
+          order to get a conversation started.
+        </p>
+      )}
+
+      <hr className="mb-16" />
+
+      <h2 className="text-3xl lg:text-4xl mb-10">💬 Current Conversations</h2>
 
       {convos.length === 0 && (
         <div className="mb-32">
@@ -153,15 +178,15 @@ export const ClientUI = ({
 
       <hr className="mb-8" />
 
-
       <p className="text-2xl mb-4">
-        Click on the &lsquo;Edit Note&rsquo; button to make permanent changes to the Note.
+        Click on the &lsquo;Edit Note&rsquo; button to make permanent changes to
+        the Note.
       </p>
 
       <p className="text-2xl mb-8">
-        You can delete unwanted Conversations or files from the Note, change the Note&rsquo;s Title, or delete the entire Note.
+        You can delete unwanted Conversations or files from the Note, change the
+        Note&rsquo;s Title, or delete the entire Note.
       </p>
-
 
       <div className="mb-32">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
