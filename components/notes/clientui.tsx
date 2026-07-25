@@ -60,14 +60,15 @@ export const ClientUI = ({
       ) : (
         <div className="mb-16">
           <p className="text-2xl mb-4">
-            Click on any Note Page link to manage all the files attached to that
-            Note.
+            Click on any Note Page link to:
           </p>
-
-          <p className="text-2xl">
-            From there, you can also start a new Conversation with the LLM about
-            your Note Files. 🤖
-          </p>
+          
+          <ul className="ml-6">
+            <li className="text-lg mb-2">Create a new conversation;</li>
+            <li className="text-lg mb-2">Go to an existing conversation;</li>
+            <li className="text-lg mb-2">See all the files attached to your Note; or</li>
+            <li className="text-lg">Add/remove files from the Note.</li>
+          </ul>
         </div>
       )}
 
