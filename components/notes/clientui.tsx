@@ -59,14 +59,14 @@ export const ClientUI = ({
         </p>
       ) : (
         <div className="mb-16">
-          <p className="text-2xl mb-4">
-            Click on any Note Page link to:
-          </p>
-          
+          <p className="text-2xl mb-4">Click on any Note Page link to:</p>
+
           <ul className="ml-6">
             <li className="text-lg mb-2">Create a new conversation;</li>
             <li className="text-lg mb-2">Go to an existing conversation;</li>
-            <li className="text-lg mb-2">See all the files attached to your Note; or</li>
+            <li className="text-lg mb-2">
+              See all the files attached to your Note; or
+            </li>
             <li className="text-lg">Add/remove files from the Note.</li>
           </ul>
         </div>
@@ -86,6 +86,20 @@ export const ClientUI = ({
                   <span className="font-semibold">Date Created</span>:{' '}
                   {dayjs(noteDoc.date_created).format('dddd, MMMM D, YYYY')}
                 </Link>
+                &nbsp; | &nbsp;{' '}
+                <Tooltip content="Edit Note">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    isIconOnly={true}
+                    aria-label="Edit Note"
+                    onPress={() =>
+                      router.push(`/notes/${noteDoc._id.toString()}/edit`)
+                    }
+                  >
+                    ✍🏼
+                  </Button>
+                </Tooltip>
                 &nbsp; | &nbsp;{' '}
                 <Tooltip content="Delete Note">
                   <Button
