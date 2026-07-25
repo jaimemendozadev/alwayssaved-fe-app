@@ -46,6 +46,8 @@ export const ClientUI = ({
     }
   }, []);
 
+  // 7-24-26 TODO: Remove Convo Files from <ChatBox /> and place them above the <ChatThread />
+
   // See Dev Notes below.
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">

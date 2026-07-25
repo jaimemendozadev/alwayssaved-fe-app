@@ -59,16 +59,15 @@ export const ClientUI = ({
         </p>
       ) : (
         <div className="mb-16">
-          <p className="text-2xl mb-4">Click on any Note Page link to:</p>
+          <p className="text-2xl mb-4">
+            Click on any Note Page link to create a new conversation or continue
+            a convo.
+          </p>
 
-          <ul className="ml-6">
-            <li className="text-lg mb-2">Create a new conversation;</li>
-            <li className="text-lg mb-2">Go to an existing conversation;</li>
-            <li className="text-lg mb-2">
-              See all the files attached to your Note; or
-            </li>
-            <li className="text-lg">Add/remove files from the Note.</li>
-          </ul>
+          <p className="text-2xl mb-4">
+            You can also see all the files attached to your Note or add and
+            remove files.
+          </p>
         </div>
       )}
 
