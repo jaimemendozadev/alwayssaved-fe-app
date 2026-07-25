@@ -57,7 +57,7 @@ export const ClientUI = ({
             Create a new Conversation for this Note to start chatting with the
             LLM. 🤖
           </p>
-          <div className="mb-8">
+          <div className="mb-32">
             <Button
               size="md"
               variant="ghost"
@@ -68,7 +68,7 @@ export const ClientUI = ({
           </div>
         </>
       ) : (
-        <p className="text-2xl mb-8">
+        <p className="text-2xl mb-32">
           You have no media files attached to this Note. Add media files in
           order to get a conversation started.
         </p>
@@ -79,7 +79,7 @@ export const ClientUI = ({
       <h2 className="text-3xl lg:text-4xl mb-6">✍🏼 Edit Your Note</h2>
 
       <p className="text-2xl mb-4">
-        Click on the &lsquo;Edit Note&rsquo; button to make permanent changes to
+        Click on the &ldquo;Edit Note&rdquo; button to make permanent changes to
         the Note.
       </p>
 
@@ -88,7 +88,7 @@ export const ClientUI = ({
         Note&rsquo;s Title, or delete the entire Note.
       </p>
 
-      <div className="mb-8">
+      <div className="mb-32">
         <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
           ✍🏼 Edit Note
         </Button>
@@ -142,7 +142,7 @@ export const ClientUI = ({
       </h2>
 
       {noteFiles.length === 0 ? (
-        <div className="mb-36">
+        <div className="mb-32">
           <p className="text-xl mb-1">
             You have no files attached to this Note. 😔
           </p>
@@ -152,7 +152,7 @@ export const ClientUI = ({
           </p>
         </div>
       ) : (
-        <ul className="space-y-6 mb-40">
+        <ul className="space-y-6 mb-32">
           {noteFiles.map((fileDoc) => (
             <li key={fileDoc._id} className="border-2 p-5">
               <span className="font-semibold">File Name</span>:{' '}
