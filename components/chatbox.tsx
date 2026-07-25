@@ -33,7 +33,7 @@ interface ChatBoxProps {
 }
 
 const defaultInput = 'Ask something';
-const DEFAULT_TITLE = 'Untitled';
+// const DEFAULT_TITLE = 'Untitled';
 const toastOptions = { duration: 6000 };
 
 export const ChatBox = ({
@@ -181,41 +181,41 @@ export const ChatBox = ({
     ]
   );
 
-  const titleChange = (evt: InputEvent) => {
-    if (evt?.type === 'blur') {
-      if (convoTitle.length === 0) {
-        setConvoTitle(defaultTitle);
-        return;
-      }
-    }
+  // const titleChange = (evt: InputEvent) => {
+  //   if (evt?.type === 'blur') {
+  //     if (convoTitle.length === 0) {
+  //       setConvoTitle(defaultTitle);
+  //       return;
+  //     }
+  //   }
 
-    if (evt?.type === 'change') {
-      setConvoTitle(evt.target.value);
-      return;
-    }
-  };
+  //   if (evt?.type === 'change') {
+  //     setConvoTitle(evt.target.value);
+  //     return;
+  //   }
+  // };
 
-  const updateTitle = async (evt: SubmitEvent): Promise<void> => {
-    evt.preventDefault();
+  // const updateTitle = async (evt: SubmitEvent): Promise<void> => {
+  //   evt.preventDefault();
 
-    if (!currentConvo) return;
+  //   if (!currentConvo) return;
 
-    setFlightStatus(true);
+  //   setFlightStatus(true);
 
-    const updatedConvo = await updateConversationByID(
-      currentConvo._id,
-      { title: convoTitle },
-      { returnDocument: 'after' }
-    );
+  //   const updatedConvo = await updateConversationByID(
+  //     currentConvo._id,
+  //     { title: convoTitle },
+  //     { returnDocument: 'after' }
+  //   );
 
-    if (updatedConvo) {
-      setDefaultTitle(updatedConvo.title);
-      toast.success('Your Conversation title has been updated.', toastOptions);
-    }
+  //   if (updatedConvo) {
+  //     setDefaultTitle(updatedConvo.title);
+  //     toast.success('Your Conversation title has been updated.', toastOptions);
+  //   }
 
-    setFlightStatus(false);
-    router.refresh();
-  };
+  //   setFlightStatus(false);
+  //   router.refresh();
+  // };
 
   if (!currentConvo) return;
 
@@ -240,7 +240,7 @@ export const ChatBox = ({
           </Button>
         </div>
       </form>
-      <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
+      {/* <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
         <div className="flex items-end">
           <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
             <span className="font-bold">Conversation Title</span>:<br />
@@ -260,9 +260,9 @@ export const ChatBox = ({
             Submit
           </Button>
         </div>
-      </form>
+      </form> */}
 
-      <div className="border-2 p-4 rounded-md">
+      {/* <div className="border-2 p-4 rounded-md">
         <p className="mb-1">
           <span className="font-bold">Convo Files</span>:
         </p>
@@ -273,7 +273,7 @@ export const ChatBox = ({
             })}
           </ul>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
