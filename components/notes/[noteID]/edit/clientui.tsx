@@ -16,7 +16,6 @@ import { deleteConvoByID } from '@/actions/schemamodels/conversations';
 import { deleteMessagesByConvoID } from '@/actions/schemamodels/convomessages';
 import { purgeFileByID } from '@/actions/schemamodels/files';
 import { DeleteModal } from '@/components/deletemodal';
-import { UploadInstructions } from '@/components/uploadinstructions';
 import { FileUpload } from '@/components/fileupload';
 
 interface ClientUIProps {
@@ -195,12 +194,12 @@ export const ClientUI = ({
       {/*  Remove Files Attached to Your Note */}
 
       <h2 className="text-3xl lg:text-4xl mb-12">
-        Remove Files Attached to Your Note
+        ‼️ Remove Files From Your Note
       </h2>
 
       <article className="mb-24">
         <p className="text-2xl mb-5 font-bold text-red-700">
-          📢 WARNING ABOUT DELETING .txt FILES:
+          ⚠️ WARNING ABOUT DELETING .txt FILES:
         </p>
 
         <p className="text-2xl mb-3">
@@ -272,12 +271,47 @@ export const ClientUI = ({
       {/* Upload More Files */}
 
       <h2 className="text-3xl lg:text-4xl mb-10">
-        💿 Upload More Files to Your Note
+        💿 Upload Files to Your Note
       </h2>
 
-      {/* TODO: Will have to craft a new set of instructions for uploadidng files to an existing Note. */}
+      <article className="mb-16">
+        <p className="text-xl mb-2">
+          <span className="font-bold">Media Upload Instructions</span>:
+        </p>
+        <ol className="list-decimal ml-6">
+          <li className="text-lg mb-8">
+            You may update the current Note&apos;s name in the form.
+          </li>
 
-      <UploadInstructions />
+          <li className="text-lg mb-8">
+            Add video or audio files to your note for transcribing.{' '}
+            <span className="font-bold">WAIT UNTIL ALL FILES ARE UPLOADED</span>{' '}
+            to the cloud ☁️ for transcribing.
+          </li>
+          <ul className="text-lg mb-8">
+            <li className="font-bold text-red-700">
+              🙅🏽‍♀️ DO NOT GO TO ANOTHER PAGE IN THE APP WHILE UPLOADING FILES.
+            </li>
+          </ul>
+
+          <li className="text-lg mb-8">
+            When the files finish uploading, you&apos;re essentially done. You
+            may now:
+          </li>
+
+          <ul className="text-lg mb-8">
+            <li className="mb-3">
+              Upload more media files to the current Note; or
+            </li>
+            <li>Navigate to another part of the app.</li>
+          </ul>
+
+          <li className="text-lg mb-8">
+            We&apos;ll send you an email 📬 to let you know when your files are
+            finished processing so you can talk to the LLM about them. 🤖
+          </li>
+        </ol>
+      </article>
 
       <div className="mb-44">
         <FileUpload
