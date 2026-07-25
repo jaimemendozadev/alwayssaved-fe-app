@@ -28,6 +28,7 @@ interface ClientUIProps {
 
 const toastOptions = { duration: 6000 };
 
+// 7-25-26 TODO: Investigate whether we can delete currentNoteID if we can also get it from currentNote prop.
 export const ClientUI = ({
   currentUser,
   currentNote,
@@ -146,12 +147,31 @@ export const ClientUI = ({
 
       {/* Delete Attached Conversations */}
 
+      <h2 className="text-3xl lg:text-4xl mb-10">
+        ❌ Delete Attached Conversations
+      </h2>
+
+      {convos.length === 0 && (
+        <div className="mb-24">
+          <p className="text-xl mb-8">
+            You have no Conversations attached to this Note. 😔
+          </p>
+
+          <p className="text-xl mb-8">
+            Go back to the Note&apos;s{' '}
+            <Link
+              className="underline underline-offset-4"
+              href={`/notes/${noteID}`}
+            >
+              main page
+            </Link>{' '}
+            to start a convo with the LLM. 🤖
+          </p>
+        </div>
+      )}
+
       {convos.length > 0 && (
         <div className="mb-24">
-          <h2 className="text-3xl lg:text-4xl mb-4">
-            ❌ Delete Attached Conversations
-          </h2>
-
           <p className="text-2xl mb-10">
             Click on the trash can button to remove any Conversation attached to
             your Note. 🗑️
