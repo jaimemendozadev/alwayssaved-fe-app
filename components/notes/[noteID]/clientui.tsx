@@ -78,14 +78,9 @@ export const ClientUI = ({
 
       <h2 className="text-3xl lg:text-4xl mb-6">✍🏼 Edit Your Note</h2>
 
-      <p className="text-2xl mb-4">
-        Click on the &ldquo;Edit Note&rdquo; button to make permanent changes to
-        the Note.
-      </p>
-
       <p className="text-2xl mb-8">
-        You can delete unwanted Conversations or files from the Note, change the
-        Note&rsquo;s Title, or delete the entire Note.
+        Update the Note by adding new files, removing convos/files, upload new
+        files, or delete the entire Note.
       </p>
 
       <div className="mb-32">

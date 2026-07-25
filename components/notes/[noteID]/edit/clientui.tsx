@@ -79,18 +79,6 @@ export const ClientUI = ({
     router.refresh();
   };
 
-  const handleNewConvo = async () => {
-    const newConvo = await createConversation(currentUser._id, currentNote._id);
-
-    if (newConvo) {
-      router.push(`/notes/${currentNote._id}/convos/${newConvo._id}`);
-    }
-
-    throw new Error(
-      `There was an error creating a new Conversation for Note ${currentNote._id}`
-    );
-  };
-
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
@@ -135,35 +123,6 @@ export const ClientUI = ({
           </p>
         </div>
       )}
-
-      {/* Create a New Conversation */}
-
-      {noteFiles.length > 0 && (
-        <div className="mb-32">
-          <h2 className="text-3xl lg:text-4xl mb-4">
-            💬 Create a New Conversation
-          </h2>
-          <p className="text-2xl mb-8">
-            Click on the &lsquo;Create Convo&rsquo; button and start chatting
-            with the LLM about your Note Files. 🤖
-          </p>
-          <div className="mb-10">
-            <Button
-              size="md"
-              variant="ghost"
-              onPress={async () => await handleNewConvo()}
-            >
-              💬 Create Convo
-            </Button>
-          </div>
-
-          {convos.length === 0 && (
-            <p className="text-2xl">You have no Conversations for this Note.</p>
-          )}
-        </div>
-      )}
-
-      <hr className="mb-16" />
 
       {/* Delete Attached Conversations */}
 
