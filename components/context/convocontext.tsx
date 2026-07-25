@@ -12,8 +12,8 @@ export interface TempConvoMessage {
 
 interface ConvoContextShape {
   currentConvo: null | LeanConversation;
-  convoThread: (LeanConvoMessage | TempConvoMessage)[];
   setCurrentConvo?: Dispatch<SetStateAction<LeanConversation | null>>;
+  convoThread: (LeanConvoMessage | TempConvoMessage)[];
   updateThread?: Dispatch<
     SetStateAction<(LeanConvoMessage | TempConvoMessage)[]>
   >;
@@ -38,7 +38,7 @@ export const ConvoProvider = ({
 
   return (
     <ConvoContext.Provider
-      value={{ currentConvo, convoThread, setCurrentConvo, updateThread }}
+      value={{ currentConvo, setCurrentConvo, convoThread, updateThread }}
     >
       {children}
     </ConvoContext.Provider>
