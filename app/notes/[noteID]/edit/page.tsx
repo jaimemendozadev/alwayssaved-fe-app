@@ -86,7 +86,6 @@ export default async function NoteEditPage({
       currentUser={currentUser}
       currentNote={currentNote}
       noteFiles={textFiles}
-      currentNoteID={noteID}
       convos={activeConvos}
     />
   );

@@ -22,18 +22,15 @@ interface ClientUIProps {
   currentUser: LeanUser;
   currentNote: LeanNote;
   noteFiles: LeanFile[];
-  currentNoteID: string;
   convos: LeanConversation[];
 }
 
 const toastOptions = { duration: 6000 };
 
-// 7-25-26 TODO: Investigate whether we can delete currentNoteID if we can also get it from currentNote prop.
 export const ClientUI = ({
   currentUser,
   currentNote,
   noteFiles,
-  currentNoteID,
   convos
 }: ClientUIProps): ReactNode => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -44,11 +41,11 @@ export const ClientUI = ({
     router.refresh();
   };
 
-  const noteID = currentNote._id.toString();
+  const currentNoteID = currentNote._id.toString();
 
   // See Dev Note #1 below.
   const deleteNoteCallback = async (onClose: () => void) => {
-    const deleteRes = await deleteNoteByID(noteID);
+    const deleteRes = await deleteNoteByID(currentNoteID);
 
     if (deleteRes.date_deleted) {
       toast.success('Your Note has been delete. 👍🏽', toastOptions);
@@ -161,7 +158,7 @@ export const ClientUI = ({
             Go back to the Note&apos;s{' '}
             <Link
               className="underline underline-offset-4"
-              href={`/notes/${noteID}`}
+              href={`/notes/${currentNoteID}`}
             >
               main page
             </Link>{' '}
