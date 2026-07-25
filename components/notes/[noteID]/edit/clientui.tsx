@@ -1,8 +1,10 @@
 'use client';
 import { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
-import { Button, useDisclosure } from '@heroui/react';
+import { Button, Tooltip, useDisclosure } from '@heroui/react';
 import {
   LeanUser,
   LeanNote,
@@ -10,8 +12,13 @@ import {
   LeanConversation
 } from '@/utils/mongodb';
 import { deleteNoteByID } from '@/actions/schemamodels/notes';
+import {
+  createConversation,
+  deleteConvoByID
+} from '@/actions/schemamodels/conversations';
+import { deleteMessagesByConvoID } from '@/actions/schemamodels/convomessages';
 import { DeleteModal } from '@/components/deletemodal';
-import { EditConvosSection, RemoveFilesSection } from './components';
+import { RemoveFilesSection } from './components';
 import { UploadInstructions } from '@/components/uploadinstructions';
 import { FileUpload } from '@/components/fileupload';
 
@@ -59,11 +66,38 @@ export const ClientUI = ({
     onClose();
   };
 
+  // See Dev Note #2 below.
+  const handleConvoDeletion = async (convoID: string): Promise<void> => {
+    if (convoID === null) return;
+
+    await deleteConvoByID(convoID);
+
+    await deleteMessagesByConvoID(convoID);
+
+    toast.success('Your Conversation has been delete. 👍🏽', toastOptions);
+
+    router.refresh();
+  };
+
+  const handleNewConvo = async () => {
+    const newConvo = await createConversation(currentUser._id, currentNote._id);
+
+    if (newConvo) {
+      router.push(`/notes/${currentNote._id}/convos/${newConvo._id}`);
+    }
+
+    throw new Error(
+      `There was an error creating a new Conversation for Note ${currentNote._id}`
+    );
+  };
+
   return (
     <div className="p-6 w-[85%]">
       <h1 className="text-3xl lg:text-6xl mb-16">
-        Edit Page for Note: {currentNote?.title}
+        Edit Page for: {currentNote?.title}
       </h1>
+
+      {/* Delete Your Note */}
 
       <h2 className="text-3xl lg:text-4xl mb-10">❌ Delete Your Note</h2>
 
@@ -73,14 +107,110 @@ export const ClientUI = ({
         </Button>
       </div>
 
-      <hr className="mb-16" />
-
       <DeleteModal
         deleteCallback={deleteNoteCallback}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         resourceType="Note"
       />
+
+      <hr className="mb-16" />
+
+      {/* Attach Note Files Reminder */}
+
+      {noteFiles.length === 0 && (
+        <div className="mb-32">
+          <h2 className="text-3xl lg:text-4xl mb-4">
+            📌 REMINDER: Attach Files to Note
+          </h2>
+          <p className="text-xl mb-8">
+            You have no Files attached to this Note. 😔
+          </p>
+          <p className="text-xl mb-8">
+            You&apos;ll need to upload Files to this Note before you can start
+            having a Conversation with the LLM. 🤖
+          </p>
+          <p className="text-xl mb-20">
+            You can add Files to the Note in the file uploader.
+          </p>
+        </div>
+      )}
+
+      {/* Create a New Conversation */}
+
+      {noteFiles.length > 0 && (
+        <div className="mb-32">
+          <h2 className="text-3xl lg:text-4xl mb-4">
+            💬 Create a New Conversation
+          </h2>
+          <p className="text-2xl mb-8">
+            Click on the &lsquo;Create Convo&rsquo; button and start chatting
+            with the LLM about your Note Files. 🤖
+          </p>
+          <div className="mb-10">
+            <Button
+              size="md"
+              variant="ghost"
+              onPress={async () => await handleNewConvo()}
+            >
+              💬 Create Convo
+            </Button>
+          </div>
+
+          {convos.length === 0 && (
+            <p className="text-2xl">You have no Conversations for this Note.</p>
+          )}
+        </div>
+      )}
+
+      <hr className="mb-16" />
+
+      {/* Delete Attached Conversations */}
+
+      {convos.length > 0 && (
+        <div className="mb-24">
+          <h2 className="text-3xl lg:text-4xl mb-4">
+            ❌ Delete Attached Conversations
+          </h2>
+
+          <p className="text-2xl mb-10">
+            Click on the trash can button to remove any Conversation attached to
+            your Note. 🗑️
+          </p>
+
+          <ul className="space-y-7">
+            {convos.map((convo) => {
+              return (
+                <li className="border p-5" key={convo._id}>
+                  <Link
+                    className="hover:underline underline-offset-4"
+                    href={`/notes/${convo.note_id}/convos/${convo._id}`}
+                  >
+                    <span className="font-semibold">Convo Name</span>:{' '}
+                    {convo.title} &nbsp; | &nbsp;{' '}
+                    <span className="font-semibold">Convo Start Date</span>:{' '}
+                    {dayjs(convo.date_started).format('dddd, MMMM D, YYYY')}{' '}
+                    &nbsp;{' '}
+                  </Link>
+                  <Tooltip content="Delete Convo">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      isIconOnly={true}
+                      aria-label="Delete Conversation"
+                      onPress={async () => await handleConvoDeletion(convo._id)}
+                    >
+                      🗑️
+                    </Button>
+                  </Tooltip>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <hr className="mb-16" />
 
       <h2 className="text-3xl lg:text-4xl mb-10">
         💿 Upload More Files to Your Note
@@ -95,13 +225,6 @@ export const ClientUI = ({
           routerCallback={handleRedirect}
         />
       </div>
-
-      <EditConvosSection
-        currentUser={currentUser}
-        currentNote={currentNote}
-        noteFiles={noteFiles}
-        convos={convos}
-      />
 
       <RemoveFilesSection currentUser={currentUser} noteFiles={noteFiles} />
     </div>
@@ -121,5 +244,11 @@ export const ClientUI = ({
       - Deleting all the Vector points in Vector DB.
       - Deleting File DB document.
     - Deleting the Note DB document.
+
+  2) Conversation & ConvoMessage documents are not
+     hard deleted in the app. They're marked with
+     date_deleted value in the document. They will
+     be removed from the database in a separate
+     async job.
 
 */
