@@ -43,7 +43,7 @@ export const ClientUI = ({
 
   return (
     <div className="p-6 w-[85%]">
-      <h1 className="text-3xl lg:text-6xl mb-16">
+      <h1 className="text-3xl lg:text-6xl mb-20">
         Note Page for: {currentNote?.title}
       </h1>
 
@@ -73,6 +73,26 @@ export const ClientUI = ({
           order to get a conversation started.
         </p>
       )}
+
+      <hr className="mb-16" />
+
+      <h2 className="text-3xl lg:text-4xl mb-6">✍🏼 Edit Your Note</h2>
+
+      <p className="text-2xl mb-4">
+        Click on the &lsquo;Edit Note&rsquo; button to make permanent changes to
+        the Note.
+      </p>
+
+      <p className="text-2xl mb-8">
+        You can delete unwanted Conversations or files from the Note, change the
+        Note&rsquo;s Title, or delete the entire Note.
+      </p>
+
+      <div className="mb-8">
+        <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
+          ✍🏼 Edit Note
+        </Button>
+      </div>
 
       <hr className="mb-16" />
 
@@ -143,24 +163,6 @@ export const ClientUI = ({
           ))}
         </ul>
       )}
-
-      <hr className="mb-8" />
-
-      <p className="text-2xl mb-4">
-        Click on the &lsquo;Edit Note&rsquo; button to make permanent changes to
-        the Note.
-      </p>
-
-      <p className="text-2xl mb-8">
-        You can delete unwanted Conversations or files from the Note, change the
-        Note&rsquo;s Title, or delete the entire Note.
-      </p>
-
-      <div className="mb-32">
-        <Button size="md" variant="ghost" onPress={() => router.push(editURL)}>
-          ✍🏼 Edit Note
-        </Button>
-      </div>
     </div>
   );
 };
