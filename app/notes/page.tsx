@@ -5,20 +5,25 @@ import { getUserFromDB } from '@/actions';
 import { matchProjectNotes } from '@/actions/schemamodels/notes';
 import { ClientUI } from '@/components/notes';
 import { getObjectIDFromString, LeanNote } from '@/utils/mongodb';
+import { PipelineStage } from 'mongoose';
 
 export default async function NotesPage(): Promise<ReactNode> {
   const currentUser = await getUserFromDB();
   let userNotes: LeanNote[] = [];
 
   if (currentUser) {
-    const dbResult = await matchProjectNotes(
+    const pipeline: PipelineStage[] = [
       {
-        user_id: getObjectIDFromString(currentUser._id),
-        date_deleted: { $eq: null }
+        $match: {
+          user_id: getObjectIDFromString(currentUser._id),
+          date_deleted: { $eq: null }
+        }
       },
-      { _id: 1, title: 1, date_created: 1 },
-      true
-    );
+      { $project: { _id: 1, title: 1, date_created: 1 } },
+      { $sort: { date_created: -1 } }
+    ];
+
+    const dbResult = await matchProjectNotes(pipeline);
 
     if (Array.isArray(dbResult)) {
       userNotes = dbResult;

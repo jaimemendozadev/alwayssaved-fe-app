@@ -18,39 +18,10 @@ export const getNoteByID = async (noteID: string): Promise<LeanNote | void> => {
   return deepLean(foundNote);
 };
 
-interface SpecifiedNoteFields {
-  _id?: number;
-  user_id?: number;
-  title?: number;
-  date_created?: number;
-  date_deleted?: number;
-  files?: number;
-}
-
-interface SearchNoteFields {
-  _id?: unknown;
-  user_id?: unknown;
-  title?: unknown;
-  date_created?: unknown;
-  date_deleted?: unknown;
-  files?: unknown;
-}
-
-// TODO: Refactor matchProjectNotes to pass PipelineStage[] as function argument.
+// Signature of pipeline can be [{$match},{$project},{$sort}]
 export const matchProjectNotes = async (
-  match: SearchNoteFields,
-  projectFields: SpecifiedNoteFields,
-  sortByDateCreated: boolean = false
+  pipeline: PipelineStage[]
 ): Promise<LeanNote[]> => {
-  const pipeline: PipelineStage[] = [
-    { $match: match },
-    { $project: projectFields }
-  ];
-
-  if (sortByDateCreated) {
-    pipeline.push({ $sort: { date_created: -1 } });
-  }
-
   const foundNotes = await NoteModel.aggregate(pipeline);
 
   return deepLean(foundNotes);

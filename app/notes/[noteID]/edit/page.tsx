@@ -24,17 +24,23 @@ export default async function NoteEditPage({
     );
   }
 
-  const [currentNote] = await matchProjectNotes(
+  const pipeline = [
     {
-      _id: getObjectIDFromString(noteID),
-      user_id: getObjectIDFromString(currentUser._id),
-      date_deleted: { $eq: null }
+      $match: {
+        _id: getObjectIDFromString(noteID),
+        user_id: getObjectIDFromString(currentUser._id),
+        date_deleted: { $eq: null }
+      }
     },
     {
-      _id: 1,
-      title: 1
+      $project: {
+        _id: 1,
+        title: 1
+      }
     }
-  );
+  ];
+
+  const [currentNote] = await matchProjectNotes(pipeline);
 
   if (!currentNote) {
     throw new Error(
