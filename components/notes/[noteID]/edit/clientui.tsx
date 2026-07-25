@@ -194,27 +194,26 @@ export const ClientUI = ({
 
       {/*  Remove Files Attached to Your Note */}
 
-      <h2 className="text-3xl lg:text-4xl mb-10">
+      <h2 className="text-3xl lg:text-4xl mb-12">
         Remove Files Attached to Your Note
       </h2>
 
       <article className="mb-24">
-        <p className="text-lg mb-5 font-bold text-red-700">
+        <p className="text-2xl mb-5 font-bold text-red-700">
           📢 WARNING ABOUT DELETING .txt FILES:
         </p>
 
-        <p className="text-lg mb-3">
-          If you delete a .txt text file from your Note, any Conversation that
-          references that text File{' '}
+        <p className="text-2xl mb-3">
+          If you delete a <i>.txt</i> text file from your Note, the LLM{' '}
           <strong>
-            will severely affect the quality of your ongoing Conversation
-          </strong>
-          .
+            will no longer understand what you&apos;re talking about
+          </strong>{' '}
+          in past and future conversations.
         </p>
 
-        <p className="text-lg">
-          In other words, the LLM will no longer understand what you&apos;re
-          talking about going forward. 😵‍💫
+        <p className="text-2xl">
+          Essentially you&apos;re wiping the LLM&apos;s knowledge of your files
+          from it&apos;s memory. 😵‍💫
         </p>
       </article>
 
@@ -226,7 +225,7 @@ export const ClientUI = ({
       />
 
       {noteFiles.length > 0 && (
-        <ul className="space-y-4 mb-16">
+        <ul className="space-y-4 mb-24">
           {noteFiles.map((fileDoc) => (
             <li key={fileDoc._id} className="border p-5">
               <span className="font-semibold">File Name</span>:{' '}
