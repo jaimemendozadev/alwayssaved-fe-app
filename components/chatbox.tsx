@@ -7,7 +7,6 @@ import {
   useContext,
   useCallback
 } from 'react';
-import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { Button } from '@heroui/react';
@@ -18,8 +17,7 @@ import {
   LeanNote,
   LeanUser
 } from '@/utils/mongodb';
-import { BackendResponse, InputEvent, SubmitEvent } from '@/utils/ts';
-import { updateConversationByID } from '@/actions/schemamodels/conversations';
+import { BackendResponse, SubmitEvent } from '@/utils/ts';
 import { useLLMRequest } from '@/utils/hooks';
 import { HTTP_METHOD } from 'next/dist/server/web/http';
 import { ConvoContext } from './context';
@@ -33,7 +31,6 @@ interface ChatBoxProps {
 }
 
 const defaultInput = 'Ask something';
-// const DEFAULT_TITLE = 'Untitled';
 const toastOptions = { duration: 6000 };
 
 export const ChatBox = ({
@@ -42,21 +39,9 @@ export const ChatBox = ({
   currentNote
 }: ChatBoxProps): ReactNode => {
   const [userInput, setUserInput] = useState(defaultInput);
-  const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
-  const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
   const [inFlight, setFlightStatus] = useState(false);
   const { makeRequest } = useLLMRequest();
   const { updateThread, convoThread, currentConvo } = useContext(ConvoContext);
-  const router = useRouter();
-
-  const [prevConvo, setPrevConvo] = useState(currentConvo);
-  if (currentConvo !== prevConvo) {
-    setPrevConvo(currentConvo);
-    if (currentConvo) {
-      setConvoTitle(currentConvo?.title || DEFAULT_TITLE);
-      setDefaultTitle(currentConvo.title || DEFAULT_TITLE);
-    }
-  }
 
   const chatBoxChange = (
     evt: ChangeEvent<HTMLTextAreaElement> | FocusEvent<HTMLTextAreaElement>
@@ -181,42 +166,6 @@ export const ChatBox = ({
     ]
   );
 
-  // const titleChange = (evt: InputEvent) => {
-  //   if (evt?.type === 'blur') {
-  //     if (convoTitle.length === 0) {
-  //       setConvoTitle(defaultTitle);
-  //       return;
-  //     }
-  //   }
-
-  //   if (evt?.type === 'change') {
-  //     setConvoTitle(evt.target.value);
-  //     return;
-  //   }
-  // };
-
-  // const updateTitle = async (evt: SubmitEvent): Promise<void> => {
-  //   evt.preventDefault();
-
-  //   if (!currentConvo) return;
-
-  //   setFlightStatus(true);
-
-  //   const updatedConvo = await updateConversationByID(
-  //     currentConvo._id,
-  //     { title: convoTitle },
-  //     { returnDocument: 'after' }
-  //   );
-
-  //   if (updatedConvo) {
-  //     setDefaultTitle(updatedConvo.title);
-  //     toast.success('Your Conversation title has been updated.', toastOptions);
-  //   }
-
-  //   setFlightStatus(false);
-  //   router.refresh();
-  // };
-
   if (!currentConvo) return;
 
   return (
@@ -240,40 +189,6 @@ export const ChatBox = ({
           </Button>
         </div>
       </form>
-      {/* <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
-        <div className="flex items-end">
-          <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
-            <span className="font-bold">Conversation Title</span>:<br />
-            <input
-              className="w-[100%] p-2 border ounded-md rounded-md"
-              onBlur={titleChange}
-              onFocus={titleChange}
-              onChange={titleChange}
-              id="convoTitle"
-              name="convoTitle"
-              value={convoTitle}
-              disabled={inFlight}
-            />
-          </label>
-
-          <Button size="md" variant="ghost" type="submit" className="ml-4">
-            Submit
-          </Button>
-        </div>
-      </form> */}
-
-      {/* <div className="border-2 p-4 rounded-md">
-        <p className="mb-1">
-          <span className="font-bold">Convo Files</span>:
-        </p>
-        {convoFiles.length > 0 && (
-          <ul className="space-y-2">
-            {convoFiles.map((convoFile) => {
-              return <li key={convoFile._id}>{convoFile.file_name}</li>;
-            })}
-          </ul>
-        )}
-      </div> */}
     </div>
   );
 };

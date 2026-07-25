@@ -1,5 +1,8 @@
 'use client';
 import { ReactNode, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@heroui/react';
+import toast from 'react-hot-toast';
 import { ChatBox } from '@/components/chatbox';
 import {
   LeanConversation,
@@ -10,6 +13,9 @@ import {
 import { ChatThread } from '@/components/chatthread';
 import { ConvoContext } from '@/components/context';
 import { getConversationMessages } from '@/actions/schemamodels/convomessages';
+import { updateConversationByID } from '@/actions/schemamodels/conversations';
+import { InputEvent, SubmitEvent } from '@/utils/ts';
+
 interface ClientUIProps {
   currentUser: LeanUser;
   convo: LeanConversation;
@@ -18,6 +24,8 @@ interface ClientUIProps {
 }
 
 const DEFAULT_TITLE = 'Untitled';
+
+const toastOptions = { duration: 6000 };
 
 /* 
   7-25-26 TODO: 
@@ -31,27 +39,36 @@ export const ClientUI = ({
   currentNote
 }: ClientUIProps): ReactNode => {
   const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
-    const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
-
+  const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
+  const [inFlight, setFlightStatus] = useState(false);
+  const router = useRouter();
 
   const { currentConvo, convoThread, setCurrentConvo, updateThread } =
     useContext(ConvoContext);
 
+  const [prevConvo, setPrevConvo] = useState(currentConvo);
+
+  if (currentConvo !== prevConvo) {
+    setPrevConvo(currentConvo);
+    if (currentConvo) {
+      setConvoTitle(currentConvo?.title || DEFAULT_TITLE);
+      setDefaultTitle(currentConvo.title || DEFAULT_TITLE);
+    }
+  }
 
   const titleChange = (evt: InputEvent) => {
-      if (evt?.type === 'blur') {
-        if (convoTitle.length === 0) {
-          setConvoTitle(defaultTitle);
-          return;
-        }
-      }
-  
-      if (evt?.type === 'change') {
-        setConvoTitle(evt.target.value);
+    if (evt?.type === 'blur') {
+      if (convoTitle.length === 0) {
+        setConvoTitle(defaultTitle);
         return;
       }
-    };
+    }
 
+    if (evt?.type === 'change') {
+      setConvoTitle(evt.target.value);
+      return;
+    }
+  };
 
   const updateTitle = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
@@ -95,7 +112,6 @@ export const ClientUI = ({
     }
   }, []);
 
-
   // See Dev Notes below.
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
@@ -112,45 +128,42 @@ export const ClientUI = ({
       <section>
         <section>
           <div className="border-2 p-4 rounded-md">
-        <p className="mb-1">
-          <span className="font-bold">Convo Files</span>:
-        </p>
-        {convoFiles.length > 0 && (
-          <ul className="space-y-2">
-            {convoFiles.map((convoFile) => {
-              return <li key={convoFile._id}>{convoFile.file_name}</li>;
-            })}
-          </ul>
-        )}
-      </div>
+            <p className="mb-1">
+              <span className="font-bold">Convo Files</span>:
+            </p>
+            {convoFiles.length > 0 && (
+              <ul className="space-y-2">
+                {convoFiles.map((convoFile) => {
+                  return <li key={convoFile._id}>{convoFile.file_name}</li>;
+                })}
+              </ul>
+            )}
+          </div>
         </section>
 
-      <section>
-        <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
-        <div className="flex items-end">
-          <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
-            <span className="font-bold">Conversation Title</span>:<br />
-            <input
-              className="w-[100%] p-2 border ounded-md rounded-md"
-              onBlur={titleChange}
-              onFocus={titleChange}
-              onChange={titleChange}
-              id="convoTitle"
-              name="convoTitle"
-              value={convoTitle}
-              disabled={inFlight}
-            />
-          </label>
+        <section>
+          <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
+            <div className="flex items-end">
+              <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
+                <span className="font-bold">Conversation Title</span>:<br />
+                <input
+                  className="w-[100%] p-2 border ounded-md rounded-md"
+                  onBlur={titleChange}
+                  onFocus={titleChange}
+                  onChange={titleChange}
+                  id="convoTitle"
+                  name="convoTitle"
+                  value={convoTitle}
+                  disabled={inFlight}
+                />
+              </label>
 
-          <Button size="md" variant="ghost" type="submit" className="ml-4">
-            Submit
-          </Button>
-        </div>
-      </form>
-      </section>
-
-
-
+              <Button size="md" variant="ghost" type="submit" className="ml-4">
+                Submit
+              </Button>
+            </div>
+          </form>
+        </section>
       </section>
     </div>
   );
