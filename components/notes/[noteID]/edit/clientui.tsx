@@ -11,11 +11,9 @@ import {
 } from '@/utils/mongodb';
 import { deleteNoteByID } from '@/actions/schemamodels/notes';
 import { DeleteModal } from '@/components/deletemodal';
-import {
-  EditConvosSection,
-  FileUploadSection,
-  RemoveFilesSection
-} from './components';
+import { EditConvosSection, RemoveFilesSection } from './components';
+import { UploadInstructions } from '@/components/uploadinstructions';
+import { FileUpload } from '@/components/fileupload';
 
 interface ClientUIProps {
   currentUser: LeanUser;
@@ -67,11 +65,15 @@ export const ClientUI = ({
         Edit Page for Note: {currentNote?.title}
       </h1>
 
+      <h2 className="text-3xl lg:text-4xl mb-10">❌ Delete Your Note</h2>
+
       <div className="mb-32">
         <Button onPress={onOpen} color="danger" size="md" variant="ghost">
           Delete Note
         </Button>
       </div>
+
+      <hr className="mb-16" />
 
       <DeleteModal
         deleteCallback={deleteNoteCallback}
@@ -80,11 +82,19 @@ export const ClientUI = ({
         resourceType="Note"
       />
 
-      <FileUploadSection
-        currentNoteID={currentNoteID}
-        currentUser={currentUser}
-        handleRedirect={handleRedirect}
-      />
+      <h2 className="text-3xl lg:text-4xl mb-10">
+        💿 Upload More Files to Your Note
+      </h2>
+
+      <UploadInstructions />
+
+      <div className="mb-44">
+        <FileUpload
+          currentUser={currentUser}
+          currentNoteID={currentNoteID}
+          routerCallback={handleRedirect}
+        />
+      </div>
 
       <EditConvosSection
         currentUser={currentUser}
