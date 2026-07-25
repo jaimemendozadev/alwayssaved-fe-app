@@ -15,6 +15,8 @@ interface ClientUIProps {
 
 const toastOptions = { duration: 6000 };
 
+// 7-25-26 TODO: Might consider adding Create Convo button in ListItem
+
 export const ClientUI = ({
   userNotes,
   currentUser
@@ -60,13 +62,12 @@ export const ClientUI = ({
       ) : (
         <div className="mb-16">
           <p className="text-2xl mb-4">
-            Click on any Note Page link to create a new conversation or continue
-            a convo.
+            Click on the link to go to the Note&apos;s main page.
           </p>
 
           <p className="text-2xl mb-4">
-            You can also see all the files attached to your Note or add and
-            remove files.
+            From there you can manage and edit the Note&apos;s contents,
+            including starting a new LLM conversataion. 🤖
           </p>
         </div>
       )}
