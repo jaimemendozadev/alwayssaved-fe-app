@@ -28,7 +28,7 @@ export const createConversation = async (
   };
 
   const [newConvo] = await ConversationModel.create([convoPayload], {
-    j: true
+    j: true // See Dev Note #1 below.
   });
 
   return deepLean(newConvo);
@@ -54,7 +54,7 @@ export const updateConversationByID = async (
   return deepLean(updatedConvo);
 };
 
-// See Dev Note #1 below.
+// See Dev Note #2 below.
 export const deleteConvoByID = async (
   convoID: string
 ): Promise<LeanConversation> => {
@@ -67,7 +67,6 @@ export const deleteConvoByID = async (
     { date_deleted: deleteDate },
     { returnDocument: 'after' }
   ).exec();
-
 
   if (!deleteUpdate || deleteUpdate.date_deleted === null) {
     throw new Error(
@@ -82,7 +81,10 @@ export const deleteConvoByID = async (
  * Notes
  ***************************
 
- 1) Conversation documents are not
+ 1) See Model.prototype.save() options documentation:
+    https://mongoosejs.com/docs/api/model.html#Model.prototype.save()
+
+ 2) Conversation documents are not
     hard deleted in the app. They're marked with
     date_deleted value in the document and will
     be removed from the database in a separate

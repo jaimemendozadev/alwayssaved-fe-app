@@ -34,6 +34,7 @@ export default async function ConvoIDPage({
   const [targetConvo] = await matchProjectConversations([
     {
       $match: {
+        _id: getObjectIDFromString(convoID),
         user_id: getObjectIDFromString(currentUser._id),
         note_id: getObjectIDFromString(currentNote._id),
         date_deleted: { $eq: null },
@@ -45,7 +46,7 @@ export default async function ConvoIDPage({
 
   if (!targetConvo) {
     throw new Error(
-      `There was an error getting the Conversation ${convoID} for User ${currentUser._id} Note ${noteID}. Try again later.`
+      `There was an error getting the Conversation ${convoID} for User ${currentUser._id} and the Note ${noteID}. Try again later.`
     );
   }
 
