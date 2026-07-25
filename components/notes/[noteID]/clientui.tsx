@@ -76,59 +76,23 @@ export const ClientUI = ({
 
       <hr className="mb-16" />
 
-      <h2 className="text-3xl lg:text-4xl mb-10">💬 Current Conversations</h2>
+      <h2 className="text-3xl lg:text-4xl mb-10">📓 Current Conversations</h2>
 
       {convos.length === 0 && (
         <div className="mb-32">
           <p className="text-2xl mb-4">
             You have no Conversations for this Note.
           </p>
-          {noteFiles.length > 0 && (
-            <>
-              <p className="text-2xl mb-8">
-                Create a Conversation for this Note to start chatting with the
-                LLM. 🤖
-              </p>
-              <div>
-                <Button
-                  size="md"
-                  variant="ghost"
-                  onPress={async () => await handleNewConvo()}
-                >
-                  💬 Create Convo
-                </Button>
-              </div>
-            </>
-          )}
         </div>
       )}
 
       {convos.length > 0 && (
-        <div className="mb-44">
+        <div className="mb-32">
           <div className="mb-24">
             <p className="text-2xl mb-4">
-              Click on any Conversation link below to view the Convo Chat thread
-              and continue chatting with the LLM about your Note files. 🦾
+              Click on any Conversation link below to view the Chat thread and
+              continue talking with the LLM about your files. 💬
             </p>
-
-            {noteFiles.length > 0 && (
-              <>
-                <p className="text-2xl mb-16">
-                  Or you can click on the &lsquo;Create Convo&rsquo; button and
-                  start a new Conversation about your Note Files.
-                </p>
-
-                <div>
-                  <Button
-                    size="md"
-                    variant="ghost"
-                    onPress={async () => await handleNewConvo()}
-                  >
-                    💬 Create Convo
-                  </Button>
-                </div>
-              </>
-            )}
           </div>
 
           <ul className="space-y-7">
@@ -151,7 +115,11 @@ export const ClientUI = ({
         </div>
       )}
 
-      <h2 className="text-3xl lg:text-4xl mb-6">Files Attached to Your Note</h2>
+      <hr className="mb-16" />
+
+      <h2 className="text-3xl lg:text-4xl mb-6">
+        💿 Files Attached to Your Note
+      </h2>
 
       {noteFiles.length === 0 ? (
         <div className="mb-36">
