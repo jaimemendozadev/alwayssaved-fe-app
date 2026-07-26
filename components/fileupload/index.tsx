@@ -29,6 +29,7 @@ const toastOptions = { duration: 6000 };
 const getDefaultNoteTitle = () =>
   `Enter a New Note Title - ${dayjs().format('dddd, MMMM D, YYYY')}`;
 
+// 7-26-26 TODO: Need a separate flightStatus when updating Note Title
 export const FileUpload = ({
   currentUser,
   currentNoteID,
@@ -38,7 +39,7 @@ export const FileUpload = ({
   const [defaultTitle, setDefaultTitle] = useState(''); // Updater for setting current Note title
   const [localNote, setLocalNote] = useState<LeanNote | null>(null); // State tracker for init Note creation
 
-  const [inFlight, setFlightStatus] = useState(false);
+  const [inFlight, setFlightStatus] = useState(false); // flightStatus for File Uploads
   const [progressValue, updateProgress] = useState(0);
 
   const router = useRouter();
