@@ -39,7 +39,7 @@ interface TempConvoMessage {
 
 const DEFAULT_TITLE = 'Untitled';
 
-const toastOptions = { duration: 10000 };
+const toastOptions = { duration: 6000 };
 
 export const ClientUI = ({
   currentUser,
@@ -137,7 +137,7 @@ export const ClientUI = ({
 
       toast.loading(
         'The LLM message will appear at the bottom in a litle bit. ⏲️',
-        toastOptions
+        { duration: 12000 }
       );
 
       const chatRes = await makeRequest<
@@ -197,7 +197,7 @@ export const ClientUI = ({
   // See Dev Notes below.
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
-      <h1 className="text-3xl lg:text-6xl mb-16">
+      <h1 className="text-3xl lg:text-5xl mb-16">
         💬 Convo Page for: {currentConvo.title}
       </h1>
       <ChatThread convoThread={convoThread} />
