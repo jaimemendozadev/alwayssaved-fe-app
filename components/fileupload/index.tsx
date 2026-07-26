@@ -34,25 +34,28 @@ export const FileUpload = ({
   currentNoteID,
   routerCallback
 }: FileUploadProps): ReactNode => {
-  const [noteTitle, setNoteTitle] = useState('');
-  const [defaultTitle, setDefaultTitle] = useState('');
-  const [localNote, setLocalNote] = useState<LeanNote | null>(null);
+  const [noteTitle, setNoteTitle] = useState(''); // Updater for local Form handleChange
+  const [defaultTitle, setDefaultTitle] = useState(''); // Updater for setting current Note title
+  const [localNote, setLocalNote] = useState<LeanNote | null>(null); // State tracker for init Note creation
+
   const [inFlight, setFlightStatus] = useState(false);
   const [progressValue, updateProgress] = useState(0);
 
   const router = useRouter();
 
-  const noteKey = currentUser
-    ? `${currentUser._id}-${currentNoteID ?? ''}`
-    : null;
-  const [prevNoteKey, setPrevNoteKey] = useState(noteKey);
-  if (noteKey !== prevNoteKey) {
+  const [prevNoteKey, setPrevNoteKey] = useState<null | string>(null);
+
+  // If block only runs for first time Note creation
+  if (!currentNoteID && !prevNoteKey) {
+    const noteKey = currentUser
+      ? `${currentUser._id}-${currentNoteID ?? ''}`
+      : null;
+
+    const newDefaultTitle = getDefaultNoteTitle();
+
     setPrevNoteKey(noteKey);
-    if (currentUser && !currentNoteID) {
-      const newDefaultTitle = getDefaultNoteTitle();
-      setNoteTitle(newDefaultTitle);
-      setDefaultTitle(newDefaultTitle);
-    }
+    setNoteTitle(newDefaultTitle);
+    setDefaultTitle(newDefaultTitle);
   }
 
   const handleChange = (evt: InputEvent) => {
@@ -78,11 +81,12 @@ export const FileUpload = ({
     }
   };
 
-  const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
+  const handleFormSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
     if (!currentUser) return;
 
+    // We do not refresh the page on initial Note creation, store in localState
     if (!localNote) {
       const newNote = await createNoteDocument(currentUser._id, noteTitle);
 
@@ -93,8 +97,6 @@ export const FileUpload = ({
           toastOptions
         );
 
-        // TODO: Maybe we shouldn't refresh if the currentNoteID is null
-        // router.refresh();
         return;
       }
 
@@ -115,7 +117,7 @@ export const FileUpload = ({
     }
   };
 
-  const handleUpload = async <T extends File>(acceptedFiles: T[]) => {
+  const handleFileUpload = async <T extends File>(acceptedFiles: T[]) => {
     if (!currentUser) return;
 
     if (!localNote) {
@@ -128,9 +130,6 @@ export const FileUpload = ({
 
     setFlightStatus(true);
     updateProgress(7);
-
-    // TODO: Resolve what to do with this because this prevents build from happening.
-    // const isNewNote = currentNoteID === null;
 
     // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
@@ -302,7 +301,7 @@ export const FileUpload = ({
 
   return (
     <div className="w-[900px]">
-      <form onSubmit={handleSubmit} className="mb-8 border-2 p-4">
+      <form onSubmit={handleFormSubmit} className="mb-8 border-2 p-4">
         <div className="flex items-end">
           <label htmlFor="noteTitle" className="text-lg min-w-[400px]">
             <span className="font-bold">Note Title</span>:<br />
@@ -337,7 +336,7 @@ export const FileUpload = ({
         )}
       </div>
 
-      <Dropzone disabled={inFlight} onDrop={handleUpload}>
+      <Dropzone disabled={inFlight} onDrop={handleFileUpload}>
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
             <div {...getRootProps()}>
