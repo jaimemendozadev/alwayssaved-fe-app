@@ -7,8 +7,14 @@ import {
   CellMeasurer,
   CellMeasurerCache
 } from 'react-virtualized';
-import { TempConvoMessage } from './context/convocontext';
 import { MeasuredCellParent } from 'react-virtualized/dist/es/CellMeasurer';
+
+interface TempConvoMessage {
+  message?: string;
+  is_pending?: boolean;
+  is_thinking?: boolean;
+  temp_id?: string;
+}
 interface ChatThreadProps {
   convoThread: (LeanConvoMessage | TempConvoMessage)[];
 }
