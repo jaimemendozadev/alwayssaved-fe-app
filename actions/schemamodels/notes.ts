@@ -31,12 +31,23 @@ export const updateNoteByID = async (
   noteID: string,
   update: { [key: string]: unknown },
   options: { [key: string]: unknown } = {}
-): Promise<void> => {
-  await NoteModel.findByIdAndUpdate(
-    getObjectIDFromString(noteID),
-    update,
-    options
-  );
+): Promise<LeanNote | void> => {
+  try {
+    const dbRes = await NoteModel.findByIdAndUpdate(
+      getObjectIDFromString(noteID),
+      update,
+      options
+    );
+
+    if (dbRes) {
+      return deepLean(dbRes);
+    }
+
+    throw new Error(`There was a problem updating note ${noteID}`);
+  } catch (error) {
+    // TODO: Handle in Telemetry.
+    console.log('Error in updateNoteByID, ', error);
+  }
 };
 
 // See Dev Notes below.

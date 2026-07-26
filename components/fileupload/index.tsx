@@ -45,6 +45,9 @@ export const FileUpload = ({
 
   const [prevNoteKey, setPrevNoteKey] = useState<null | string>(null);
 
+  console.log('localNote: ', localNote);
+  console.log('\n');
+
   // If block only runs for first time Note creation
   if (!currentNoteID && !prevNoteKey) {
     const noteKey = currentUser
@@ -86,8 +89,11 @@ export const FileUpload = ({
 
     if (!currentUser) return;
 
-    // We do not refresh the page on initial Note creation, store in localState
+    setFlightStatus(true);
+
+    // We do not refresh the page on initial Note creation, store in localState.
     if (!localNote) {
+      // Error will be thrown if new Note is not created.
       const newNote = await createNoteDocument(currentUser._id, noteTitle);
 
       if (newNote) {
@@ -97,24 +103,42 @@ export const FileUpload = ({
           toastOptions
         );
 
+        setFlightStatus(false);
+
         return;
       }
 
-      // TODO: Should we throw an error here if we fail to create a new note?
+      toast.error(
+        'There was a problem creating your Note. Try again later. 🥺',
+        toastOptions
+      );
+      setFlightStatus(false);
+      return;
     }
 
     if (localNote) {
-      await updateNoteByID(localNote?._id, { title: noteTitle });
-      toast.success('Your Note title has been updated. 👏🏼', toastOptions);
+      const updatedNote = await updateNoteByID(
+        localNote?._id,
+        { title: noteTitle },
+        { new: true }
+      );
 
-      /*
-        TODO: 
-          - Verify how this works in a /notes/[noteID]/edit page & on /home page
-          - Maybe we shouldn't refresh if the currentNoteID is null
-      */
-      router.refresh();
-      return;
+      if (updatedNote) {
+        toast.success('Your Note title has been updated. 👏🏼', toastOptions);
+
+        setLocalNote(updatedNote);
+        setFlightStatus(false);
+
+        return;
+      }
+
+      toast.error(
+        'There was a problem creating your Note. Try again later. 🥺',
+        toastOptions
+      );
     }
+
+    setFlightStatus(false);
   };
 
   const handleFileUpload = async <T extends File>(acceptedFiles: T[]) => {
@@ -134,7 +158,7 @@ export const FileUpload = ({
     // 1) Create all the File documents associated with that Note.
     let currentFiles = [...acceptedFiles];
 
-    // TODO: Might want to add a check to handle only uploading '.mp4' or '.mp3' files in v1.
+    // 7-26-26 TODO: Add a verify check to upload only allowed file types (e.g. '.mp4' & '.mp3') in v1.
     const fileInfoArray = currentFiles.map((file) => ({
       name: file.name
     }));
@@ -173,7 +197,10 @@ export const FileUpload = ({
 
     updateProgress(32);
 
-    // 2) Create the presignUrls for each File document.
+    /* 
+      2) Create the presignUrls for each File document.
+      s3Key format: `{userID}/{noteID}/{fileID}/{file_name.file_extension}`
+    */
     const presignPayloads = await handlePresignedUrls(createdFiles);
 
     updateProgress(35);

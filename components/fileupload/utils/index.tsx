@@ -50,7 +50,10 @@ export const getFileExtension = (filePath: string): string => {
     const parsedUrl = new URL(filePath);
     pathToParse = parsedUrl.pathname; // safe extraction if it's a valid URL
   } catch (err) {
-    // TODO: Handle in telemetry.
+    /*
+      TODO: Handle in telemetry.
+      Note: Error will probably happen if filePath is an s3Key, which may not be a valid URL.
+    */
     console.log('Error in getFileExtension ', err);
   }
 
