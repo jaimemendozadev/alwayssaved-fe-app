@@ -1,26 +1,40 @@
 'use client';
-import { ReactNode, useContext, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { HTTP_METHOD } from 'next/dist/server/web/http';
 import { Button } from '@heroui/react';
 import toast from 'react-hot-toast';
+import { v4 as uuidv4 } from 'uuid';
 import { ChatBox } from '@/components/chatbox';
+import { ChatThread } from '@/components/chatthread';
 import {
+  getConversationMessages,
+  getConvoMessageByID
+} from '@/actions/schemamodels/convomessages';
+import { updateConversationByID } from '@/actions/schemamodels/conversations';
+import { useLLMRequest } from '@/utils/hooks';
+import { InputEvent, SubmitEvent, BackendResponse } from '@/utils/ts';
+import {
+  LeanConvoMessage,
+  getObjectIDFromString,
   LeanConversation,
   LeanFile,
   LeanNote,
   LeanUser
 } from '@/utils/mongodb';
-import { ChatThread } from '@/components/chatthread';
-import { ConvoContext } from '@/components/context';
-import { getConversationMessages } from '@/actions/schemamodels/convomessages';
-import { updateConversationByID } from '@/actions/schemamodels/conversations';
-import { InputEvent, SubmitEvent } from '@/utils/ts';
 
 interface ClientUIProps {
   currentUser: LeanUser;
-  convo: LeanConversation;
+  currentConvo: LeanConversation;
   convoFiles: LeanFile[];
   currentNote: LeanNote;
+}
+
+interface TempConvoMessage {
+  message?: string;
+  is_pending?: boolean;
+  is_thinking?: boolean;
+  temp_id?: string;
 }
 
 const DEFAULT_TITLE = 'Untitled';
@@ -34,26 +48,24 @@ const toastOptions = { duration: 6000 };
 */
 export const ClientUI = ({
   currentUser,
-  convo,
+  currentConvo,
   convoFiles,
   currentNote
 }: ClientUIProps): ReactNode => {
   const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
   const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
+  const [localConvo, setLocalConvo] = useState<null | LeanConversation>(null);
+  const [convoThread, updateThread] = useState<
+    (LeanConvoMessage | TempConvoMessage)[]
+  >([]);
+
   const [inFlight, setFlightStatus] = useState(false);
+  const { makeRequest } = useLLMRequest();
+
   const router = useRouter();
 
-  const { currentConvo, convoThread, setCurrentConvo, updateThread } =
-    useContext(ConvoContext);
-
-  const [prevConvo, setPrevConvo] = useState(currentConvo);
-
-  if (currentConvo !== prevConvo) {
-    setPrevConvo(currentConvo);
-    if (currentConvo) {
-      setConvoTitle(currentConvo?.title || DEFAULT_TITLE);
-      setDefaultTitle(currentConvo.title || DEFAULT_TITLE);
-    }
+  if (currentConvo && localConvo === null) {
+    setLocalConvo(currentConvo);
   }
 
   const titleChange = (evt: InputEvent) => {
@@ -92,23 +104,95 @@ export const ClientUI = ({
     router.refresh();
   };
 
-  useEffect(() => {
-    if (convo && setCurrentConvo && currentConvo === null) {
-      setCurrentConvo(convo);
+  const chatHandler = async (userInput: string): Promise<void> => {
+    const method: HTTP_METHOD = 'POST';
+
+    setFlightStatus(true);
+
+    const file_ids_list = convoFiles.map((leanFile) => leanFile._id);
+    const note_id = currentNote._id;
+
+    const userConvoMsg = {
+      conversation_id: getObjectIDFromString(currentConvo._id),
+      user_id: getObjectIDFromString(currentUser._id),
+      sender_type: 'user',
+      message: userInput.trim(),
+      file_ids_list,
+      note_id
+    };
+
+    const options = {
+      body: userConvoMsg,
+      method
+    };
+
+    const backendURL = `/convos/${currentConvo._id}`;
+
+    try {
+      const tempUpdate = [
+        ...convoThread,
+        { ...userConvoMsg, is_pending: true, temp_id: uuidv4() }
+      ];
+      updateThread(tempUpdate);
+
+      toast.loading(
+        'The LLM message will appear at the bottom in a litle bit. ⏲️',
+        toastOptions
+      );
+
+      const chatRes = await makeRequest<
+        BackendResponse<{
+          user_msg_id: string;
+          llm_response: LeanConvoMessage;
+        }>
+      >(backendURL, options);
+
+      console.log('chatRes in chatHandler ', chatRes);
+
+      updateThread((prevState) => {
+        const filtered = prevState.filter(
+          (leanMsg: TempConvoMessage | LeanConvoMessage) =>
+            'temp_id' in leanMsg === false
+        );
+
+        return filtered;
+      });
+
+      setFlightStatus(false);
+
+      if (chatRes && chatRes.payload) {
+        const { payload } = chatRes;
+        const { user_msg_id, llm_response } = payload;
+
+        const savedUserMsg = await getConvoMessageByID(user_msg_id);
+
+        updateThread((prevState) => [...prevState, savedUserMsg, llm_response]);
+
+        return;
+      }
+
+      throw new Error('Never received a response from the LLM Service.');
+    } catch (error) {
+      // TODO: Handle in telemetry.
+      console.log('Error in ChatBox submitChat ', error);
+      toast.error(
+        'There was a problem sending your message to the LLM. 🥺 Try again later.',
+        toastOptions
+      );
     }
-  }, [convo, currentConvo, setCurrentConvo]);
+
+    setFlightStatus(false);
+  };
 
   useEffect(() => {
     async function setConvoMessage(convoID: string) {
       const convoMessages = await getConversationMessages(convoID);
 
-      if (updateThread) {
-        updateThread(convoMessages);
-      }
+      updateThread(convoMessages);
     }
 
-    if (convo && updateThread) {
-      setConvoMessage(convo._id);
+    if (currentConvo) {
+      setConvoMessage(currentConvo._id);
     }
   }, []);
 
@@ -116,14 +200,10 @@ export const ClientUI = ({
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
       <h1 className="text-3xl lg:text-6xl mb-16">
-        💬 Convo Page for: {convo.title}
+        💬 Convo Page for: {currentConvo.title}
       </h1>
       <ChatThread convoThread={convoThread} />
-      <ChatBox
-        currentUser={currentUser}
-        currentNote={currentNote}
-        convoFiles={convoFiles}
-      />
+      <ChatBox chatHandler={chatHandler} inFlight={inFlight} />
 
       <section>
         <section>
