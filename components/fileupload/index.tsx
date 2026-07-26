@@ -94,7 +94,7 @@ export const FileUpload = ({
         );
 
         // TODO: Maybe we shouldn't refresh if the currentNoteID is null
-        router.refresh();
+        // router.refresh();
         return;
       }
 
