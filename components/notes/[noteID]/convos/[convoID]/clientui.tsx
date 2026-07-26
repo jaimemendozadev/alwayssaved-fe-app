@@ -201,6 +201,7 @@ export const ClientUI = ({
         💬 Convo Page for: {currentConvo.title}
       </h1>
       <ChatThread convoThread={convoThread} />
+
       <ChatBox chatHandler={chatHandler} inFlight={inFlight} />
 
       <section>

@@ -82,7 +82,7 @@ export const ChatThread = ({ convoThread }: ChatThreadProps): ReactNode => {
   // May delete this if it looks bad.
   if (convoThread.length === 0) {
     return (
-      <div className="w-[900px] h-[500px] mx-auto border-2 bg-white rounded-md"></div>
+      <div className="w-[900px] h-[500px] mx-auto mb-[60px] border-2 bg-white rounded-md"></div>
     );
   }
 
