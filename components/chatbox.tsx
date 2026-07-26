@@ -38,10 +38,13 @@ export const ChatBox = ({ chatHandler, inFlight }: ChatBoxProps): ReactNode => {
     }
   };
 
-  const submitChat = (evt: SubmitEvent) => {
+  // See Dev Note #1 below
+  const submitChat = async (evt: SubmitEvent) => {
     evt.preventDefault();
 
-    chatHandler(userInput);
+    await chatHandler(userInput);
+
+    setUserInput(defaultInput);
   };
 
   return (
@@ -68,3 +71,15 @@ export const ChatBox = ({ chatHandler, inFlight }: ChatBoxProps): ReactNode => {
     </div>
   );
 };
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) We have to wait for the Promise to resolve, which takes forever.
+    Only then can we reset the form with its default text. We may
+    need to refactor because the responsiveness of the UI 
+    could be improved.
+
+
+*/
