@@ -47,8 +47,16 @@ export const ClientUI = ({
   convoFiles,
   currentNote
 }: ClientUIProps): ReactNode => {
-  const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
-  const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
+  const [convoTitle, setConvoTitle] = useState(
+    () => currentConvo.title || DEFAULT_TITLE
+  );
+  const [prevConvoTitle, setPrevConvoTitle] = useState(currentConvo.title);
+
+  if (currentConvo.title !== prevConvoTitle) {
+    setPrevConvoTitle(currentConvo.title);
+    setConvoTitle(currentConvo.title || DEFAULT_TITLE);
+  }
+
   const [convoThread, updateThread] = useState<
     (LeanConvoMessage | TempConvoMessage)[]
   >([]);
@@ -58,10 +66,13 @@ export const ClientUI = ({
 
   const router = useRouter();
 
+  console.log('currentConvo: ', currentConvo);
+  console.log('\n');
+
   const titleChange = (evt: InputEvent) => {
     if (evt?.type === 'blur') {
       if (convoTitle.length === 0) {
-        setConvoTitle(defaultTitle);
+        setConvoTitle(currentConvo.title || DEFAULT_TITLE);
         return;
       }
     }
@@ -86,7 +97,6 @@ export const ClientUI = ({
     );
 
     if (updatedConvo) {
-      setDefaultTitle(updatedConvo.title);
       toast.success('Your Conversation title has been updated.', toastOptions);
     }
 
@@ -194,44 +204,43 @@ export const ClientUI = ({
       <ChatBox chatHandler={chatHandler} inFlight={inFlight} />
 
       <section>
-        <section>
-          <div className="border-2 p-4 rounded-md">
-            <p className="mb-1">
-              <span className="font-bold">Convo Files</span>:
-            </p>
-            {convoFiles.length > 0 && (
-              <ul className="space-y-2">
-                {convoFiles.map((convoFile) => {
-                  return <li key={convoFile._id}>{convoFile.file_name}</li>;
-                })}
-              </ul>
-            )}
+        <div className="border-2 p-4 rounded-md mb-8">
+          <p className="mb-1">
+            <span className="font-bold">Attached Convo Files</span>:
+          </p>
+          {convoFiles.length > 0 && (
+            <ul className="space-y-2">
+              {convoFiles.map((convoFile) => {
+                return <li key={convoFile._id}>{convoFile.file_name}</li>;
+              })}
+            </ul>
+          )}
+        </div>
+
+        <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
+          <div className="flex items-end">
+            <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
+              <span>
+                <b>Conversation Title</b> (<em>can be updated</em>)
+              </span>
+              :<br />
+              <input
+                className="w-[100%] p-2 border ounded-md rounded-md"
+                onBlur={titleChange}
+                onFocus={titleChange}
+                onChange={titleChange}
+                id="convoTitle"
+                name="convoTitle"
+                value={convoTitle}
+                disabled={inFlight}
+              />
+            </label>
+
+            <Button size="md" variant="ghost" type="submit" className="ml-4">
+              Submit
+            </Button>
           </div>
-        </section>
-
-        <section>
-          <form onSubmit={updateTitle} className="mb-8 border-2 p-4 rounded-md">
-            <div className="flex items-end">
-              <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
-                <span className="font-bold">Conversation Title</span>:<br />
-                <input
-                  className="w-[100%] p-2 border ounded-md rounded-md"
-                  onBlur={titleChange}
-                  onFocus={titleChange}
-                  onChange={titleChange}
-                  id="convoTitle"
-                  name="convoTitle"
-                  value={convoTitle}
-                  disabled={inFlight}
-                />
-              </label>
-
-              <Button size="md" variant="ghost" type="submit" className="ml-4">
-                Submit
-              </Button>
-            </div>
-          </form>
-        </section>
+        </form>
       </section>
     </div>
   );
