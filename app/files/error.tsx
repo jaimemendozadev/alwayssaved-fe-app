@@ -1,0 +1,28 @@
+'use client'; // Error boundaries must be Client Components
+import { ReactNode, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+
+const duration = { duration: 6000 };
+const toastMessage =
+  "Something went wrong. 🥺 You'll be redirected to the landing page in a few seconds.";
+
+export default function FileErrorPage({
+  error
+}: {
+  error: Error & { digest?: string };
+}): ReactNode {
+  const router = useRouter();
+
+  useEffect(() => {
+    toast.error(toastMessage, duration);
+    // TODO: Handle in telemetry.
+    console.log('Error in FilesPage: ', error);
+
+    setTimeout(() => {
+      router.push('/');
+    }, 3000);
+  }, [error, router]);
+
+  return null;
+}

@@ -25,6 +25,12 @@ export const LeftNavbar = (): ReactNode => {
 
       <li className="min-w-28 p-5 mb-2 w-36">
         <p className="text-[#919191] font-semibold">
+          <Link href="/files">🗄️ Files</Link>
+        </p>
+      </li>
+
+      <li className="min-w-28 p-5 mb-2 w-36">
+        <p className="text-[#919191] font-semibold">
           <Link href="/settings">⚙️ Settings</Link>
         </p>
       </li>
