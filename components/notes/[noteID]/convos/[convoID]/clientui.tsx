@@ -39,13 +39,8 @@ interface TempConvoMessage {
 
 const DEFAULT_TITLE = 'Untitled';
 
-const toastOptions = { duration: 6000 };
+const toastOptions = { duration: 10000 };
 
-/* 
-  7-25-26 TODO: 
-    - Decouple Note Title From and list of media files out of <ChatBox /> 
-    - Refamiliarize ConvoContext & reimplement to make it less confusng going forward
-*/
 export const ClientUI = ({
   currentUser,
   currentConvo,
@@ -54,7 +49,6 @@ export const ClientUI = ({
 }: ClientUIProps): ReactNode => {
   const [convoTitle, setConvoTitle] = useState(DEFAULT_TITLE);
   const [defaultTitle, setDefaultTitle] = useState(DEFAULT_TITLE);
-  const [localConvo, setLocalConvo] = useState<null | LeanConversation>(null);
   const [convoThread, updateThread] = useState<
     (LeanConvoMessage | TempConvoMessage)[]
   >([]);
@@ -63,10 +57,6 @@ export const ClientUI = ({
   const { makeRequest } = useLLMRequest();
 
   const router = useRouter();
-
-  if (currentConvo && localConvo === null) {
-    setLocalConvo(currentConvo);
-  }
 
   const titleChange = (evt: InputEvent) => {
     if (evt?.type === 'blur') {
@@ -147,8 +137,6 @@ export const ClientUI = ({
         }>
       >(backendURL, options);
 
-      console.log('chatRes in chatHandler ', chatRes);
-
       updateThread((prevState) => {
         const filtered = prevState.filter(
           (leanMsg: TempConvoMessage | LeanConvoMessage) =>
@@ -185,14 +173,14 @@ export const ClientUI = ({
   };
 
   useEffect(() => {
-    async function setConvoMessage(convoID: string) {
+    async function loadConvoMessages(convoID: string) {
       const convoMessages = await getConversationMessages(convoID);
 
       updateThread(convoMessages);
     }
 
     if (currentConvo) {
-      setConvoMessage(currentConvo._id);
+      loadConvoMessages(currentConvo._id);
     }
   }, []);
 

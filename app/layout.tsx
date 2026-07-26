@@ -4,7 +4,6 @@ import { HeroUIProvider } from '@heroui/react';
 import { Toaster } from 'react-hot-toast';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { ConvoProvider } from '@/components/context';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,16 +27,14 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <ConvoProvider>
-        <html lang="en">
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-          >
-            <Toaster />
-            <HeroUIProvider>{children}</HeroUIProvider>
-          </body>
-        </html>
-      </ConvoProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <Toaster />
+          <HeroUIProvider>{children}</HeroUIProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
