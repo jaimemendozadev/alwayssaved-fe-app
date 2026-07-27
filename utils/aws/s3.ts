@@ -42,10 +42,15 @@ export const getPresignedDownloadUrl = async (
 
   const client = new S3Client(config);
 
+  // See Note #4 below
+  const asciiFileName =
+    fileName.replace(/[^\x20-\x7E]/g, '_').replace(/"/g, "'") || 'download';
+  const encodedFileName = encodeURIComponent(fileName);
+
   const command = new GetObjectCommand({
     Bucket: AWS_BUCKET,
     Key: key,
-    ResponseContentDisposition: `attachment; filename="${fileName}"`
+    ResponseContentDisposition: `attachment; filename="${asciiFileName}"; filename*=UTF-8''${encodedFileName}`
   });
 
   const signedUrl = await getSignedUrl(client, command, { expiresIn });
@@ -94,6 +99,12 @@ export const deleteFileFromS3 = async (
 
 3) ResponseContentDisposition: 'attachment' forces the browser to download the
    file instead of rendering it inline (e.g. .txt files opening in a new tab).
+
+
+4) HTTP header values must be ISO-8859-1, so a fileName with non-Latin1
+   characters (e.g. "｜") breaks the raw filename= param. Sending both a
+   sanitized ASCII filename and an RFC 5987 filename*=UTF-8''<percent-encoded>
+   param lets modern browsers use the real name while staying header-safe.
 
 
 */
