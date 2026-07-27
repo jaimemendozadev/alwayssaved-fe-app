@@ -1,24 +1,23 @@
 'use server';
-import { PipelineStage } from 'mongoose';
+import { FilterQuery, PipelineStage } from 'mongoose';
 import { deleteFileFromS3 } from '@/utils/aws';
 import {
   deepLean,
   FileModel,
   getObjectIDFromString,
+  IFile,
   LeanFile
 } from '@/utils/mongodb';
 import { getQdrantDB } from '@/utils/qdrant';
 
 const { QDRANT_COLLECTION_NAME } = process.env;
 
-export const getFilesByNoteID = async (
-  noteID: string
+export const getFilesBy = async (
+  filter: FilterQuery<IFile> // See Dev Note #1 below.
 ): Promise<LeanFile[] | void> => {
-  const mongoID = getObjectIDFromString(noteID);
+  const noteFiles = await FileModel.find(filter).exec();
 
-  const noteFiles = await FileModel.find({ note_id: mongoID }).exec();
-
-  if (noteFiles.length === 0) return;
+  if (noteFiles.length === 0) return [];
 
   return deepLean(noteFiles);
 };
@@ -31,7 +30,7 @@ export const matchProjectFiles = async (
   return deepLean(foundNotes);
 };
 
-// See Dev Note #1 below.
+// See Dev Note #2 below.
 export const purgeFileByID = async (
   fileID: string,
   fileType: string
@@ -126,7 +125,13 @@ export const purgeFileByID = async (
  * Notes
  ********************************************
 
- 1) For MVP v1, purgeFileByID "deletes" by 
+ 1) Per Claude: Mongoose already ships a type for exactly this: FilterQuery<T>. 
+    It wraps every field in Condition<T> (which allows the raw value or query 
+    operators like $eq, $ne, $in, etc.), so you don't need to hand-annotate 
+    each field with the Mongo operator shapes yourself.
+
+
+ 2) For MVP v1, purgeFileByID "deletes" by 
     - Deleting the File from s3.
     - Updating the File.date_deleted property to today's date.
     - Deleting the Qdrant Vector DB points if it's a '.txt' file.

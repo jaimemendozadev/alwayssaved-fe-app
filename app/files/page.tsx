@@ -2,7 +2,15 @@
 import { ReactNode } from 'react';
 import { Spinner } from '@heroui/react';
 import { getUserFromDB } from '@/actions';
+import { getFilesBy } from '@/actions/schemamodels/files';
+import { getObjectIDFromString } from '@/utils/mongodb';
 
+/*
+  7-26-26 TODO: 
+    - For v1, display .txt files.
+    - Display other file types when Subscriptions are implemented.
+  
+*/
 export default async function FilesPage(): Promise<ReactNode> {
   const currentUser = await getUserFromDB();
 
@@ -19,9 +27,19 @@ export default async function FilesPage(): Promise<ReactNode> {
     );
   }
 
+  const filter = {
+    user_id: getObjectIDFromString(currentUser._id),
+    file_type: '.txt',
+    date_deleted: { $eq: null }
+  };
+
+  const transcripts = await getFilesBy(filter);
+
+  console.log('transcripts ', transcripts);
+
   return (
     <div>
-      <h1>🗄️ Files Page</h1>
+      <h1 className="text-3xl lg:text-6xl mb-16">🗄️ Files Page</h1>
     </div>
   );
 }
