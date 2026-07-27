@@ -17,10 +17,14 @@ export interface IFile {
   date_deleted: Date | null;
 }
 
-export type LeanFile = Omit<IFile, '_id' | 'user_id' | 'note_id'> & {
+export type LeanFile = Omit<
+  IFile,
+  '_id' | 'user_id' | 'note_id' | 'date_uploaded'
+> & {
   _id: string;
   user_id: string | LeanUser;
   note_id: string | LeanNote;
+  date_uploaded: string;
 };
 
 const { Schema, model } = mongoose;

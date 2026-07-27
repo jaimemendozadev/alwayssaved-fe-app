@@ -17,7 +17,7 @@ export const getFilesBy = async (
 ): Promise<LeanFile[] | void> => {
   const noteFiles = await FileModel.find(filter).exec();
 
-  if (noteFiles.length === 0) return [];
+  if (noteFiles.length === 0) return;
 
   return deepLean(noteFiles);
 };

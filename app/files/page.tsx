@@ -1,6 +1,7 @@
 'use server';
 import { ReactNode } from 'react';
 import { Spinner } from '@heroui/react';
+import { ClientUI } from '@/components/files';
 import { getUserFromDB } from '@/actions';
 import { getFilesBy } from '@/actions/schemamodels/files';
 import { getObjectIDFromString } from '@/utils/mongodb';
@@ -37,9 +38,9 @@ export default async function FilesPage(): Promise<ReactNode> {
 
   console.log('transcripts ', transcripts);
 
-  return (
-    <div>
-      <h1 className="text-3xl lg:text-6xl mb-16">🗄️ Files Page</h1>
-    </div>
-  );
+  if (transcripts) {
+    return <ClientUI currentUser={currentUser} userFiles={transcripts} />;
+  }
+
+  throw new Error('There was an error displaying the Files Page.');
 }
