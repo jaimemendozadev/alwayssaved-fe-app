@@ -40,14 +40,12 @@ export const FileUpload = ({
   const [localNote, setLocalNote] = useState<LeanNote | null>(null); // State tracker for init Note creation
 
   const [inFlight, setFlightStatus] = useState(false); // flightStatus for File Uploads
+  const [formInFlight, setFormFlightStatus] = useState(false);
   const [progressValue, updateProgress] = useState(0);
 
   const router = useRouter();
 
   const [prevNoteKey, setPrevNoteKey] = useState<null | string>(null);
-
-  console.log('localNote: ', localNote);
-  console.log('\n');
 
   // If block only runs for first time Note creation
   if (!currentNoteID && !prevNoteKey) {
@@ -90,7 +88,7 @@ export const FileUpload = ({
 
     if (!currentUser) return;
 
-    setFlightStatus(true);
+    setFormFlightStatus(true);
 
     // We do not refresh the page on initial Note creation, store in localState.
     if (!localNote) {
@@ -104,7 +102,7 @@ export const FileUpload = ({
           toastOptions
         );
 
-        setFlightStatus(false);
+        setFormFlightStatus(false);
 
         return;
       }
@@ -113,7 +111,7 @@ export const FileUpload = ({
         'There was a problem creating your Note. Try again later. 🥺',
         toastOptions
       );
-      setFlightStatus(false);
+      setFormFlightStatus(false);
       return;
     }
 
@@ -128,7 +126,7 @@ export const FileUpload = ({
         toast.success('Your Note title has been updated. 👏🏼', toastOptions);
 
         setLocalNote(updatedNote);
-        setFlightStatus(false);
+        setFormFlightStatus(false);
 
         return;
       }
@@ -139,7 +137,7 @@ export const FileUpload = ({
       );
     }
 
-    setFlightStatus(false);
+    setFormFlightStatus(false);
   };
 
   const handleFileUpload = async <T extends File>(acceptedFiles: T[]) => {
@@ -340,7 +338,7 @@ export const FileUpload = ({
               onChange={handleChange}
               id="noteTitle"
               value={noteTitle}
-              disabled={inFlight}
+              disabled={formInFlight || inFlight}
             />
           </label>
 
@@ -364,7 +362,7 @@ export const FileUpload = ({
         )}
       </div>
 
-      <Dropzone disabled={inFlight} onDrop={handleFileUpload}>
+      <Dropzone disabled={formInFlight || inFlight} onDrop={handleFileUpload}>
         {({ getRootProps, getInputProps }) => (
           <section className="border-4 border-dashed p-10">
             <div {...getRootProps()}>
