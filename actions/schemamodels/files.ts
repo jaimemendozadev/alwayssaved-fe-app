@@ -1,6 +1,7 @@
 'use server';
 import { FilterQuery, PipelineStage } from 'mongoose';
-import { deleteFileFromS3 } from '@/utils/aws';
+import { getUserFromDB } from '@/actions';
+import { deleteFileFromS3, getPresignedDownloadUrl } from '@/utils/aws';
 import {
   deepLean,
   FileModel,
@@ -121,6 +122,37 @@ export const purgeFileByID = async (
   return deepLean(updatedFile);
 };
 
+// See Dev Note #3 below.
+export const getFileDownloadUrl = async (fileID: string): Promise<string> => {
+  const currentUser = await getUserFromDB();
+
+  if (!currentUser) {
+    throw new Error(
+      `Can't get a download URL for File ${fileID} without a logged in user.`
+    );
+  }
+
+  const convertedFileID = getObjectIDFromString(fileID);
+
+  const foundFile = await FileModel.findById(convertedFileID).exec();
+
+  if (!foundFile) {
+    throw new Error(`No File found for fileID ${fileID}.`);
+  }
+
+  if (foundFile.user_id.toString() !== currentUser._id) {
+    throw new Error(
+      `User ${currentUser._id} is not authorized to download File ${fileID}.`
+    );
+  }
+
+  if (!foundFile.s3_key) {
+    throw new Error(`File ${fileID} has no s3_key and cannot be downloaded.`);
+  }
+
+  return getPresignedDownloadUrl(foundFile.s3_key, foundFile.file_name);
+};
+
 /********************************************
  * Notes
  ********************************************
@@ -131,9 +163,14 @@ export const purgeFileByID = async (
     each field with the Mongo operator shapes yourself.
 
 
- 2) For MVP v1, purgeFileByID "deletes" by 
+ 2) For MVP v1, purgeFileByID "deletes" by
     - Deleting the File from s3.
     - Updating the File.date_deleted property to today's date.
     - Deleting the Qdrant Vector DB points if it's a '.txt' file.
+
+
+ 3) getFileDownloadUrl re-checks that the File's user_id matches the logged in
+    user before signing a URL, since fileID is client-supplied and shouldn't be
+    trusted to belong to the requester on its own.
 
  */

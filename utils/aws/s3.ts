@@ -1,6 +1,7 @@
 'use server';
 import {
   PutObjectCommand,
+  GetObjectCommand,
   S3Client,
   DeleteObjectCommand,
   DeleteObjectCommandOutput
@@ -20,6 +21,33 @@ export const handlePresignedUrlsWithClient = async (
   const client = new S3Client(config);
 
   const command = new PutObjectCommand({ Bucket: AWS_BUCKET, Key: key });
+  const signedUrl = await getSignedUrl(client, command, { expiresIn });
+
+  return signedUrl;
+};
+
+// See Note #3 below
+export const getPresignedDownloadUrl = async (
+  key: string,
+  fileName: string,
+  expiresIn: number = 3600
+): Promise<string> => {
+  console.log('NODE_ENV ', NODE_ENV);
+  console.log('\n');
+
+  const config = getAWSConfigByEnv(NODE_ENV);
+
+  console.log('getPresignedDownloadUrl config ', config);
+  console.log('\n');
+
+  const client = new S3Client(config);
+
+  const command = new GetObjectCommand({
+    Bucket: AWS_BUCKET,
+    Key: key,
+    ResponseContentDisposition: `attachment; filename="${fileName}"`
+  });
+
   const signedUrl = await getSignedUrl(client, command, { expiresIn });
 
   return signedUrl;
@@ -61,7 +89,11 @@ export const deleteFileFromS3 = async (
     /{fileOwner}/{noteID}/{fileID}/{fileName}.{fileExtension} 
 
     fileOwner: is the User._id
-    fileName: is the name of the file with the fileType extension 
+    fileName: is the name of the file with the fileType extension
+
+
+3) ResponseContentDisposition: 'attachment' forces the browser to download the
+   file instead of rendering it inline (e.g. .txt files opening in a new tab).
 
 
 */
