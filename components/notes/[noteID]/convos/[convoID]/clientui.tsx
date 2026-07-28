@@ -104,9 +104,6 @@ export const ClientUI = ({
   const chatHandler = async (userInput: string): Promise<void> => {
     const method: HTTP_METHOD = 'POST';
 
-    console.log('userInput in chatHandler ', userInput);
-    console.log('\n');
-
     setFlightStatus(true);
 
     const file_ids_list = convoFiles.map((leanFile) => leanFile._id);
@@ -128,9 +125,6 @@ export const ClientUI = ({
 
     const backendURL = `/convos/${currentConvo._id}`;
 
-    console.log('backendURL in chatHandler ', backendURL);
-    console.log('\n');
-
     try {
       const tempUpdate = [
         ...convoThread,
@@ -149,9 +143,6 @@ export const ClientUI = ({
           llm_response: LeanConvoMessage;
         }>
       >(backendURL, options);
-
-      console.log('chatRes in chatHandler ', chatRes);
-      console.log('\n');
 
       updateThread((prevState) => {
         const filtered = prevState.filter(
