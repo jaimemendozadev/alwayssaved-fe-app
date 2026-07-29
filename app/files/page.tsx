@@ -15,9 +15,6 @@ import { getObjectIDFromString } from '@/utils/mongodb';
 export default async function FilesPage(): Promise<ReactNode> {
   const currentUser = await getUserFromDB();
 
-  console.log('currentUser in FilesPage ', currentUser);
-  console.log('\n');
-
   if (!currentUser) {
     return (
       <div className="p-6 w-[85%]">
@@ -35,8 +32,6 @@ export default async function FilesPage(): Promise<ReactNode> {
   };
 
   const transcripts = await getFilesBy(filter);
-
-  console.log('transcripts ', transcripts);
 
   return <ClientUI currentUser={currentUser} userFiles={transcripts} />;
 }

@@ -11,7 +11,7 @@ export default async function CommonPageLayout({
     <div className="flex">
       <LeftNavbar />
 
-      <main className="max-w-5/6 p-6 w-screen">{children}</main>
+      <main className="max-w-5/6 p-6 w-screen min-h-[1200px]">{children}</main>
     </div>
   );
 }
