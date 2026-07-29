@@ -15,10 +15,10 @@ const { QDRANT_COLLECTION_NAME } = process.env;
 
 export const getFilesBy = async (
   filter: FilterQuery<IFile> // See Dev Note #1 below.
-): Promise<LeanFile[] | void> => {
+): Promise<LeanFile[]> => {
   const noteFiles = await FileModel.find(filter).exec();
 
-  if (noteFiles.length === 0) return;
+  if (noteFiles.length === 0) return noteFiles;
 
   return deepLean(noteFiles);
 };

@@ -38,9 +38,5 @@ export default async function FilesPage(): Promise<ReactNode> {
 
   console.log('transcripts ', transcripts);
 
-  if (transcripts) {
-    return <ClientUI currentUser={currentUser} userFiles={transcripts} />;
-  }
-
-  throw new Error('There was an error displaying the Files Page.');
+  return <ClientUI currentUser={currentUser} userFiles={transcripts} />;
 }

@@ -55,7 +55,7 @@ export const ClientUI = ({
         📝 {currentUser?.first_name}&#39;s Files
       </h1>
 
-      {userFiles.length > 0 && (
+      {userFiles.length > 0 ? (
         <ul className="space-y-7">
           {userFiles.map((userFile) => {
             return (
@@ -78,6 +78,8 @@ export const ClientUI = ({
             );
           })}
         </ul>
+      ) : (
+        <p className="text-2xl">You have files available for download. 😔</p>
       )}
     </div>
   );
