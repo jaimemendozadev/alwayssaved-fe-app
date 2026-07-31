@@ -23,6 +23,8 @@ export default async function ConvoIDPage({
     );
   }
 
+  // See Dev Note #1 below.
+
   const currentNote = await getNoteByID(noteID);
 
   if (!currentNote) {
@@ -31,7 +33,7 @@ export default async function ConvoIDPage({
     );
   }
 
-  // See Dev Note #1 below.
+  // See Dev Note #2 below.
   const [currentConvo] = await matchProjectConversations([
     {
       $match: {
@@ -87,8 +89,14 @@ export default async function ConvoIDPage({
 /***************************
  * Notes
  ***************************
+ 
+ 1) 7-31-26 TODO: Should think about refactoring by hydrating Convo document 
+    with note in 'note_id' and replacing old call to finding the Note with
+    getting the ConvoMessages at top level of Page and feeding that to the
+    ClientUI instead of making the DB call for ConvoMessages in the UI.
 
- 1) 7-31-26 TODO: Need to reevaluate how ConvoMessages are recorded so
+
+ 2) 7-31-26 TODO: Need to reevaluate how ConvoMessages are recorded so
     that the chat order is correct. For v2, we want to create the ability
     for paid users to be able to download a .txt file of their chat convo.
     We need to make sure the ConvoMessage order is being correctly recorded
