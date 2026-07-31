@@ -55,6 +55,12 @@ export const ClientUI = ({
         📝 {currentUser?.first_name}&#39;s Files
       </h1>
 
+      {userFiles.length > 0 && (
+        <p className="text-xl lg:text-2xl mb-16">
+          Click on the file link to download it locally to your device. 👩🏽‍💻
+        </p>
+      )}
+
       {userFiles.length > 0 ? (
         <ul className="space-y-7">
           {userFiles.map((userFile) => {
