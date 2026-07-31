@@ -31,6 +31,7 @@ export default async function ConvoIDPage({
     );
   }
 
+  // See Dev Note #1 below.
   const [currentConvo] = await matchProjectConversations([
     {
       $match: {
@@ -82,3 +83,16 @@ export default async function ConvoIDPage({
     />
   );
 }
+
+/***************************
+ * Notes
+ ***************************
+
+ 1) 7-31-26 TODO: Need to reevaluate how ConvoMessages are recorded so
+    that the chat order is correct. For v2, we want to create the ability
+    for paid users to be able to download a .txt file of their chat convo.
+    We need to make sure the ConvoMessage order is being correctly recorded
+    so we can query the database to get all the convomessages for a chat and
+    ensure the convomessage order is correct.
+\
+*/
