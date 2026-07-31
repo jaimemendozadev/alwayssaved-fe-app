@@ -1,7 +1,6 @@
 'use client';
 import { ReactNode, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
@@ -19,7 +18,6 @@ export const ClientUI = ({
   userFiles,
   currentUser
 }: ClientUIProps): ReactNode => {
-  const router = useRouter();
   const [downloadingFileID, setDownloadingFileID] = useState<string | null>(
     null
   );
@@ -64,9 +62,19 @@ export const ClientUI = ({
       {userFiles.length > 0 ? (
         <ul className="space-y-7">
           {userFiles.map((userFile) => {
+            const noteTitle =
+              typeof userFile.note_id === 'object'
+                ? userFile.note_id.title
+                : 'Untitled';
+
+            const fileType = userFile.file_type;
+            const dateUploaded = dayjs(userFile.date_uploaded).format(
+              'dddd, MMMM D, YYYY'
+            );
+
             return (
               <li className="border-2 p-5" key={userFile._id}>
-                File Name:{' '}
+                <span className="font-semibold">File Name</span>:{' '}
                 <button
                   type="button"
                   className="underline hover:text-blue-600 disabled:opacity-50 disabled:no-underline"
@@ -77,9 +85,13 @@ export const ClientUI = ({
                     ? 'Downloading...'
                     : userFile.file_name}
                 </button>{' '}
-                &nbsp; | &nbsp; File Type: {userFile.file_type} &nbsp; | &nbsp;
-                Date Uploaded:{' '}
-                {dayjs(userFile.date_uploaded).format('dddd, MMMM D, YYYY')}
+                &nbsp; | &nbsp;{' '}
+                <span className="font-semibold">Belongs to Note</span>:{' '}
+                {noteTitle} &nbsp; | &nbsp;
+                <span className="font-semibold">File Type</span>: {fileType}{' '}
+                &nbsp; | &nbsp;
+                <span className="font-semibold">Date Uploaded</span>:{' '}
+                {dateUploaded}
               </li>
             );
           })}
