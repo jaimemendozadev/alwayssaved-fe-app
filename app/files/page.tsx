@@ -10,6 +10,10 @@ import { getObjectIDFromString } from '@/utils/mongodb';
   7-26-26 TODO: 
     - For v1, display .txt files.
     - Display other file types when Subscriptions are implemented.
+
+  7-31-26 TODO: 
+    - Use matchProjectFiles to get Files so you can also project/display
+      either the Note or Convo Name that the File is attached to.
   
 */
 export default async function FilesPage(): Promise<ReactNode> {
