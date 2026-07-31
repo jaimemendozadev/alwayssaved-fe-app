@@ -1,6 +1,9 @@
 'use server';
 import {
+  ConversationModel,
+  ConvoMessageModel,
   deepLean,
+  FileModel,
   getObjectIDFromString,
   LeanNote,
   NoteModel
@@ -50,15 +53,15 @@ export const updateNoteByID = async (
   }
 };
 
-// See Dev Notes below.
+// See Dev Note #1 below.
 export const deleteNoteByID = async (noteID: string): Promise<LeanNote> => {
-  const _id = getObjectIDFromString(noteID);
+  const note_id = getObjectIDFromString(noteID);
+  const date_deleted = new Date();
 
-  const deleteDate = new Date();
-
+  // Mark Note for deletion
   const deleteUpdate = await NoteModel.findOneAndUpdate(
-    _id,
-    { date_deleted: deleteDate },
+    note_id,
+    { date_deleted },
     { returnDocument: 'after' }
   ).exec();
 
@@ -68,6 +71,15 @@ export const deleteNoteByID = async (noteID: string): Promise<LeanNote> => {
     );
   }
 
+  // Mark attached Conversations for deletion
+  await ConversationModel.updateMany({ note_id }, { date_deleted }).exec();
+
+  // Mark attached ConvoMessages for deletion
+  await ConvoMessageModel.updateMany({ note_id }, { date_deleted }).exec();
+
+  // Mark attached Files for deletion
+  await FileModel.updateMany({ note_id }, { date_deleted }).exec();
+
   return deepLean(deleteUpdate);
 };
 
@@ -76,14 +88,13 @@ export const deleteNoteByID = async (noteID: string): Promise<LeanNote> => {
  ********************************************
 
  1) For MVP v1, deleteNoteByID "deletes" a Note by updating
-    the date_deleted property. In a separate async job,
-    a proper Note deletion will involve:
+    the date_deleted property. 
+    
+    In a separate async job, a proper Note deletion will involve:
 
-    - Getting all the Note's File DB references in NoteModel.files[].
-      - Deleting all Note's Files from s3.
-      - Deleting all the Vector points in Vector DB.
-      - Deleting File DB document.
-    - Deleting the Note DB document.
+    - Deleting all Note's Files from s3.
+    - Deleting all the Note's Vector points in Vector DB.
+    - Deleting the Note, Convo, ConvoMessages, and File documents from DB.
 
 
  */
