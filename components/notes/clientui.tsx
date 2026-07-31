@@ -66,8 +66,8 @@ export const ClientUI = ({
           </p>
 
           <p className="text-2xl mb-4">
-            From there you can manage and edit the Note&apos;s contents,
-            including starting a new LLM conversataion. 🤖
+            From there you can start a new LLM 🤖 conversataion or manage and
+            edit the Note&apos;s contents.
           </p>
         </div>
       )}
