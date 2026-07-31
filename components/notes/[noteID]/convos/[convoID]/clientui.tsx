@@ -196,9 +196,15 @@ export const ClientUI = ({
   // See Dev Notes below.
   return (
     <div className="min-h-screen p-6 flex flex-col justify-between">
-      <h1 className="text-3xl lg:text-5xl mb-16">
-        💬 Convo Page for: {currentConvo.title}
-      </h1>
+      <div className="mb-16">
+        <h1 className="text-2xl lg:text-4xl mb-6">
+          💬 Convo Page for Note: {currentNote.title}
+        </h1>
+
+        <h2 className="text-xl lg:text-3xl">
+          Convo Title: {currentConvo.title}
+        </h2>
+      </div>
       <ChatThread convoThread={convoThread} />
 
       <ChatBox chatHandler={chatHandler} inFlight={inFlight} />
@@ -206,7 +212,7 @@ export const ClientUI = ({
       <section>
         <div className="border-2 p-4 rounded-md mb-8">
           <p className="mb-1">
-            <span className="font-bold">Attached Convo Files</span>:
+            <span className="text-lg font-bold">Attached Convo Files</span>:
           </p>
           {convoFiles.length > 0 && (
             <ul className="space-y-2">
@@ -221,7 +227,7 @@ export const ClientUI = ({
           <div className="flex items-end">
             <label htmlFor="convoTitle" className="text-lg min-w-[400px]">
               <span>
-                <b>Conversation Title</b> (<em>can be updated</em>)
+                <b>Convo Title</b> (<em>can be updated</em>)
               </span>
               :<br />
               <input
