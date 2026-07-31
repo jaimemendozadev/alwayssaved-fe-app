@@ -48,7 +48,7 @@ export const ChatBox = ({ chatHandler, inFlight }: ChatBoxProps): ReactNode => {
   };
 
   return (
-    <div className="w-[700px] mx-auto mb-8 bg-white">
+    <div className="w-[700px] mx-auto mb-16 bg-white">
       <form onSubmit={submitChat} className="mb-8 border-2 p-4 rounded-md">
         <div className="flex items-center">
           <textarea

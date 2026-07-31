@@ -139,10 +139,9 @@ export const ClientUI = ({
       ];
       updateThread(tempUpdate);
 
-      toast.loading(
-        'The LLM message will appear at the bottom in a litle bit. ⏲️',
-        { duration: 12000 }
-      );
+      toast.loading('Waiting for the LLM to respond... ⏲️', {
+        duration: 10000
+      });
 
       const chatRes = await makeRequest<
         BackendResponse<{
