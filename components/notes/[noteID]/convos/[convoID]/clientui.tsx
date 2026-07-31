@@ -67,6 +67,13 @@ export const ClientUI = ({
   const router = useRouter();
 
   const titleChange = (evt: InputEvent) => {
+    if (evt?.type === 'focus') {
+      if (convoTitle === prevConvoTitle || convoTitle === DEFAULT_TITLE) {
+        setConvoTitle('');
+        return;
+      }
+    }
+
     if (evt?.type === 'blur') {
       if (convoTitle.length === 0) {
         setConvoTitle(currentConvo.title || DEFAULT_TITLE);
@@ -94,7 +101,7 @@ export const ClientUI = ({
     );
 
     if (updatedConvo) {
-      toast.success('Your Conversation title has been updated.', toastOptions);
+      toast.success('Your Convo title has been updated.', toastOptions);
     }
 
     setFlightStatus(false);
