@@ -9,6 +9,8 @@ interface ClientUIProps {
   convos: LeanConversation[];
 }
 
+// 7-31-26 TODO: Enable delete convo to list item & make sure JUST THE CONVO & CONVO MESSAGES get deleted
+
 export const ClientUI = ({ currentUser, convos }: ClientUIProps): ReactNode => {
   return (
     <div className="p-6 w-[85%]">
