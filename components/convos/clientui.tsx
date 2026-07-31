@@ -20,20 +20,31 @@ export const ClientUI = ({ currentUser, convos }: ClientUIProps): ReactNode => {
 
       {convos.length === 0 && (
         <div className="mb-32">
-          <p className="text-2xl mb-4">
+          <p className="text-2xl mb-10">
             You have no active Conversations at this time. 😔
           </p>
 
+          <p className="text-2xl mb-4">
+            You can go to the{' '}
+            <Link
+              className="hover:underline underline-offset-4 text-blue-700"
+              href="/notes"
+            >
+              Notes Page
+            </Link>{' '}
+            and select a Note to start an LLM Conversation there. 🤖
+          </p>
+
           <p className="text-2xl">
-            Go back to the{' '}
+            Or you can go back to the{' '}
             <Link
               className="hover:underline underline-offset-4 text-blue-700"
               href="/home"
             >
               Home Page
             </Link>
-            , upload some video files, and create a Note to get the LLM convos
-            started! 🤖💬
+            , upload some video files, and create a brand new Note to get the
+            LLM convos started! 💬
           </p>
         </div>
       )}
