@@ -24,7 +24,9 @@ export const getConvoMessageByID = async (
 export const getConversationMessages = async (convoID: string) => {
   const convoMessages = await ConvoMessageModel.find({
     conversation_id: getObjectIDFromString(convoID)
-  }).exec();
+  })
+    .sort({ date_sent: 1, _id: 1 })
+    .exec();
 
   return deepLean(convoMessages);
 };
@@ -40,5 +42,4 @@ export const deleteMessagesByConvoID = async (
     { conversation_id },
     { date_deleted: deleteDate }
   ).exec();
-
 };
